@@ -1,2 +1,2 @@
 # SonarExportingTool
-Wep app which name is selfexplainatory. The pourpose is to offer support to exporting the measures obtained with SonarCloud
+Wep app which name is selfexplainatory. The purpose is to offer support to exporting the measures obtained with SonarCloud
