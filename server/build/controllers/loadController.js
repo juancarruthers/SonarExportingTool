@@ -19,6 +19,7 @@ const path_1 = require("path");
 const metric_1 = require("../models/metric");
 const project_1 = require("../models/project");
 const project_measure_1 = require("./../models/project_measure");
+const component_1 = require("./../models/component");
 class LoadController {
     //Carga de las metricas obtenidas de la API de SONAR
     metrics(req, res) {
@@ -35,7 +36,7 @@ class LoadController {
                     console.log(err);
                 }));
             }
-            res.json(api_query["metrics"]);
+            console.log('Metrics is Loaded!');
         });
     }
     //Carga de las proyectos analizados de la API de SONAR
@@ -73,14 +74,49 @@ class LoadController {
                         console.log(err);
                     }));
                 }
-                res.json(api_query);
             }
             catch (error) {
                 console.log(error);
             }
+            console.log('Projectos is Loaded!');
         });
     }
-    //Carga de las metricas obtenidas de la API de SONAR
+    //Carga de los componentes de los proyectos analizados de la API de SONAR
+    components(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let projectsKeys = yield database_1.default.then((r) => r.query('SELECT p.idproject, p.key FROM projects AS p')
+                .catch(err => {
+                console.log(err);
+            }));
+            for (let proj of projectsKeys) {
+                let url = "https://sonarcloud.io/api/components/tree?component=" + proj['key'] + "&p=1&ps=500";
+                let api_query = yield cross_fetch_1.default(url).then(response => {
+                    return response.json();
+                });
+                let response_page = api_query["paging"];
+                let totalPages = response_page["total"] / 500;
+                let cont = 0;
+                let response_components;
+                while (cont < totalPages) {
+                    url = "https://sonarcloud.io/api/components/tree?component=" + proj['key'] + "&p=" + (cont + 1) + "&ps=500";
+                    api_query = yield cross_fetch_1.default(url).then(response => {
+                        return response.json();
+                    });
+                    response_components = api_query["components"];
+                    for (let comp of response_components) {
+                        let respComp = new component_1.Component(proj["idproject"], comp["name"], comp["qualifier"], comp["path"], comp["language"]);
+                        database_1.default.then((r) => r.query('INSERT INTO components set ?', [respComp])
+                            .catch(err => {
+                            console.log(err);
+                        }));
+                    }
+                    cont = cont + 1;
+                }
+            }
+            console.log('Components is Loaded!');
+        });
+    }
+    //Carga de las medidas de los proyectos obtenidas de la API de SONAR
     projectMeasures(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             let projectsKeys = yield database_1.default.then((r) => r.query('SELECT p.idproject, p.key FROM projects AS p')
@@ -106,7 +142,7 @@ class LoadController {
                     }));
                 }
             }
-            console.log('Process Ended!');
+            console.log('Project Measures is Loaded!');
         });
     }
 }
