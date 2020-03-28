@@ -3,7 +3,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 
 
-import indexRoutes from './routes/indexRoutes';
+import indexRoutes from './routes/loadRoutes';
 
 
 class Server {
