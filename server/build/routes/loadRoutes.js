@@ -10,6 +10,7 @@ class LoadRoutes {
     config() {
         this.router.get('/metrics', loadController_1.loadController.metrics);
         this.router.get('/projects', loadController_1.loadController.projects);
+        this.router.get('/project_measures', loadController_1.loadController.projectMeasures);
     }
 }
 const loadRoutes = new LoadRoutes();

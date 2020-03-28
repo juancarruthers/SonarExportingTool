@@ -14,6 +14,7 @@ class LoadRoutes {
     config(): void {
         this.router.get('/metrics', loadController.metrics);
         this.router.get('/projects', loadController.projects);
+        this.router.get('/project_measures', loadController.projectMeasures);
     }
 
 }
