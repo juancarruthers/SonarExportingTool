@@ -12,7 +12,7 @@ class LoadRoutes {
         this.router.get('/projects', loadController_1.loadController.projects);
         this.router.get('/components', loadController_1.loadController.components);
         this.router.get('/project_measures', loadController_1.loadController.projectMeasures);
-        //this.router.get('/component_measures', loadController.componentMeasures);
+        this.router.get('/component_measures1', loadController_1.loadController.componentMeasures);
     }
 }
 const loadRoutes = new LoadRoutes();

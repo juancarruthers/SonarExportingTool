@@ -17,13 +17,11 @@ class Server {
         this.app.set('port', process.env.PORT || 3000);
         this.app.use(morgan_1.default('dev'));
         this.app.use(cors_1.default());
-        //express.json() utilizado para comprender las solicitudes json de los clientes
         this.app.use(express_1.default.json());
         this.app.use(express_1.default.urlencoded({ extended: false }));
     }
     routes() {
         this.app.use(loadRoutes_1.default);
-        //this.app.use(gamesRoutes);
     }
     start() {
         this.app.listen(this.app.get('port'), () => {

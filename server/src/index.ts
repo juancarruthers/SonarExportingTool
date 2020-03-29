@@ -3,7 +3,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 
 
-import indexRoutes from './routes/loadRoutes';
+import loadRoutes from './routes/loadRoutes';
 
 
 class Server {
@@ -21,7 +21,6 @@ class Server {
         this.app.set('port', process.env.PORT || 3000);
         this.app.use(morgan('dev'));
         this.app.use(cors());
-        //express.json() utilizado para comprender las solicitudes json de los clientes
         this.app.use(express.json());
         this.app.use(express.urlencoded({extended: false}));
 
@@ -29,8 +28,7 @@ class Server {
 
     routes(): void {
 
-        this.app.use(indexRoutes);
-        //this.app.use(gamesRoutes);
+        this.app.use(loadRoutes);
 
     }
 
