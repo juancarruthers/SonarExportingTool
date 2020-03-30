@@ -4,7 +4,7 @@ import cors from 'cors';
 
 
 import loadRoutes from './routes/loadRoutes';
-
+import projectsRoutes from './routes/projectsRoutes';
 
 class Server {
 
@@ -29,6 +29,7 @@ class Server {
     routes(): void {
 
         this.app.use(loadRoutes);
+        this.app.use(projectsRoutes);
 
     }
 

@@ -12,11 +12,12 @@ class LoadRoutes {
     }
 
     config(): void {
-        this.router.get('/metrics', loadController.metrics);
+
+        /*this.router.get('/metrics', loadController.metrics);
         this.router.get('/projects', loadController.projects);
         this.router.get('/components', loadController.components);
         this.router.get('/project_measures', loadController.projectMeasures);
-        this.router.get('/component_measures1', loadController.componentMeasures);
+        this.router.get('/component_measures1', loadController.componentMeasures);*/
     }
 
 }
