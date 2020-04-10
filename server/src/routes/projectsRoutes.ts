@@ -14,7 +14,7 @@ class ProjectRoutes {
     config(): void {
 
         this.router.get('/api/projects', projectController.listProjects);
-        this.router.get('/api/projects/measures', projectController.listProjectsMeasures);
+        this.router.get('/api/projects/measures/:id/:type', projectController.downloadProjectMeasures);
     }
 
 }

@@ -16,8 +16,4 @@ export class ProjectsService {
     return this.http.get(`${this.API_URI}/projects`);
   }
 
-  getProjectMeasures(){
-    return this.http.get(`${this.API_URI}/projects/measures`);
-  }
-
 }

@@ -2,32 +2,39 @@
 
     <div class="row">
 
-        <div class="col-md-9">
+        <div class="col-md-11">
             <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First</th>
-                    <th scope="col">Last</th>
-                    <th scope="col">Handle</th>
+                    <th scope="col">Key</th>
+                    <th scope="col">Project</th>
+                    <th scope="col">Last Analysis</th>
+                    <th scope="col">Link to Sonar Cloud</th>
+                    <th scope="col">Link to Project</th>
+                    <th scope="col"><input type="checkbox" (change)="checkAll($event.target.checked)"></th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let project of projects">
-                    <th scope="row">{{project.idproject}}</th>
-                    <td>{{project.key}}</td>
-                    <td>{{project.name}}</td>
-                    <td>{{project.lastAnalysis}}</td>
+                    <td>{{ project.key }}</td>
+                    <td>{{ project.name }}</td>
+                    <td>{{ project.lastAnalysis }}</td>                   
+                    <td><a href="{{ 'https://sonarcloud.io/dashboard?id=unne.sonar%3A' + project.name.toLowerCase() }}">Sonar Cloud Measures</a></td>
+                    <td><a href="{{ project.projectLink }}"></a>Project</td>
+                    <td><input type="checkbox" id="{{ 'checkbox' + project.idproject }}" (change)="addElement($event.target.checked, project.idproject)"></td>
                   </tr>
-                </tbody>
+                  
+                  </tbody>
               </table>
         </div>
 
-        <div class="col-md-3">
-            <button type="button" class="btn btn-primary btn-lg btn-block" (click)="export()">
-                <i class="fas fa-file-export"></i>Export</button>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#staticBackdrop" (click)="export()">
+                <em class="fas fa-file-export"></em> Export</button>
         </div>
 
     </div>
+
+    <app-export-modal></app-export-modal>
 
 </div>

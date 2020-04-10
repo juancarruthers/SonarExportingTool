@@ -14,7 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database"));
 const fs_1 = __importDefault(require("fs"));
+const js2xmlparser_1 = require("js2xmlparser");
 class ProjectController {
+    constructor() {
+        this.dir = '/tmp/sonar';
+    }
     listProjects(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const query = yield database_1.default
@@ -26,11 +30,11 @@ class ProjectController {
             res.json(query);
         });
     }
-    listProjectsMeasures(req, res) {
+    listProjectsMeasures(p_paramsReceived) {
         return __awaiter(this, void 0, void 0, function* () {
             let queryProject = yield database_1.default
                 .then((r) => r
-                .query('SELECT * FROM projects'))
+                .query('SELECT * FROM projects WHERE idproject IN ( ? )', [p_paramsReceived]))
                 .catch(err => {
                 console.log(err);
             });
@@ -46,17 +50,38 @@ class ProjectController {
                 queryProject[index] = proj;
                 index = index + 1;
             }
-            //let xml = parse('projects',queryProject);
-            let file = JSON.stringify(queryProject);
-            fs_1.default.writeFile('/tmp/sonar/projects_measures.json', file, function (err) {
-                if (err)
-                    console.log(err);
-                res.download('/tmp/sonar/projects_measures.json');
-            });
-            /*fs.writeFile('/tmp/sonar/projects_measures.xml',xml, function (err) {
-                if (err) console.log(err);
-                res.download('/tmp/sonar/projects_measures.xml');
-            });*/
+            return queryProject;
+        });
+    }
+    downloadProjectMeasures(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            const { type } = req.params;
+            const projectsIds = id.split(',');
+            let projectMeasures = yield exports.projectController.listProjectsMeasures(projectsIds);
+            if (!fs_1.default.existsSync(exports.projectController.dir)) {
+                fs_1.default.mkdirSync(exports.projectController.dir);
+            }
+            switch (type) {
+                case 'json':
+                    let file = JSON.stringify(projectMeasures);
+                    fs_1.default.writeFile('/tmp/sonar/projects_measures.json', file, function (err) {
+                        if (err)
+                            console.log(err);
+                        res.download('/tmp/sonar/projects_measures.json');
+                    });
+                    break;
+                case 'xml':
+                    let xml = js2xmlparser_1.parse('projects', projectMeasures);
+                    fs_1.default.writeFile('/tmp/sonar/projects_measures.xml', xml, function (err) {
+                        if (err)
+                            console.log(err);
+                        res.download('/tmp/sonar/projects_measures.xml');
+                    });
+                    break;
+                case 'csv':
+                    break;
+            }
         });
     }
 }

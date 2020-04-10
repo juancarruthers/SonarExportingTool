@@ -9,7 +9,7 @@ class ProjectRoutes {
     }
     config() {
         this.router.get('/api/projects', projectController_1.projectController.listProjects);
-        this.router.get('/api/projects/measures', projectController_1.projectController.listProjectsMeasures);
+        this.router.get('/api/projects/measures/:id/:type', projectController_1.projectController.downloadProjectMeasures);
     }
 }
 const projectRoutes = new ProjectRoutes();

@@ -1,0 +1,4 @@
+From jext
+
+'src/plugins/Php/trans/Français/PHPPlugin.props.xml'
+'src/plugins/Php/trans/Français'
