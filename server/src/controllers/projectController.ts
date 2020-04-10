@@ -3,14 +3,17 @@ import pool from '../database';
 import { Pool } from 'promise-mysql';
 import fs from 'fs';
 import { parse } from 'js2xmlparser';
+import JSZip from 'jszip';
 
 
 class ProjectController {
 
     dir : string;
+    zip : JSZip;
 
     constructor(){
         this.dir = '/tmp/sonar';
+        this.zip = new JSZip();
     }
 
     public async listProjects (req:Request, res:Response): Promise<void>{
@@ -26,10 +29,10 @@ class ProjectController {
 
     }   
 
-    public async listProjectsMeasures (p_paramsReceived: Array<string>): Promise<any>{   
+    public async listProjectsMeasures (p_paramsReceived: Array<string>): Promise<any>{         
         let queryProject = await pool
             .then((r: Pool) => r
-            .query('SELECT * FROM projects WHERE idproject IN ( ? )',[p_paramsReceived])
+            .query('SELECT p.idproject, p.key, p.name, p.qualifier, p.lastAnalysis FROM projects AS p WHERE idproject IN ( ? )',[p_paramsReceived])
             )
             .catch(err =>{
                 console.log(err)
@@ -65,33 +68,58 @@ class ProjectController {
 
         if (!fs.existsSync(projectController.dir)){
             fs.mkdirSync(projectController.dir);
-        }   
+        }
         
         switch (type) {
             case 'json':
-
-                let file = JSON.stringify(projectMeasures);
-                fs.writeFile('/tmp/sonar/projects_measures.json',file, function (err) {
-                    if (err) console.log(err);
-                    res.download('/tmp/sonar/projects_measures.json');
-                });
+                
+                projectController.generateJsonFile(projectMeasures);
 
             break;
         
-            case 'xml':
-
-                let xml = parse('projects',projectMeasures);
-                fs.writeFile('/tmp/sonar/projects_measures.xml',xml, function (err) {
-                    if (err) console.log(err);
-                    res.download('/tmp/sonar/projects_measures.xml');
-                });
+            case 'xml':               
+                
+                projectController.generateXmlFile(projectMeasures);
 
             break;
 
             case 'csv':
             break;
+
+            
         }
         
+        projectController.zipFile(res);
+    }
+
+    
+
+    generateJsonFile(p_projectMeasures:any){
+        for(let proj of p_projectMeasures){
+            let file = JSON.stringify(proj);
+            let name : string = proj['name'].replace(/\s+/g, '') + ".json";
+            this.zip.file(name, file);       
+        }
+        
+    }
+
+    generateXmlFile(p_projectMeasures:any){
+        for(let proj of p_projectMeasures){
+            let file = parse('project',proj);
+            let name : string = proj['name'].replace(/\s+/g, '') + ".xml";
+            this.zip.file( name, file);   
+        }
+    }
+
+    public async zipFile (res:Response) {
+        this.zip
+        .generateAsync({type:"nodebuffer"})
+        .then(function (content) {
+            fs.writeFile('/tmp/sonar/projects_measures.zip', content, function(err){
+                console.log(err?.path);
+            });
+        });
+        res.download('/tmp/sonar/projects_measures.zip');
     }
     
 

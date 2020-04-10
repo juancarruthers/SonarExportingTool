@@ -15,9 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database"));
 const fs_1 = __importDefault(require("fs"));
 const js2xmlparser_1 = require("js2xmlparser");
+const jszip_1 = __importDefault(require("jszip"));
 class ProjectController {
     constructor() {
         this.dir = '/tmp/sonar';
+        this.zip = new jszip_1.default();
     }
     listProjects(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -34,7 +36,7 @@ class ProjectController {
         return __awaiter(this, void 0, void 0, function* () {
             let queryProject = yield database_1.default
                 .then((r) => r
-                .query('SELECT * FROM projects WHERE idproject IN ( ? )', [p_paramsReceived]))
+                .query('SELECT p.idproject, p.key, p.name, p.qualifier, p.lastAnalysis FROM projects AS p WHERE idproject IN ( ? )', [p_paramsReceived]))
                 .catch(err => {
                 console.log(err);
             });
@@ -64,24 +66,41 @@ class ProjectController {
             }
             switch (type) {
                 case 'json':
-                    let file = JSON.stringify(projectMeasures);
-                    fs_1.default.writeFile('/tmp/sonar/projects_measures.json', file, function (err) {
-                        if (err)
-                            console.log(err);
-                        res.download('/tmp/sonar/projects_measures.json');
-                    });
+                    exports.projectController.generateJsonFile(projectMeasures);
                     break;
                 case 'xml':
-                    let xml = js2xmlparser_1.parse('projects', projectMeasures);
-                    fs_1.default.writeFile('/tmp/sonar/projects_measures.xml', xml, function (err) {
-                        if (err)
-                            console.log(err);
-                        res.download('/tmp/sonar/projects_measures.xml');
-                    });
+                    exports.projectController.generateXmlFile(projectMeasures);
                     break;
                 case 'csv':
                     break;
             }
+            exports.projectController.zipFile(res);
+        });
+    }
+    generateJsonFile(p_projectMeasures) {
+        for (let proj of p_projectMeasures) {
+            let file = JSON.stringify(proj);
+            let name = proj['name'].replace(/\s+/g, '') + ".json";
+            this.zip.file(name, file);
+        }
+    }
+    generateXmlFile(p_projectMeasures) {
+        for (let proj of p_projectMeasures) {
+            let file = js2xmlparser_1.parse('project', proj);
+            let name = proj['name'].replace(/\s+/g, '') + ".xml";
+            this.zip.file(name, file);
+        }
+    }
+    zipFile(res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.zip
+                .generateAsync({ type: "nodebuffer" })
+                .then(function (content) {
+                fs_1.default.writeFile('/tmp/sonar/projects_measures.zip', content, function (err) {
+                    console.log(err === null || err === void 0 ? void 0 : err.path);
+                });
+            });
+            res.download('/tmp/sonar/projects_measures.zip');
         });
     }
 }
