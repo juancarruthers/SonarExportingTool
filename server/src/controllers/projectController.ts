@@ -98,28 +98,30 @@ class ProjectController {
         for(let proj of p_projectMeasures){
             let file = JSON.stringify(proj);
             let name : string = proj['name'].replace(/\s+/g, '') + ".json";
-            this.zip.file(name, file);       
+            projectController.zip.file(name, file);       
         }
         
     }
 
-    generateXmlFile(p_projectMeasures:any){
+    generateXmlFile(p_projectMeasures:any){       
         for(let proj of p_projectMeasures){
             let file = parse('project',proj);
             let name : string = proj['name'].replace(/\s+/g, '') + ".xml";
-            this.zip.file( name, file);   
+            projectController.zip.file( name, file);   
         }
     }
 
     public async zipFile (res:Response) {
-        this.zip
+        projectController.zip
         .generateAsync({type:"nodebuffer"})
         .then(function (content) {
-            fs.writeFile('/tmp/sonar/projects_measures.zip', content, function(err){
+            fs.writeFile(projectController.dir + '/projects_measures.zip', content, function(err){
                 if (err) console.log(err);
+                res.download(projectController.dir + '/projects_measures.zip');
             });
         });
-        res.download('/tmp/sonar/projects_measures.zip');
+        projectController.zip = new JSZip();
+        
     }
     
 

@@ -19,7 +19,7 @@
                     <td>{{ project.key }}</td>
                     <td>{{ project.name }}</td>
                     <td>{{ project.lastAnalysis }}</td>                   
-                    <td><a href="{{ 'https://sonarcloud.io/dashboard?id=unne.sonar%3A' + project.name.toLowerCase() }}">Sonar Cloud Measures</a></td>
+                    <td><a href="{{ 'https://sonarcloud.io/dashboard?id=unne.sonar%3A' + project.name.toLowerCase().replace(' ', '-') }}">Sonar Cloud Measures</a></td>
                     <td><a href="{{ project.projectLink }}"></a>Project</td>
                     <td><input type="checkbox" id="{{ 'checkbox' + project.idproject }}" (change)="addElement($event.target.checked, project.idproject)"></td>
                   </tr>

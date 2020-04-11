@@ -1,5 +1,4 @@
-import { Request, Response } from 'express';
-import pool from '../database';
+import pool from './database';
 import { Pool } from 'promise-mysql';
 
 
@@ -7,17 +6,17 @@ import fetch from 'cross-fetch';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
-import { Metric } from '../models/metric';
-import { Project } from '../models/project';
-import { Project_measure } from './../models/project_measure';
-import { Component_measure } from './../models/component_measure';
-import { Component } from './../models/component';
+import { Metric } from './models/metric';
+import { Project } from './models/project';
+import { Project_measure } from './models/project_measure';
+import { Component_measure } from './models/component_measure';
+import { Component } from './models/component';
 
-class LoadController {
+class LoadAPIModule {
 
 
   //Carga de las metricas obtenidas de la API de SONAR
-  public async metrics(req:Request, res:Response){
+  public async metrics(){
 
     let url = "https://sonarcloud.io/api/metrics/search?p=1&ps=105";
 
@@ -46,7 +45,7 @@ class LoadController {
   }
 
   //Carga de las proyectos analizados de la API de SONAR
-  public async projects(req:Request, res:Response){
+  public async projects(){
     try {
       var key: string;
       
@@ -76,7 +75,7 @@ class LoadController {
 
       for(let proj of response){
 
-        let timestamp = proj["lastAnalysisDate"].split('T');;
+        let timestamp = proj["lastAnalysisDate"].split('T');
         let date = timestamp[0].split('-');
         let time = timestamp[1].split('+');
         let hours = time[0].split(':');
@@ -96,12 +95,12 @@ class LoadController {
       console.log(error);
     }   
     
-    console.log('Projectos is Loaded!');
+    console.log('Projects is Loaded!');
           
   }
 
   //Carga de los componentes de los proyectos analizados de la API de SONAR. Eliminados dos componentes del proyecto Jedit
-  public async components(req:Request, res:Response){
+  public async components(){
 
     let projectsKeys = await pool
       .then((r: Pool) => r.query('SELECT p.idproject, p.key FROM projects AS p')
@@ -164,7 +163,7 @@ class LoadController {
   }
 
   //Carga de las medidas de los proyectos obtenidas de la API de SONAR
-  public async projectMeasures(req:Request, res:Response){
+  public async projectMeasures(){
     
     let projectsKeys = await pool
       .then((r: Pool) => r.query('SELECT p.idproject, p.key FROM projects AS p')
@@ -214,7 +213,7 @@ class LoadController {
   }
 
   //Carga de las medidas de los componentes del proyecto obtenidas de la API de SONAR
-  public async componentMeasures(req:Request, res:Response){
+  public async componentMeasures(){
     
     let projectsKeys = await pool
       .then((r: Pool) => r.query('SELECT p.idproject, p.key FROM projects AS p')
@@ -283,4 +282,9 @@ class LoadController {
 
 }
 
-export const loadController = new LoadController();
+export const loadModule = new LoadAPIModule();
+loadModule.metrics();
+loadModule.projects();
+loadModule.components();
+loadModule.projectMeasures();
+loadModule.componentMeasures();

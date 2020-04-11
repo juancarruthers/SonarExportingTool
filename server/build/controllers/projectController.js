@@ -81,27 +81,28 @@ class ProjectController {
         for (let proj of p_projectMeasures) {
             let file = JSON.stringify(proj);
             let name = proj['name'].replace(/\s+/g, '') + ".json";
-            this.zip.file(name, file);
+            exports.projectController.zip.file(name, file);
         }
     }
     generateXmlFile(p_projectMeasures) {
         for (let proj of p_projectMeasures) {
             let file = js2xmlparser_1.parse('project', proj);
             let name = proj['name'].replace(/\s+/g, '') + ".xml";
-            this.zip.file(name, file);
+            exports.projectController.zip.file(name, file);
         }
     }
     zipFile(res) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.zip
+            exports.projectController.zip
                 .generateAsync({ type: "nodebuffer" })
                 .then(function (content) {
-                fs_1.default.writeFile('/tmp/sonar/projects_measures.zip', content, function (err) {
+                fs_1.default.writeFile(exports.projectController.dir + '/projects_measures.zip', content, function (err) {
                     if (err)
                         console.log(err);
+                    res.download(exports.projectController.dir + '/projects_measures.zip');
                 });
             });
-            res.download('/tmp/sonar/projects_measures.zip');
+            exports.projectController.zip = new jszip_1.default();
         });
     }
 }

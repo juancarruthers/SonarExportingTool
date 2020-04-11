@@ -12,18 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const database_1 = __importDefault(require("../database"));
+const database_1 = __importDefault(require("./database"));
 const cross_fetch_1 = __importDefault(require("cross-fetch"));
 const fs_1 = require("fs");
 const path_1 = require("path");
-const metric_1 = require("../models/metric");
-const project_1 = require("../models/project");
-const project_measure_1 = require("./../models/project_measure");
-const component_measure_1 = require("./../models/component_measure");
-const component_1 = require("./../models/component");
-class LoadController {
+const metric_1 = require("./models/metric");
+const project_1 = require("./models/project");
+const project_measure_1 = require("./models/project_measure");
+const component_measure_1 = require("./models/component_measure");
+const component_1 = require("./models/component");
+class LoadAPIModule {
     //Carga de las metricas obtenidas de la API de SONAR
-    metrics(req, res) {
+    metrics() {
         return __awaiter(this, void 0, void 0, function* () {
             let url = "https://sonarcloud.io/api/metrics/search?p=1&ps=105";
             let api_query = yield cross_fetch_1.default(url)
@@ -46,7 +46,7 @@ class LoadController {
         });
     }
     //Carga de las proyectos analizados de la API de SONAR
-    projects(req, res) {
+    projects() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 var key;
@@ -71,7 +71,6 @@ class LoadController {
                 let response = api_query["components"];
                 for (let proj of response) {
                     let timestamp = proj["lastAnalysisDate"].split('T');
-                    ;
                     let date = timestamp[0].split('-');
                     let time = timestamp[1].split('+');
                     let hours = time[0].split(':');
@@ -88,11 +87,11 @@ class LoadController {
             catch (error) {
                 console.log(error);
             }
-            console.log('Projectos is Loaded!');
+            console.log('Projects is Loaded!');
         });
     }
     //Carga de los componentes de los proyectos analizados de la API de SONAR. Eliminados dos componentes del proyecto Jedit
-    components(req, res) {
+    components() {
         return __awaiter(this, void 0, void 0, function* () {
             let projectsKeys = yield database_1.default
                 .then((r) => r.query('SELECT p.idproject, p.key FROM projects AS p')
@@ -137,7 +136,7 @@ class LoadController {
         });
     }
     //Carga de las medidas de los proyectos obtenidas de la API de SONAR
-    projectMeasures(req, res) {
+    projectMeasures() {
         return __awaiter(this, void 0, void 0, function* () {
             let projectsKeys = yield database_1.default
                 .then((r) => r.query('SELECT p.idproject, p.key FROM projects AS p')
@@ -173,7 +172,7 @@ class LoadController {
         });
     }
     //Carga de las medidas de los componentes del proyecto obtenidas de la API de SONAR
-    componentMeasures(req, res) {
+    componentMeasures() {
         return __awaiter(this, void 0, void 0, function* () {
             let projectsKeys = yield database_1.default
                 .then((r) => r.query('SELECT p.idproject, p.key FROM projects AS p')
@@ -221,4 +220,9 @@ class LoadController {
         });
     }
 }
-exports.loadController = new LoadController();
+exports.loadModule = new LoadAPIModule();
+exports.loadModule.metrics();
+exports.loadModule.projects();
+exports.loadModule.components();
+exports.loadModule.projectMeasures();
+exports.loadModule.componentMeasures();
