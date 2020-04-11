@@ -97,7 +97,8 @@ class ProjectController {
                 .generateAsync({ type: "nodebuffer" })
                 .then(function (content) {
                 fs_1.default.writeFile('/tmp/sonar/projects_measures.zip', content, function (err) {
-                    console.log(err === null || err === void 0 ? void 0 : err.path);
+                    if (err)
+                        console.log(err);
                 });
             });
             res.download('/tmp/sonar/projects_measures.zip');
