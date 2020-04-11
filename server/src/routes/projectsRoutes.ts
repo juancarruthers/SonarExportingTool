@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import { projectController } from '../controllers/projectController';
+import { metricController } from '../controllers/metricController';
 
 class ProjectRoutes {
 
@@ -14,7 +15,8 @@ class ProjectRoutes {
     config(): void {
 
         this.router.get('/api/projects', projectController.listProjects);
-        this.router.get('/api/projects/measures/:id/:type', projectController.downloadProjectMeasures);
+        this.router.get('/api/projects/metrics', metricController.listProjectMetrics);
+        this.router.get('/api/projects/measures/:idproj/:idmet', projectController.listProjectsMeasures);
     }
 
 }

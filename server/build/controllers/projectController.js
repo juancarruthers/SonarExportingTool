@@ -13,13 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database"));
-const fs_1 = __importDefault(require("fs"));
-const js2xmlparser_1 = require("js2xmlparser");
-const jszip_1 = __importDefault(require("jszip"));
 class ProjectController {
     constructor() {
-        this.dir = '/tmp/sonar';
-        this.zip = new jszip_1.default();
     }
     listProjects(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -32,11 +27,15 @@ class ProjectController {
             res.json(query);
         });
     }
-    listProjectsMeasures(p_paramsReceived) {
+    listProjectsMeasures(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { idproj } = req.params;
+            const { idmet } = req.params;
+            const projectsIds = idproj.split(',');
+            const metricsIds = idmet.split(',');
             let queryProject = yield database_1.default
                 .then((r) => r
-                .query('SELECT p.idproject, p.key, p.name, p.qualifier, p.lastAnalysis FROM projects AS p WHERE idproject IN ( ? )', [p_paramsReceived]))
+                .query('SELECT p.idproject, p.key, p.name, p.qualifier, p.lastAnalysis FROM projects AS p WHERE idproject IN ( ? )', [projectsIds]))
                 .catch(err => {
                 console.log(err);
             });
@@ -44,7 +43,7 @@ class ProjectController {
             for (let proj of queryProject) {
                 let queryMeasures = yield database_1.default
                     .then((r) => r
-                    .query('SELECT m.key, m.type, m.name, m.description, m.domain, pm.value FROM project_measures AS pm JOIN metrics as m ON pm.idmetric = m.idmetric WHERE idproject = ? ORDER BY m.domain ASC', proj['idproject']))
+                    .query('SELECT m.key, m.type, m.name, m.description, m.domain, pm.value FROM project_measures AS pm JOIN metrics as m ON pm.idmetric = m.idmetric WHERE idproject = ? AND m.idmetric IN (?) ORDER BY m.domain, m.name ASC', [proj['idproject'], metricsIds]))
                     .catch(err => {
                     console.log(err);
                 });
@@ -52,57 +51,7 @@ class ProjectController {
                 queryProject[index] = proj;
                 index = index + 1;
             }
-            return queryProject;
-        });
-    }
-    downloadProjectMeasures(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const { type } = req.params;
-            const projectsIds = id.split(',');
-            let projectMeasures = yield exports.projectController.listProjectsMeasures(projectsIds);
-            if (!fs_1.default.existsSync(exports.projectController.dir)) {
-                fs_1.default.mkdirSync(exports.projectController.dir);
-            }
-            switch (type) {
-                case 'json':
-                    exports.projectController.generateJsonFile(projectMeasures);
-                    break;
-                case 'xml':
-                    exports.projectController.generateXmlFile(projectMeasures);
-                    break;
-                case 'csv':
-                    break;
-            }
-            exports.projectController.zipFile(res);
-        });
-    }
-    generateJsonFile(p_projectMeasures) {
-        for (let proj of p_projectMeasures) {
-            let file = JSON.stringify(proj);
-            let name = proj['name'].replace(/\s+/g, '') + ".json";
-            exports.projectController.zip.file(name, file);
-        }
-    }
-    generateXmlFile(p_projectMeasures) {
-        for (let proj of p_projectMeasures) {
-            let file = js2xmlparser_1.parse('project', proj);
-            let name = proj['name'].replace(/\s+/g, '') + ".xml";
-            exports.projectController.zip.file(name, file);
-        }
-    }
-    zipFile(res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            exports.projectController.zip
-                .generateAsync({ type: "nodebuffer" })
-                .then(function (content) {
-                fs_1.default.writeFile(exports.projectController.dir + '/projects_measures.zip', content, function (err) {
-                    if (err)
-                        console.log(err);
-                    res.download(exports.projectController.dir + '/projects_measures.zip');
-                });
-            });
-            exports.projectController.zip = new jszip_1.default();
+            res.json(queryProject);
         });
     }
 }
