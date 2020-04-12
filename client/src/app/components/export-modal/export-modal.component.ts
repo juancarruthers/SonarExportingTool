@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertComponent } from '../alert/alert.component';
+import { ProjectsService } from '../../services/projects.service';
+import { DownloadService } from '../../services/download.service';
 
 @Component({
   selector: 'app-export-modal',
@@ -13,9 +15,11 @@ export class ExportModalComponent implements OnInit {
   radioOptions: string[];
   exportOption: string;
   projectsExported: number[];
+  projMetricsExported: number[];
+  compMetricsExported: number[];
   @ViewChild(AlertComponent) alert:AlertComponent;
 
-  constructor() {
+  constructor(private projectsService: ProjectsService, private downloadService: DownloadService) {
 
   }
 
@@ -28,12 +32,17 @@ export class ExportModalComponent implements OnInit {
   }
 
   validateExport(){
+    let flag: boolean = false;
     if (this.exportOption != '') {
-      if (this.projectsExported.length != 0){
+
+      flag = this.validProjMetricsSelected(flag);
+      flag = this.validCompMetricsSelected(flag);
+
+      if (flag){
         this.export();
         this.hideAlert();
       }else{
-        this.alert.text = 'Select the project/s to export!';
+        this.alert.text = 'Select the metric/s to export!';
         this.alert.bootstrapColor = 'danger';
         this.showAlert();
       }
@@ -44,8 +53,67 @@ export class ExportModalComponent implements OnInit {
    }
   }
 
+  validProjMetricsSelected(p_flag: boolean): boolean{
+    if ((!p_flag) && (this.compMetricsExported[0] == 0)&&(this.projMetricsExported.length != 0)){
+      p_flag = true
+    }
+    return p_flag;
+  }
+
+  validCompMetricsSelected(p_flag: boolean){
+    if ((!p_flag) && (this.compMetricsExported[0] != 0) && (this.compMetricsExported.length != 0)){
+      p_flag = true
+    }
+    return p_flag
+  }
+
   export(){
-    window.open("http://localhost:3000/api/projects/measures/" + this.projectsExported + '/' + this.exportOption, "_blank");
+    
+    this.projectsService.getProjectsMeasures(this.projectsExported, this.projMetricsExported)
+      .subscribe(
+        resProj=> {
+          
+
+          if (this.compMetricsExported[0] != 0) {
+            this.projectsService.getComponentsMeasures(this.projectsExported, this.compMetricsExported)
+            .subscribe(
+              resComp => {
+                
+                let measuresCombined = this.downloadService.joinComponentsANDProjectsMeasures(resProj, resComp);
+                this.generateZipFile(measuresCombined);
+
+              },
+              err=> console.log(err)
+            );
+          }else{
+
+            this.generateZipFile(resProj);
+
+          }
+        },
+        err=> console.log(err)
+      );
+    
+
+  }
+
+  generateZipFile(p_projects:any){
+    switch (this.exportOption) {
+      case 'json':
+          
+          this.downloadService.generateJsonFile(p_projects);
+
+      break;
+  
+      case 'xml':               
+          
+          this.downloadService.generateXmlFile(p_projects);
+
+      break;
+
+      case 'csv':
+      break;    
+    }
   }
 
   showAlert() {

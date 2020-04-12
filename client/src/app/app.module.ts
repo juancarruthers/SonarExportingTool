@@ -10,10 +10,15 @@ import { AppComponent } from './app.component';
 import { TableComponent } from './components/table/table.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ExportModalComponent } from './components/export-modal/export-modal.component';
+import { AlertComponent } from './components/alert/alert.component';
+import { MetricsTableComponent } from './components/metrics-table/metrics-table.component';
 
 //Services
 import { ProjectsService } from './services/projects.service';
-import { AlertComponent } from './components/alert/alert.component';
+import { DownloadService } from './services/download.service';
+import { TwoOptionModalComponent } from './components/two-option-modal/two-option-modal.component';
+import { CompMetricsTableComponent } from './components/comp-metrics-table/comp-metrics-table.component';
+
 
 
 
@@ -23,7 +28,10 @@ import { AlertComponent } from './components/alert/alert.component';
     TableComponent,
     NavbarComponent,
     ExportModalComponent,
-    AlertComponent
+    AlertComponent,
+    MetricsTableComponent,
+    TwoOptionModalComponent,
+    CompMetricsTableComponent
   ],
   imports: [
     BrowserModule,
@@ -31,7 +39,8 @@ import { AlertComponent } from './components/alert/alert.component';
     HttpClientModule,
   ],
   providers: [ 
-    ProjectsService
+    ProjectsService,
+    DownloadService
    ],
   bootstrap: [AppComponent]
 })

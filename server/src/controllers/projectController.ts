@@ -30,7 +30,7 @@ class ProjectController {
 
         let queryProject = await pool
             .then((r: Pool) => r
-            .query('SELECT p.idproject, p.key, p.name, p.qualifier, p.lastAnalysis FROM projects AS p WHERE idproject IN ( ? )',[projectsIds])
+            .query('SELECT p.idproject, p.key, p.name, p.qualifier, p.lastAnalysis FROM projects AS p WHERE idproject IN ( ? ) ORDER BY p.idproject ASC',[projectsIds])
             )
             .catch(err =>{
                 console.log(err)

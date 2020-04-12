@@ -28,5 +28,17 @@ class MetricController {
             res.json(query);
         });
     }
+    //eliminada metricas quality_profiles, quality_gate_details, sonarjava_feedback, ncloc_data, executable_lines_data, duplications_data  y todas las new (contienen periods)
+    listComponentMetrics(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const query = yield database_1.default
+                .then((r) => r
+                .query('SELECT * FROM metrics AS m WHERE m.idmetric NOT IN (47, 294, 349, 238, 321, 53, 164, 165, 166, 167, 168, 169, 172, 173, 174, 175, 176, 177, 178, 289, 304, 307, 309, 311, 314, 318, 337, 338, 339, 340, 341, 342, 343, 348, 351) ORDER BY m.domain, m.key ASC'))
+                .catch(err => {
+                console.log(err);
+            });
+            res.json(query);
+        });
+    }
 }
 exports.metricController = new MetricController();

@@ -1,6 +1,5 @@
 import { ProjectsService } from './../../services/projects.service';
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { ExportModalComponent } from '../export-modal/export-modal.component';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-table',
@@ -11,22 +10,11 @@ export class TableComponent implements OnInit {
 
   projects: any = [];
   projectsExported: number[];
-  @ViewChild(ExportModalComponent) exportModal:ExportModalComponent;
   
 
 
-  constructor( private projectsService: ProjectsService, private cdr: ChangeDetectorRef ) { 
+  constructor( private projectsService: ProjectsService) { 
     
-  }
-
-  ngAfterViewInit() {
-
-    this.exportModal.title = 'Export Measures';
-    this.exportModal.description = 'Select the data format for the report';
-    this.exportModal.radioOptions = ['json','xml','csv'];
-    this.exportModal.exportOption = '';
-    this.cdr.detectChanges();
-
   }
 
   ngOnInit(): void {
@@ -38,6 +26,12 @@ export class TableComponent implements OnInit {
         err=> console.log(err)
       )
     this.projectsExported = new Array<number>();
+  }
+
+  ngOnDestroy():void{
+  
+    this.projectsService.setExportedProjects(this.projectsExported);
+    
   }
 
   addElement(p_checked: boolean, p_idproject: number){
@@ -66,56 +60,5 @@ export class TableComponent implements OnInit {
       cb.dispatchEvent(event);
     }
  }
-
- export(){
-   this.exportModal.projectsExported = this.projectsExported;
- }
-
- /*sweetAlert(){
-
-  const inputOptions = Swal.mixin({
-    customClass: {
-      'json': 'json',
-      'xml': 'xml'
-    }
-  })
-  
-  const swalWithBootstrapButtons = Swal.mixin({
-    customClass: {
-      confirmButton: 'btn btn-success',
-      cancelButton: 'btn btn-danger'
-    },
-    buttonsStyling: true
-  })
-  
-  swalWithBootstrapButtons.fire({
-    title: 'Export',
-    text: "What type of file",
-    icon: 'question',
-    showCancelButton: true,
-    input: 'radio',
-    inputOptions: inputOptions,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'No, cancel!',
-    reverseButtons: true
-  }).then((result) => {
-    if (result.value) {
-      swalWithBootstrapButtons.fire(
-        'Deleted!',
-        'Your file has been deleted.',
-        'success'
-      )
-    } else if (
-      
-      result.dismiss === Swal.DismissReason.cancel
-    ) {
-      swalWithBootstrapButtons.fire(
-        'Cancelled',
-        'Your imaginary file is safe :)',
-        'error'
-      )
-    }
-  })
- }*/
 
 }

@@ -13,46 +13,37 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database"));
-class ProjectController {
+class ComponentController {
     constructor() {
     }
-    listProjects(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const query = yield database_1.default
-                .then((r) => r
-                .query('SELECT * FROM projects'))
-                .catch(err => {
-                console.log(err);
-            });
-            res.json(query);
-        });
-    }
-    listProjectsMeasures(req, res) {
+    listComponentsMeasures(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { idproj } = req.params;
             const { idmet } = req.params;
             const projectsIds = idproj.split(',');
             const metricsIds = idmet.split(',');
-            let queryProject = yield database_1.default
+            let queryComponent = yield database_1.default
                 .then((r) => r
-                .query('SELECT p.idproject, p.key, p.name, p.qualifier, p.lastAnalysis FROM projects AS p WHERE idproject IN ( ? ) ORDER BY p.idproject ASC', [projectsIds]))
+                .query('SELECT * FROM components AS c WHERE idproject IN ( ? ) ORDER BY c.idproject ASC', [projectsIds]))
                 .catch(err => {
                 console.log(err);
             });
             let index = 0;
-            for (let proj of queryProject) {
+            for (let comp of queryComponent) {
                 let queryMeasures = yield database_1.default
                     .then((r) => r
-                    .query('SELECT m.key, m.type, m.name, m.description, m.domain, pm.value FROM project_measures AS pm JOIN metrics as m ON pm.idmetric = m.idmetric WHERE idproject = ? AND m.idmetric IN (?) ORDER BY m.domain, m.name ASC', [proj['idproject'], metricsIds]))
+                    .query('SELECT m.key, m.type, m.name, m.description, m.domain, cm.value FROM component_measures AS cm JOIN metrics as m ON m.idmetric = cm.idmetric WHERE idcomponent = ? AND m.idmetric IN (?) ORDER BY m.domain, m.name ASC', [comp['idcomponent'], metricsIds]))
                     .catch(err => {
                     console.log(err);
                 });
-                proj['measures'] = queryMeasures;
-                queryProject[index] = proj;
+                comp['component_measures'] = queryMeasures;
+                queryComponent[index] = comp;
                 index = index + 1;
+                //Pruebas
+                console.log("SERVIDOR: " + index + " COMPONENTES CARGADOS");
             }
-            res.json(queryProject);
+            res.json(queryComponent);
         });
     }
 }
-exports.projectController = new ProjectController();
+exports.componentController = new ComponentController();
