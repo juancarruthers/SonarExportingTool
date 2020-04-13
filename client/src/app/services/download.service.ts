@@ -18,9 +18,7 @@ export class DownloadService {
       let file = JSON.stringify(proj);
       let name : string = proj['name'].replace(' ', '-') + ".json";
       this.zip.file(name, file); 
-
-      //Pruebas
-      console.log("Project Id: " + proj['idproject']+ ', added to the zip');  
+  
     }
     this.zipFile();
     
@@ -31,14 +29,13 @@ export class DownloadService {
       let file = parse('project',proj);
       let name : string = proj['name'].replace(' ', '-') + ".xml";
       this.zip.file( name, file); 
-      
-      //Pruebas
-      console.log("Project Id: " + proj['idproject']+ ', added to the zip');  
+        
     }
     this.zipFile();
   }
 
   joinComponentsANDProjectsMeasures(p_projectMeasures:any, p_componentMeasures:any): any{
+    
     let compIndex: number = 0;
     let projIndex: number = 0;
     let componentsMeasures: any = [];    
@@ -52,9 +49,6 @@ export class DownloadService {
       if (prevProjId != comp['idproject']){       
         p_projectMeasures[projIndex]['components'] = componentsMeasures;
 
-        //Pruebas
-        console.log("Project Id: " + prevProjId + ', joined to the projects json');
-
         projIndex = projIndex + 1;
         prevProjId = comp['idproject'];
         componentsMeasures = [];
@@ -62,8 +56,6 @@ export class DownloadService {
       }
     }
     p_projectMeasures[projIndex]['components'] = componentsMeasures;
-    //Pruebas
-    console.log("Project Id: " + prevProjId + ', joined to the projects json');
 
     return p_projectMeasures;
   }

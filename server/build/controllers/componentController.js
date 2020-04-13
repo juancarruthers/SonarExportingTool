@@ -39,8 +39,6 @@ class ComponentController {
                 comp['component_measures'] = queryMeasures;
                 queryComponent[index] = comp;
                 index = index + 1;
-                //Pruebas
-                console.log("SERVIDOR: " + index + " COMPONENTES CARGADOS");
             }
             res.json(queryComponent);
         });

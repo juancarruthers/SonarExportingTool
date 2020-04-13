@@ -18,6 +18,7 @@ import { ProjectsService } from './services/projects.service';
 import { DownloadService } from './services/download.service';
 import { TwoOptionModalComponent } from './components/two-option-modal/two-option-modal.component';
 import { CompMetricsTableComponent } from './components/comp-metrics-table/comp-metrics-table.component';
+import { ExportProgressBarComponent } from './components/export-progress-bar/export-progress-bar.component';
 
 
 
@@ -31,7 +32,8 @@ import { CompMetricsTableComponent } from './components/comp-metrics-table/comp-
     AlertComponent,
     MetricsTableComponent,
     TwoOptionModalComponent,
-    CompMetricsTableComponent
+    CompMetricsTableComponent,
+    ExportProgressBarComponent
   ],
   imports: [
     BrowserModule,

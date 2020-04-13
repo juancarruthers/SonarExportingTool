@@ -41,8 +41,6 @@ class ComponentController {
 
             index = index + 1;
 
-            //Pruebas
-            console.log("SERVIDOR: "+ index + " COMPONENTES CARGADOS");
         }
 
         res.json(queryComponent);

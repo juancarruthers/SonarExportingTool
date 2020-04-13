@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertComponent } from '../alert/alert.component';
 import { ProjectsService } from '../../services/projects.service';
 import { DownloadService } from '../../services/download.service';
+import { forkJoin } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-export-modal',
@@ -9,6 +11,7 @@ import { DownloadService } from '../../services/download.service';
   styleUrls: ['./export-modal.component.css']
 })
 export class ExportModalComponent implements OnInit {
+  [x: string]: any;
 
   title: string;
   description: string;
@@ -19,7 +22,7 @@ export class ExportModalComponent implements OnInit {
   compMetricsExported: number[];
   @ViewChild(AlertComponent) alert:AlertComponent;
 
-  constructor(private projectsService: ProjectsService, private downloadService: DownloadService) {
+  constructor(private projectsService: ProjectsService, private downloadService: DownloadService, private http: HttpClient) {
 
   }
 
@@ -75,11 +78,32 @@ export class ExportModalComponent implements OnInit {
           
 
           if (this.compMetricsExported[0] != 0) {
-            this.projectsService.getComponentsMeasures(this.projectsExported, this.compMetricsExported)
+            /*this.projectsService.getComponentsMeasures(this.projectsExported, this.compMetricsExported)
             .subscribe(
               resComp => {
                 
                 let measuresCombined = this.downloadService.joinComponentsANDProjectsMeasures(resProj, resComp);
+                //this.generateZipFile(measuresCombined);
+
+              },
+              err=> console.log(err)
+            );*/
+
+
+            forkJoin(this.projectsService.makeMultipleRequest(this.projectsExported, this.compMetricsExported))
+            .subscribe(
+              resCompArray => {
+                let measuresCombinedString: string = "";
+                let resp : string;
+                for(let resComp of resCompArray){   
+                  resp = JSON.stringify(resComp).replace("[",",");
+                  resp = resp.replace(/]$/,"");        
+                  measuresCombinedString = measuresCombinedString + resp;
+                }
+                measuresCombinedString = measuresCombinedString.replace(",","[");
+                measuresCombinedString = measuresCombinedString + "]";
+                let measuresCombinedJson = JSON.parse(measuresCombinedString);
+                let measuresCombined = this.downloadService.joinComponentsANDProjectsMeasures(resProj,measuresCombinedJson);
                 this.generateZipFile(measuresCombined);
 
               },
