@@ -1,9 +1,12 @@
+
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertComponent } from '../alert/alert.component';
 import { ProjectsService } from '../../services/projects.service';
-import { DownloadService } from '../../services/download.service';
 import { forkJoin } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+
+import { SweetAlert } from '../sweetAlert';
+import { CompMeasPreparation } from './../../classes/comp-meas-preparation';
+import { Download } from '../../classes/download';
 
 @Component({
   selector: 'app-export-modal',
@@ -11,8 +14,6 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./export-modal.component.css']
 })
 export class ExportModalComponent implements OnInit {
-  [x: string]: any;
-
   title: string;
   description: string;
   radioOptions: string[];
@@ -20,40 +21,25 @@ export class ExportModalComponent implements OnInit {
   projectsExported: number[];
   projMetricsExported: number[];
   compMetricsExported: number[];
+  progressModal: SweetAlert;
+  download: Download;
+  prepare: CompMeasPreparation;
   @ViewChild(AlertComponent) alert:AlertComponent;
+  
 
-  constructor(private projectsService: ProjectsService, private downloadService: DownloadService, private http: HttpClient) {
+  constructor(private projectsService: ProjectsService) {}
 
-  }
+  
 
   ngOnInit(): void {
     
   }
+  /*
+  -->>Validation Functions
+  */
 
-  selectRadio(p_radio: string){
+  selectRadio(p_radio: string): void{
     this.exportOption = p_radio;
-  }
-
-  validateExport(){
-    let flag: boolean = false;
-    if (this.exportOption != '') {
-
-      flag = this.validProjMetricsSelected(flag);
-      flag = this.validCompMetricsSelected(flag);
-
-      if (flag){
-        this.export();
-        this.hideAlert();
-      }else{
-        this.alert.text = 'Select the metric/s to export!';
-        this.alert.bootstrapColor = 'danger';
-        this.showAlert();
-      }
-   }else{
-      this.alert.text = 'Choose a data format!';
-      this.alert.bootstrapColor = 'danger';
-     this.showAlert();
-   }
   }
 
   validProjMetricsSelected(p_flag: boolean): boolean{
@@ -70,45 +56,71 @@ export class ExportModalComponent implements OnInit {
     return p_flag
   }
 
-  export(){
+  validateExport(): void{
+    let flag: boolean = false;
+    if (this.exportOption != '') {
+
+      flag = this.validProjMetricsSelected(flag);
+      flag = this.validCompMetricsSelected(flag);
+
+      if (flag){
+
+        this.validateNumberOfComponentMeasures();
+ 
+      }else{
+
+        this.alert.text = 'Select the metric/s to export!';
+        this.alert.bootstrapColor = 'danger';
+        this.alert.showAlert();
+      }
+   }else{
+      this.alert.text = 'Choose a data format!';
+      this.alert.bootstrapColor = 'danger';
+      this.alert.showAlert();
+   }
+  }
+
+  validateNumberOfComponentMeasures(): void{
+    this.projectsService.getNumberComponentsMeasures(this.projectsExported, this.compMetricsExported)
+      .subscribe(
+        res=> { 
+          if ((this.compMetricsExported[0] == 0)||(res[0]['count'] <= 3000000)){ 
+
+            this.export();
+            this.alert.closeAlert();
+
+          }else{  
+
+            this.alert.text = 'You cannot export more than 3 million measures at once! You tried to export: ' + res[0]['count'] + " components' metrics" ;
+            this.alert.bootstrapColor = 'danger';
+            this.alert.showAlert();
+              
+          }              
+        },
+        err => console.log(err),
+      )   
+  }
+
+
+
+   /*
+  -->>Export Functions
+  */
+
+  export(): void{
+    this.download = new Download();
+    this.progressModal = new SweetAlert();
+    this.progressModal.onLoad();
+    this.progressModal.update("Requesting for the Measures");  
     
     this.projectsService.getProjectsMeasures(this.projectsExported, this.projMetricsExported)
       .subscribe(
         resProj=> {
           
-
           if (this.compMetricsExported[0] != 0) {
-            /*this.projectsService.getComponentsMeasures(this.projectsExported, this.compMetricsExported)
-            .subscribe(
-              resComp => {
-                
-                let measuresCombined = this.downloadService.joinComponentsANDProjectsMeasures(resProj, resComp);
-                //this.generateZipFile(measuresCombined);
 
-              },
-              err=> console.log(err)
-            );*/
-
-
-            forkJoin(this.projectsService.makeMultipleRequest(this.projectsExported, this.compMetricsExported))
-            .subscribe(
-              resCompArray => {
-                let measuresCombinedString: string = "";
-                let resp : string;
-                for(let resComp of resCompArray){   
-                  resp = JSON.stringify(resComp).replace("[",",");
-                  resp = resp.replace(/]$/,"");        
-                  measuresCombinedString = measuresCombinedString + resp;
-                }
-                measuresCombinedString = measuresCombinedString.replace(",","[");
-                measuresCombinedString = measuresCombinedString + "]";
-                let measuresCombinedJson = JSON.parse(measuresCombinedString);
-                let measuresCombined = this.downloadService.joinComponentsANDProjectsMeasures(resProj,measuresCombinedJson);
-                this.generateZipFile(measuresCombined);
-
-              },
-              err=> console.log(err)
-            );
+            this.exportComponentMeasures(resProj);
+            
           }else{
 
             this.generateZipFile(resProj);
@@ -121,38 +133,55 @@ export class ExportModalComponent implements OnInit {
 
   }
 
-  generateZipFile(p_projects:any){
+  exportComponentMeasures(p_projectsMeasures: any): void{
+    
+    forkJoin(this.projectsService.makeMultipleRequest(this.projectsExported, this.compMetricsExported))
+      .subscribe(
+        resComp => {
+          try {
+          
+            this.progressModal.update("Setting the components' measures ready for merging"); 
+            this.prepare = new CompMeasPreparation;
+            let measuresCombinedJson = this.prepare.prepareDataFromCompMeasRequest(resComp);
+    
+            this.progressModal.update("Merging the components' measures with projects");  
+            let measuresCombined = this.prepare.joinComponentsANDProjectsMeasures(p_projectsMeasures,measuresCombinedJson);
+
+            this.generateZipFile(measuresCombined);
+            
+        
+          } catch (error) {
+            this.progressModal.close();
+            this.progressModal.error(error);
+          }
+
+        }
+      );
+    
+  }
+
+  generateZipFile(p_projects:any): void{
+      
     switch (this.exportOption) {
       case 'json':
           
-          this.downloadService.generateJsonFile(p_projects);
+          this.download.generateJsonFile(p_projects, this.progressModal);
 
       break;
   
       case 'xml':               
           
-          this.downloadService.generateXmlFile(p_projects);
+          this.download.generateXmlFile(p_projects, this.progressModal);
 
       break;
 
       case 'csv':
       break;    
     }
-  }
 
-  showAlert() {
-    if (!this.alert.show){
-      document.getElementById('alertExport').removeAttribute('class') ;
-      this.alert.show = true;
-    }
-  }
-
-  hideAlert() {
-    if (this.alert.show){
-      document.getElementById('alertExport').setAttribute('class', 'd-none') ;
-      this.alert.bootstrapColor = 'danger';
-      this.alert.show = false;
-    }
+    this.progressModal.update("Generating the zip file with the results");
+    this.download.zipFile(this.progressModal); 
+    
   }
 
 }

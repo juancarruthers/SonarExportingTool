@@ -50,14 +50,10 @@ export class TableComponent implements OnInit {
 
   checkAll(p_checked: boolean){
 
-    let event = new MouseEvent('click', {
-      'view': window,
-      'bubbles': p_checked
-    });  
-
     for(let id of this.projects){ 
-      var cb = document.getElementById('checkbox'+ id.idproject); 
-      cb.dispatchEvent(event);
+
+      document.getElementById('checkbox'+ id.idproject).click(); 
+
     }
  }
 

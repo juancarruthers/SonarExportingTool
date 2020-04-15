@@ -61,14 +61,10 @@ export class CompMetricsTableComponent implements OnInit {
 
   checkAll(p_checked: boolean){
 
-    let event = new MouseEvent('click', {
-      'view': window,
-      'bubbles': p_checked
-    });  
-
     for(let id of this.metrics){ 
-      var cb = document.getElementById('checkbox'+ id.idmetric); 
-      cb.dispatchEvent(event);
+
+      document.getElementById('checkbox'+ id.idmetric).click(); 
+
     }
  }
 

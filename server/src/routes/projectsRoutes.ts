@@ -20,6 +20,7 @@ class ProjectRoutes {
         this.router.get('/api/projects/components/metrics', metricController.listComponentMetrics);
         this.router.get('/api/projects/measures/:idproj/:idmet', projectController.listProjectsMeasures);
         this.router.get('/api/projects/components/measures/:idproj/:idmet', componentController.listComponentsMeasures);
+        this.router.get('/api/projects/components/measures/count/:idproj/:idmet', componentController.countComponentsMeasures);
     }
 
 }

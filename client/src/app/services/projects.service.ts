@@ -9,8 +9,8 @@ import { Observable } from 'rxjs/internal/Observable';
 export class ProjectsService {
 
   projMetricsExported: number[];
-  projectsExported: number[]
-  API_URI: string
+  projectsExported: number[];
+  API_URI: string;
 
   constructor(private http: HttpClient) { 
     this.API_URI = 'http://localhost:3000/api/projects';
@@ -62,6 +62,10 @@ export class ProjectsService {
     return this.http.get(`${this.API_URI}/components/metrics`);
   }
 
+  getNumberComponentsMeasures(p_projectsExported: number[], p_compMetricsExported: number[]): Observable<any>{
+    return this.http.get(`${this.API_URI}/components/measures/count/` + p_projectsExported + '/' + p_compMetricsExported);
+  }
+
   /*
   -->>Request to the API for Measures
   */
@@ -70,22 +74,23 @@ export class ProjectsService {
     return this.http.get(`${this.API_URI}/measures` + '/' + p_projectsExported + '/' + p_metricsExported);
   }
 
-  getComponentsMeasures(p_projectsExported: number[], p_compMetricsExported: number[], p_delayTime : number): Observable<any>{
+  getComponentsMeasures(p_projectsExported: number, p_compMetricsExported: number[], p_delayTime : number): Observable<any>{
     
     return this.http.get(`${this.API_URI}/components/measures` + '/' + p_projectsExported + '/' + p_compMetricsExported).pipe(delay(p_delayTime));
     
   }
 
   makeMultipleRequest(p_projectsExported: number[], p_metricsExported: number[]): any {
+
     let req: Observable<any>[] = [];
     let index: number = 0;
     let time: number = 0;
     for (let proj of p_projectsExported){  
-      req[index] = this.http.get(`${this.API_URI}/components/measures` + '/' + proj + '/' + p_metricsExported).pipe(delay(time));
+      req[index] = this.getComponentsMeasures(proj, p_metricsExported, time);
       index = index + 1;
-      time = time + 10;
-
+      time = time + 10 + 10 * (Math.floor(p_metricsExported.length/10));
     } 
+
     return req;
 
   }

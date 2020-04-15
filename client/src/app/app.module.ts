@@ -3,6 +3,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 //Components
 import { AppRoutingModule } from './app-routing.module';
@@ -12,15 +13,11 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { ExportModalComponent } from './components/export-modal/export-modal.component';
 import { AlertComponent } from './components/alert/alert.component';
 import { MetricsTableComponent } from './components/metrics-table/metrics-table.component';
+import { TwoOptionModalComponent } from './components/two-option-modal/two-option-modal.component';
+import { CompMetricsTableComponent } from './components/comp-metrics-table/comp-metrics-table.component';
 
 //Services
 import { ProjectsService } from './services/projects.service';
-import { DownloadService } from './services/download.service';
-import { TwoOptionModalComponent } from './components/two-option-modal/two-option-modal.component';
-import { CompMetricsTableComponent } from './components/comp-metrics-table/comp-metrics-table.component';
-import { ExportProgressBarComponent } from './components/export-progress-bar/export-progress-bar.component';
-
-
 
 
 @NgModule({
@@ -32,17 +29,16 @@ import { ExportProgressBarComponent } from './components/export-progress-bar/exp
     AlertComponent,
     MetricsTableComponent,
     TwoOptionModalComponent,
-    CompMetricsTableComponent,
-    ExportProgressBarComponent
+    CompMetricsTableComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    SweetAlert2Module.forRoot()
   ],
   providers: [ 
-    ProjectsService,
-    DownloadService
+    ProjectsService
    ],
   bootstrap: [AppComponent]
 })

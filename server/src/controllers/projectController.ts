@@ -46,7 +46,7 @@ class ProjectController {
                 console.log(err)
             });
 
-            proj['measures'] = queryMeasures;
+            proj['project_measure'] = queryMeasures;
     
             queryProject[index] = proj;
 

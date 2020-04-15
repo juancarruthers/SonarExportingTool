@@ -19,6 +19,8 @@ class MetricController {
             .catch(err =>{
                 console.log(err)
             });    
+        
+        res.set('Content-Type', 'application/json');
         res.json(query);
 
     } 
@@ -32,7 +34,9 @@ class MetricController {
             )
             .catch(err =>{
                 console.log(err)
-            });    
+            }); 
+            
+        res.set('Content-Type', 'application/json');
         res.json(query);
 
     }
