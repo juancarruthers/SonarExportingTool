@@ -1,4 +1,4 @@
-import { SweetAlert } from './../components/sweetAlert';
+
 export class CompMeasPreparation {
 
     prepareDataFromCompMeasRequest(p_componentMeasures: any): any{

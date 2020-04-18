@@ -65,8 +65,12 @@ fdescribe('ProjectsService Test', () => {
   })
 
   /*
-  -->>Request to the API
+  -->>Request to the API for Measures
   */
+
+  it('should get multiple components measures from the API', () => {
+    expect(service.get)
+  })
 
 
 

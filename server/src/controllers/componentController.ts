@@ -12,7 +12,7 @@ class ComponentController {
 
     public async listComponentsMeasures (req:Request, res:Response){ 
         const { idproj } = req.params;
-        const projArray = [idproj];
+        const projArray = idproj.split(',');
         const { idmet } = req.params;
         let queryComponent : any;
 
@@ -59,7 +59,7 @@ class ComponentController {
         
     }
 
-    public async countComponentsMeasures (req:Request, res:Response){ 
+    public async countComponentsMeasures (req:Request, res:Response): Promise<void>{ 
         const { idproj } = req.params;
         const { idmet } = req.params;
 
@@ -75,7 +75,7 @@ class ComponentController {
             });
 
 
-        res.json(queryComponent);
+        res.json(queryComponent[0]['count']);
         
     }
 

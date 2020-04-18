@@ -7,6 +7,7 @@ import { forkJoin } from 'rxjs';
 import { SweetAlert } from '../sweetAlert';
 import { CompMeasPreparation } from './../../classes/comp-meas-preparation';
 import { Download } from '../../classes/download';
+import { Project } from 'src/app/classes/APIRequest/project';
 
 @Component({
   selector: 'app-export-modal',
@@ -14,14 +15,23 @@ import { Download } from '../../classes/download';
   styleUrls: ['./export-modal.component.css']
 })
 export class ExportModalComponent implements OnInit {
+
+  //Title of the Modal
   title: string;
-  description: string;
+
+  //Options Available for export
   radioOptions: string[];
   exportOption: string;
+
+  //Arguments for the API Request
   projectsExported: number[];
   projMetricsExported: number[];
   compMetricsExported: number[];
+
+  //Pogress Modal Component implemented with Sweet Alert 2 library
   progressModal: SweetAlert;
+
+  //Classes to prepare and download the requested export
   download: Download;
   prepare: CompMeasPreparation;
   @ViewChild(AlertComponent) alert:AlertComponent;
@@ -32,6 +42,8 @@ export class ExportModalComponent implements OnInit {
   
 
   ngOnInit(): void {
+
+    this.radioOptions = ['json','xml','csv'];
     
   }
   /*
@@ -73,6 +85,7 @@ export class ExportModalComponent implements OnInit {
         this.alert.bootstrapColor = 'danger';
         this.alert.showAlert();
       }
+
    }else{
       this.alert.text = 'Choose a data format!';
       this.alert.bootstrapColor = 'danger';
@@ -83,15 +96,15 @@ export class ExportModalComponent implements OnInit {
   validateNumberOfComponentMeasures(): void{
     this.projectsService.getNumberComponentsMeasures(this.projectsExported, this.compMetricsExported)
       .subscribe(
-        res=> { 
-          if ((this.compMetricsExported[0] == 0)||(res[0]['count'] <= 3000000)){ 
+        numberComponents => { 
+          if ((this.compMetricsExported[0] == 0)||(numberComponents <= 3000000)){ 
 
             this.export();
             this.alert.closeAlert();
 
           }else{  
 
-            this.alert.text = 'You cannot export more than 3 million measures at once! You tried to export: ' + res[0]['count'] + " components' metrics" ;
+            this.alert.text = 'You cannot export more than 3 million measures at once! You tried to export: ' + numberComponents + " components' measures" ;
             this.alert.bootstrapColor = 'danger';
             this.alert.showAlert();
               
@@ -115,15 +128,15 @@ export class ExportModalComponent implements OnInit {
     
     this.projectsService.getProjectsMeasures(this.projectsExported, this.projMetricsExported)
       .subscribe(
-        resProj=> {
+        projectsMeasures => {
           
           if (this.compMetricsExported[0] != 0) {
 
-            this.exportComponentMeasures(resProj);
+            this.exportComponentMeasures(projectsMeasures);
             
           }else{
 
-            this.generateZipFile(resProj);
+            this.generateZipFile(projectsMeasures);
 
           }
         },
@@ -133,16 +146,16 @@ export class ExportModalComponent implements OnInit {
 
   }
 
-  exportComponentMeasures(p_projectsMeasures: any): void{
+  exportComponentMeasures(p_projectsMeasures: Project[]): void{
     
     forkJoin(this.projectsService.makeMultipleRequest(this.projectsExported, this.compMetricsExported))
       .subscribe(
-        resComp => {
+        componentsMeasures => {
           try {
           
             this.progressModal.update("Setting the components' measures ready for merging"); 
             this.prepare = new CompMeasPreparation;
-            let measuresCombinedJson = this.prepare.prepareDataFromCompMeasRequest(resComp);
+            let measuresCombinedJson = this.prepare.prepareDataFromCompMeasRequest(componentsMeasures);
     
             this.progressModal.update("Merging the components' measures with projects");  
             let measuresCombined = this.prepare.joinComponentsANDProjectsMeasures(p_projectsMeasures,measuresCombinedJson);
@@ -160,7 +173,7 @@ export class ExportModalComponent implements OnInit {
     
   }
 
-  generateZipFile(p_projects:any): void{
+  generateZipFile(p_projects: Project[]): void{
       
     switch (this.exportOption) {
       case 'json':

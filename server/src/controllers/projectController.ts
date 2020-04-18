@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import pool from '../database';
 import { Pool } from 'promise-mysql';
+import { Project } from '../models/project'
 
 
 class ProjectController {
@@ -10,7 +11,7 @@ class ProjectController {
 
     public async listProjects (req:Request, res:Response): Promise<void>{
 
-        const query = await pool
+        const query : Project [] = await pool
             .then((r: Pool) => r
             .query('SELECT * FROM projects')
             )

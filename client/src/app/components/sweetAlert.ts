@@ -20,7 +20,7 @@ export class SweetAlert {
 
   }
 
-  update(p_title){
+  update(p_title: string){
     document.getElementById("action").innerHTML = p_title;
   }
 

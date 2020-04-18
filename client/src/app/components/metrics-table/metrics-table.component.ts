@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { ProjectsService }  from '../../services/projects.service';
 import { ExportModalComponent } from '../export-modal/export-modal.component';
 import { TwoOptionModalComponent } from '../two-option-modal/two-option-modal.component';
+import { Metric } from '../../classes/APIRequest/metric';
 
 @Component({
   selector: 'app-metrics-table',
@@ -10,9 +11,14 @@ import { TwoOptionModalComponent } from '../two-option-modal/two-option-modal.co
 })
 export class MetricsTableComponent implements OnInit {
 
-  metrics: any = [];
+  //Suscribe
+  metrics: Metric[] = [];
+
+  //Arguments for the API Request
   projectsExported: number[];
   metricsExported: number[];
+
+  //Childs of this component
   @ViewChild(ExportModalComponent) exportModal:ExportModalComponent;
   @ViewChild(TwoOptionModalComponent) twoOptionModal:TwoOptionModalComponent;
 
@@ -24,9 +30,7 @@ export class MetricsTableComponent implements OnInit {
 
     this.twoOptionModal.title = 'Export Components Measures';
     this.twoOptionModal.description = 'Would you like to export the components measures also?'
-    this.exportModal.title = 'Export Measures';
-    this.exportModal.description = 'Select the data format for the report';
-    this.exportModal.radioOptions = ['json','xml','csv'];
+    this.exportModal.title = "Export Project's Measures";
     this.exportModal.exportOption = '';
     this.cdr.detectChanges();
 
@@ -67,7 +71,7 @@ export class MetricsTableComponent implements OnInit {
 
   }
 
-  checkAll(p_checked: boolean){
+  checkAll(){
 
     for(let id of this.metrics){ 
 

@@ -3,6 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { delay } from 'rxjs/operators';
 import { Observable } from 'rxjs/internal/Observable';
 
+// Interfaces
+import { Project } from '../classes/APIRequest/project'
+import { Metric } from '../classes/APIRequest/metric';
+import { Component } from '../classes/APIRequest/component';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -13,7 +18,7 @@ export class ProjectsService {
   API_URI: string;
 
   constructor(private http: HttpClient) { 
-    this.API_URI = 'http://localhost:3000/api/projects';
+    this.API_URI = 'http://localhost:3001/api/projects';
   }
 
   /*
@@ -50,39 +55,39 @@ export class ProjectsService {
   -->>Request to the API
   */
   
-  getProjects(): Observable<any>{
-    return this.http.get(`${this.API_URI}`);
+  getProjects(): Observable<Project[]>{
+    return this.http.get<Project[]>(`${this.API_URI}`);
   }
 
-  getProjectMetrics(): Observable<any>{
-    return this.http.get(`${this.API_URI}/metrics`);
+  getProjectMetrics(): Observable<Metric[]>{
+    return this.http.get<Metric[]>(`${this.API_URI}/metrics`);
   }
 
-  getComponentMetrics(): Observable<any>{
-    return this.http.get(`${this.API_URI}/components/metrics`);
+  getComponentMetrics(): Observable<Metric[]>{
+    return this.http.get<Metric[]>(`${this.API_URI}/components/metrics`);
   }
 
-  getNumberComponentsMeasures(p_projectsExported: number[], p_compMetricsExported: number[]): Observable<any>{
-    return this.http.get(`${this.API_URI}/components/measures/count/` + p_projectsExported + '/' + p_compMetricsExported);
+  getNumberComponentsMeasures(p_projectsExported: number[], p_compMetricsExported: number[]): Observable<number>{
+    return this.http.get<number>(`${this.API_URI}/components/measures/count/` + p_projectsExported + '/' + p_compMetricsExported);
   }
 
   /*
   -->>Request to the API for Measures
   */
-  getProjectsMeasures(p_projectsExported: number[], p_metricsExported: number[]): Observable<any>{
+  getProjectsMeasures(p_projectsExported: number[], p_metricsExported: number[]): Observable<Project[]>{
     
-    return this.http.get(`${this.API_URI}/measures` + '/' + p_projectsExported + '/' + p_metricsExported);
+    return this.http.get<Project[]>(`${this.API_URI}/measures` + '/' + p_projectsExported + '/' + p_metricsExported);
   }
 
-  getComponentsMeasures(p_projectsExported: number, p_compMetricsExported: number[], p_delayTime : number): Observable<any>{
+  getComponentsMeasures(p_projectsExported: number, p_compMetricsExported: number[], p_delayTime : number): Observable<Component[]>{
     
-    return this.http.get(`${this.API_URI}/components/measures` + '/' + p_projectsExported + '/' + p_compMetricsExported).pipe(delay(p_delayTime));
+    return this.http.get<Component[]>(`${this.API_URI}/components/measures` + '/' + p_projectsExported + '/' + p_compMetricsExported).pipe(delay(p_delayTime));
     
   }
 
-  makeMultipleRequest(p_projectsExported: number[], p_metricsExported: number[]): any {
+  makeMultipleRequest(p_projectsExported: number[], p_metricsExported: number[]): Observable<Component[]>[] {
 
-    let req: Observable<any>[] = [];
+    let req: Observable<Component[]>[] = [];
     let index: number = 0;
     let time: number = 0;
     for (let proj of p_projectsExported){  

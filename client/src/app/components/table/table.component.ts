@@ -1,5 +1,6 @@
 import { ProjectsService } from './../../services/projects.service';
 import { Component, OnInit } from '@angular/core';
+import { Project } from 'src/app/classes/APIRequest/project';
 
 @Component({
   selector: 'app-table',
@@ -8,10 +9,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TableComponent implements OnInit {
 
-  projects: any = [];
-  projectsExported: number[];
-  
+  //Suscribe
+  projects: Project[];
 
+  //Arguments for the API Request
+  projectsExported: number[];
 
   constructor( private projectsService: ProjectsService) { 
     
@@ -48,7 +50,7 @@ export class TableComponent implements OnInit {
 
   }
 
-  checkAll(p_checked: boolean){
+  checkAll(){
 
     for(let id of this.projects){ 
 

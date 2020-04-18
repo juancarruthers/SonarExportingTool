@@ -19,7 +19,7 @@ class ComponentController {
     listComponentsMeasures(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { idproj } = req.params;
-            const projArray = [idproj];
+            const projArray = idproj.split(',');
             const { idmet } = req.params;
             let queryComponent;
             if (projArray.length == 1) {
@@ -62,7 +62,7 @@ class ComponentController {
                 .catch(err => {
                 console.log(err);
             });
-            res.json(queryComponent);
+            res.json(queryComponent[0]['count']);
         });
     }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ExportModalComponent } from '../export-modal/export-modal.component';
 import { ProjectsService } from '../../services/projects.service';
+import { Metric } from 'src/app/classes/APIRequest/metric';
 
 @Component({
   selector: 'app-comp-metrics-table',
@@ -9,10 +10,15 @@ import { ProjectsService } from '../../services/projects.service';
 })
 export class CompMetricsTableComponent implements OnInit {
 
-  metrics: any = [];
+  //Suscribe
+  metrics: Metric [];
+
+  //Arguments for the API Request
   projectsExported: number[];
   projMetricsExported: number[];
   compMetricsExported: number[];
+
+  //Child of this component
   @ViewChild(ExportModalComponent) exportModal:ExportModalComponent;
 
   constructor(private projectsService: ProjectsService, private cdr: ChangeDetectorRef) { 
@@ -21,9 +27,7 @@ export class CompMetricsTableComponent implements OnInit {
 
   ngAfterViewInit() {
 
-    this.exportModal.title = 'Export Measures';
-    this.exportModal.description = 'Select the data format for the report';
-    this.exportModal.radioOptions = ['json','xml','csv'];
+    this.exportModal.title = "Export Components' Measures";
     this.exportModal.exportOption = '';
     this.cdr.detectChanges();
 
@@ -59,7 +63,7 @@ export class CompMetricsTableComponent implements OnInit {
 
   }
 
-  checkAll(p_checked: boolean){
+  checkAll(){
 
     for(let id of this.metrics){ 
 
