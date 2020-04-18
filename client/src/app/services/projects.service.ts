@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { delay } from 'rxjs/operators';
 import { Observable } from 'rxjs/internal/Observable';
 
@@ -16,9 +16,14 @@ export class ProjectsService {
   projMetricsExported: number[];
   projectsExported: number[];
   API_URI: string;
+  httpHeaders: HttpHeaders;
 
   constructor(private http: HttpClient) { 
-    this.API_URI = 'http://localhost:3001/api/projects';
+    this.API_URI = 'http://localhost:3000/api/projects';
+    this.httpHeaders = new HttpHeaders({
+      'Content-Type':'application/json; charset=utf-8',
+      'Cache-Control': 'private, max-age=3600, must-revalidate'
+    });
   }
 
   /*
@@ -56,32 +61,44 @@ export class ProjectsService {
   */
   
   getProjects(): Observable<Project[]>{
-    return this.http.get<Project[]>(`${this.API_URI}`);
+    let headers = this.httpHeaders;
+
+    return this.http.get<Project[]>(`${this.API_URI}`, {headers});
   }
 
   getProjectMetrics(): Observable<Metric[]>{
-    return this.http.get<Metric[]>(`${this.API_URI}/metrics`);
+    let headers = this.httpHeaders;
+
+    return this.http.get<Metric[]>(`${this.API_URI}/metrics`, {headers});
   }
 
   getComponentMetrics(): Observable<Metric[]>{
-    return this.http.get<Metric[]>(`${this.API_URI}/components/metrics`);
+    let headers = this.httpHeaders;
+
+    return this.http.get<Metric[]>(`${this.API_URI}/components/metrics`, {headers});
   }
 
   getNumberComponentsMeasures(p_projectsExported: number[], p_compMetricsExported: number[]): Observable<number>{
-    return this.http.get<number>(`${this.API_URI}/components/measures/count/` + p_projectsExported + '/' + p_compMetricsExported);
+    let headers = this.httpHeaders;
+
+    return this.http.get<number>(`${this.API_URI}/components/measures/count/` + p_projectsExported + '/' + p_compMetricsExported, {headers});
   }
 
   /*
   -->>Request to the API for Measures
   */
   getProjectsMeasures(p_projectsExported: number[], p_metricsExported: number[]): Observable<Project[]>{
+    let headers = this.httpHeaders;
     
-    return this.http.get<Project[]>(`${this.API_URI}/measures` + '/' + p_projectsExported + '/' + p_metricsExported);
+    return this.http.get<Project[]>(`${this.API_URI}/measures` + '/' + p_projectsExported + '/' + p_metricsExported, {headers});
   }
 
   getComponentsMeasures(p_projectsExported: number, p_compMetricsExported: number[], p_delayTime : number): Observable<Component[]>{
+
+    let url = `${this.API_URI}/components/measures` + '/' + p_projectsExported + '/' + p_compMetricsExported;
+    let headers = this.httpHeaders;
     
-    return this.http.get<Component[]>(`${this.API_URI}/components/measures` + '/' + p_projectsExported + '/' + p_compMetricsExported).pipe(delay(p_delayTime));
+    return this.http.get<Component[]>(url, {headers}).pipe(delay(p_delayTime));
     
   }
 

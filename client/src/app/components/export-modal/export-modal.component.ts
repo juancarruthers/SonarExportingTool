@@ -5,7 +5,6 @@ import { ProjectsService } from '../../services/projects.service';
 import { forkJoin } from 'rxjs';
 
 import { SweetAlert } from '../sweetAlert';
-import { CompMeasPreparation } from './../../classes/comp-meas-preparation';
 import { Download } from '../../classes/download';
 import { Project } from 'src/app/classes/APIRequest/project';
 
@@ -33,7 +32,8 @@ export class ExportModalComponent implements OnInit {
 
   //Classes to prepare and download the requested export
   download: Download;
-  prepare: CompMeasPreparation;
+
+  //Child Component
   @ViewChild(AlertComponent) alert:AlertComponent;
   
 
@@ -152,15 +152,15 @@ export class ExportModalComponent implements OnInit {
       .subscribe(
         componentsMeasures => {
           try {
-          
-            this.progressModal.update("Setting the components' measures ready for merging"); 
-            this.prepare = new CompMeasPreparation;
-            let measuresCombinedJson = this.prepare.prepareDataFromCompMeasRequest(componentsMeasures);
-    
-            this.progressModal.update("Merging the components' measures with projects");  
-            let measuresCombined = this.prepare.joinComponentsANDProjectsMeasures(p_projectsMeasures,measuresCombinedJson);
+             
+            this.progressModal.update("Merging the components' measures with projects");              
 
-            this.generateZipFile(measuresCombined);
+            for (let i = 0; i < p_projectsMeasures.length; i++) {
+              p_projectsMeasures[i].component = componentsMeasures[i];
+              
+            }
+
+            this.generateZipFile(p_projectsMeasures);
             
         
           } catch (error) {
@@ -174,6 +174,8 @@ export class ExportModalComponent implements OnInit {
   }
 
   generateZipFile(p_projects: Project[]): void{
+
+    this.progressModal.update("Generating " + this.exportOption.toUpperCase + " files with project's measures");
       
     switch (this.exportOption) {
       case 'json':
