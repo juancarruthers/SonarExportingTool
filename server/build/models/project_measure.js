@@ -6,5 +6,14 @@ class Project_measure {
         this.idmetric = p_idmetric;
         this.value = p_value;
     }
+    getIdproject() {
+        return this.idproject;
+    }
+    getIdmetric() {
+        return this.idmetric;
+    }
+    getValue() {
+        return this.value;
+    }
 }
 exports.Project_measure = Project_measure;

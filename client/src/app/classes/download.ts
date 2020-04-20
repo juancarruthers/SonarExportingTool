@@ -1,9 +1,8 @@
-import { SweetAlert } from './../components/sweetAlert';
+import { SweetAlert } from '../components/sweetAlert/sweetAlert';
 import * as JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import  { j2xParser } from 'fast-xml-parser/src/parser';
 import { Project } from './APIRequest/project';
-
 
 export class Download {
 
@@ -13,15 +12,16 @@ export class Download {
     this.zip = new JSZip();
   }
 
-  generateJsonFile(p_projectMeasures: Project[], p_progressModal: SweetAlert){
+  generateJsonFile(p_projectMeasures: Project[], p_progressModal: SweetAlert): void{
     try {
 
       for(let proj of p_projectMeasures){      
+        
         let file = JSON.stringify(proj);
         let name : string = proj.name.replace(' ', '-') + ".json";
         this.zip.file<"string">(name, file);
 
-      }     
+      }    
       
     } catch (error) {
 
@@ -32,12 +32,12 @@ export class Download {
 
   }
 
-  generateXmlFile(p_projectMeasures: Project[], p_progressModal: SweetAlert){ 
+  generateXmlFile(p_projectMeasures: Project[], p_progressModal: SweetAlert): void{ 
     try {      
       let project : any = [];
       for(let proj of p_projectMeasures){
         
-        project['project'] = proj ;
+        project['project'] = proj;
 
         let parser = new j2xParser({});
         let file = parser.parse(project);
@@ -54,10 +54,8 @@ export class Download {
     
   }
 
-  
 
-
-  public async zipFile (p_progressModal: SweetAlert) {
+  public async zipFile (p_progressModal: SweetAlert): Promise<void> {
     try {
 
       await this.zip

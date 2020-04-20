@@ -10,4 +10,16 @@ export class Project_measure{
         this.value = p_value;
     }
 
+    getIdproject(): number{
+        return this.idproject
+    }
+
+    getIdmetric(): number{
+        return this.idmetric
+    }
+
+    getValue(): string{
+        return this.value;
+    }
+
 }

@@ -4,7 +4,7 @@ import { AlertComponent } from '../alert/alert.component';
 import { ProjectsService } from '../../services/projects.service';
 import { forkJoin } from 'rxjs';
 
-import { SweetAlert } from '../sweetAlert';
+import { SweetAlert } from '../sweetAlert/sweetAlert';
 import { Download } from '../../classes/download';
 import { Project } from 'src/app/classes/APIRequest/project';
 
@@ -39,13 +39,12 @@ export class ExportModalComponent implements OnInit {
 
   constructor(private projectsService: ProjectsService) {}
 
-  
-
   ngOnInit(): void {
 
     this.radioOptions = ['json','xml','csv'];
     
   }
+
   /*
   -->>Validation Functions
   */
@@ -114,8 +113,6 @@ export class ExportModalComponent implements OnInit {
       )   
   }
 
-
-
    /*
   -->>Export Functions
   */
@@ -169,8 +166,7 @@ export class ExportModalComponent implements OnInit {
           }
 
         }
-      );
-    
+      );   
   }
 
   generateZipFile(p_projects: Project[]): void{
@@ -180,13 +176,13 @@ export class ExportModalComponent implements OnInit {
     switch (this.exportOption) {
       case 'json':
           
-          this.download.generateJsonFile(p_projects, this.progressModal);
+        this.download.generateJsonFile(p_projects, this.progressModal);
 
       break;
   
       case 'xml':               
           
-          this.download.generateXmlFile(p_projects, this.progressModal);
+        this.download.generateXmlFile(p_projects, this.progressModal);
 
       break;
 

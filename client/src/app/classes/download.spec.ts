@@ -1,7 +1,17 @@
 import { Download } from './download';
 
-describe('Download', () => {
-  it('should create an instance', () => {
-    expect(new Download()).toBeTruthy();
+describe('Download Test', () => {
+
+  let download : Download; 
+
+  beforeEach(() => {
+
+    download = new Download();
+    
   });
+
+  it('should create a Download instance', () => {
+    expect(download).toBeTruthy();
+  });
+
 });

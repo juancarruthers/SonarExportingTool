@@ -12,4 +12,20 @@ export class Project{
         this.lastAnalysis = p_lastAnalysis;
     }
 
+    getKey(): string{
+        return this.key;
+    }
+
+    getName(): string{
+        return this.name;
+    }
+
+    getQualifier(): string{
+        return this.qualifier
+    }
+
+    getLastAnalysis(): Date{
+        return this.lastAnalysis;
+    }
+
 }

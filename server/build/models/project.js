@@ -7,5 +7,17 @@ class Project {
         this.qualifier = p_qualifier;
         this.lastAnalysis = p_lastAnalysis;
     }
+    getKey() {
+        return this.key;
+    }
+    getName() {
+        return this.name;
+    }
+    getQualifier() {
+        return this.qualifier;
+    }
+    getLastAnalysis() {
+        return this.lastAnalysis;
+    }
 }
 exports.Project = Project;

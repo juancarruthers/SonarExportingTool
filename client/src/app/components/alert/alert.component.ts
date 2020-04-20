@@ -20,14 +20,14 @@ export class AlertComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  closeAlert(){
+  closeAlert(): void{
     if (this.show){
       document.getElementById('closeAlert').setAttribute('hidden','');
       this.show = false;    
     }
   }
 
-  showAlert(){
+  showAlert(): void{
     if (!this.show){
       document.getElementById('closeAlert').removeAttribute('hidden');
       this.show = true;

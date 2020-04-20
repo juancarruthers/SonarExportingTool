@@ -3,7 +3,8 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { ProjectsService } from './projects.service';
 
-fdescribe('ProjectsService Test', () => {
+
+describe('ProjectsService Test', () => {
 
   let service: ProjectsService;
   let http : HttpTestingController;
@@ -63,17 +64,5 @@ fdescribe('ProjectsService Test', () => {
   it('should get a 0 from projMetricsExported, because it is empty', () => {
     expect(service.getExportedProjectsMetrics().length).toBe(0);
   })
-
-  /*
-  -->>Request to the API for Measures
-  */
-
-  it('should get multiple components measures from the API', () => {
-    expect(service.get)
-  })
-
-
-
-
 
 });

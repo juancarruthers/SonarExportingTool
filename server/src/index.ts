@@ -1,8 +1,10 @@
 import express, { Application } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
+import { CronJob } from 'cron';
 
 import projectsRoutes from './routes/projectsRoutes';
+import { refreshModule } from './refreshAPIModule';
 
 class Server {
 
@@ -12,6 +14,7 @@ class Server {
         this.app = express();
         this.config();
         this.routes();
+        this.startRefreshModuleJob();
     }
 
     config(): void {
@@ -36,6 +39,14 @@ class Server {
             console.log('Server on port', this.app.get('port'));
         });
     
+    }
+
+    startRefreshModuleJob(): void{
+        let job = new CronJob ('00 20 17 * * *', async function() {
+            await refreshModule.main();
+          });
+        job.start();
+        
     }
 
 }

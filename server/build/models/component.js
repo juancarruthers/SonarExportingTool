@@ -8,5 +8,20 @@ class Component {
         this.path = p_path;
         this.language = p_language;
     }
+    getIdproject() {
+        return this.idproject;
+    }
+    getName() {
+        return this.name;
+    }
+    getQualifier() {
+        return this.qualifier;
+    }
+    getPath() {
+        return this.path;
+    }
+    getLanguage() {
+        return this.language;
+    }
 }
 exports.Component = Component;

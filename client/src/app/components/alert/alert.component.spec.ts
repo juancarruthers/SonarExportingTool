@@ -19,7 +19,17 @@ describe('AlertComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create Alert Component', () => {
     expect(component).toBeTruthy();
+  });
+
+  it("should attribute 'show' to be false because the alert is closed", () => {
+    component.closeAlert();
+    expect(component.show).toBeFalse();
+  });
+
+  it("should attribute 'show' to be true because the alert is opened", () => {
+    component.showAlert();
+    expect(component.show).toBeTrue();
   });
 });

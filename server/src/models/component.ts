@@ -14,4 +14,24 @@ export class Component{
         this.language = p_language;
     }
 
+    getIdproject(): number{
+        return this.idproject;
+    }
+
+    getName(): string{
+        return this.name;
+    }
+
+    getQualifier(): string{
+        return this.qualifier;
+    }
+
+    getPath(): string{
+        return this.path;
+    }
+
+    getLanguage(): string{
+        return this.language;
+    }
+
 }

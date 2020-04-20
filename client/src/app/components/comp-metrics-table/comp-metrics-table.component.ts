@@ -25,7 +25,7 @@ export class CompMetricsTableComponent implements OnInit {
     
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void{
 
     this.exportModal.title = "Export Components' Measures";
     this.exportModal.exportOption = '';
@@ -49,7 +49,7 @@ export class CompMetricsTableComponent implements OnInit {
     this.compMetricsExported = new Array<number>();
   }
 
-  addElement(p_checked: boolean, p_idmetric: number){
+  addElement(p_checked: boolean, p_idmetric: number): void{
 
     if (p_checked) {
 
@@ -63,7 +63,7 @@ export class CompMetricsTableComponent implements OnInit {
 
   }
 
-  checkAll(){
+  checkAll(): void{
 
     for(let id of this.metrics){ 
 
@@ -72,7 +72,7 @@ export class CompMetricsTableComponent implements OnInit {
     }
  }
 
-  export(){
+  export(): void{
     this.exportModal.projectsExported = this.projectsExported;
     this.exportModal.projMetricsExported = this.projMetricsExported;
     this.exportModal.compMetricsExported = this.compMetricsExported;
