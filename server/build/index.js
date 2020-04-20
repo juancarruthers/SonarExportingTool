@@ -41,7 +41,7 @@ class Server {
         });
     }
     startRefreshModuleJob() {
-        let job = new cron_1.CronJob('00 20 17 * * *', function () {
+        let job = new cron_1.CronJob('00 00 02 * * *', function () {
             return __awaiter(this, void 0, void 0, function* () {
                 yield refreshAPIModule_1.refreshModule.main();
             });

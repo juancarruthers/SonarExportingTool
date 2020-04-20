@@ -42,11 +42,10 @@ class Server {
     }
 
     startRefreshModuleJob(): void{
-        let job = new CronJob ('00 20 17 * * *', async function() {
+        let job = new CronJob ('00 00 02 * * *', async function() {
             await refreshModule.main();
-          });
+        });
         job.start();
-        
     }
 
 }
