@@ -439,49 +439,56 @@ class RefreshAPIModule {
             })
           );      
 
-        for(var comp of componentsPaths){
+        for(let comp of componentsPaths){
 
           //eliminada metricas quality_profiles, quality_gate_details, sonarjava_feedback, ncloc_data, executable_lines_data, duplications_data  y todas las new (contienen periods)
           let url = "https://sonarcloud.io/api/measures/component?component=" + proj['key'] + ':' + comp['path'] + "&metricKeys=blocker_violations, bugs, classes, code_smells, cognitive_complexity, comment_lines, comment_lines_data, comment_lines_density, class_complexity, file_complexity, function_complexity, complexity_in_classes, complexity_in_functions, branch_coverage, conditions_to_cover, confirmed_issues, coverage, critical_violations, complexity, last_commit_date, development_cost, directories, duplicated_blocks, duplicated_files, duplicated_lines, duplicated_lines_density, effort_to_reach_maintainability_rating_a, false_positive_issues, file_complexity_distribution, files, function_complexity_distribution, functions, generated_lines, generated_ncloc, info_violations, violations, line_coverage, lines, ncloc, ncloc_language_distribution, lines_to_cover, sqale_rating, major_violations, minor_violations, open_issues, projects, public_api, public_documented_api_density, public_undocumented_api, alert_status, reliability_rating, reliability_remediation_effort, reopened_issues, security_hotspots, security_rating, security_remediation_effort, security_review_rating, skipped_tests, statements, sqale_index, sqale_debt_ratio, uncovered_conditions, uncovered_lines, new_uncovered_lines, test_execution_time, test_errors, test_failures, tests, test_success_density, vulnerabilities, wont_fix_issues&ps=500&p=1";
           
           let api_query = await this.APIGetRequest(url, '');
 
-          var respMeasures = api_query["component"]["measures"];
+          if (!JSON.stringify(api_query).includes("not found")){
 
-          let idMeasure : number
+            let respMeasures = api_query["component"]["measures"];
 
-          for(let mea of respMeasures){
+            let idMeasure : number
 
-            let idMetric = await pool
-              .then((r: Pool) => r.query('SELECT m.idmetric FROM metrics AS m WHERE m.key = ?',mea["metric"])
-                .catch(err => {
-                  console.log(err);
-                })
-              );   
+            for(let mea of respMeasures){
 
-            idMeasure = await this.getComponentIdMeasure(comp['idcomponent'],idMetric['0']['idmetric']) ;
+              let idMetric = await pool
+                .then((r: Pool) => r.query('SELECT m.idmetric FROM metrics AS m WHERE m.key = ?',mea["metric"])
+                  .catch(err => {
+                    console.log(err);
+                  })
+                );   
 
-            if (idMeasure == 0){
+              idMeasure = await this.getComponentIdMeasure(comp['idcomponent'],idMetric['0']['idmetric']) ;
 
-              let respMeas = new Component_measure(comp['idcomponent'], idMetric['0']['idmetric'], mea["value"]);
-              await pool
-                .then((r: Pool) => r.query('INSERT INTO component_measures set ?', [respMeas])
+              if (idMeasure == 0){
+
+                let respMeas = new Component_measure(comp['idcomponent'], idMetric['0']['idmetric'], mea["value"]);
+                await pool
+                  .then((r: Pool) => r.query('INSERT INTO component_measures set ?', [respMeas])
+                    .catch(err => {
+                      console.log(err);
+                    })
+                  );
+
+              }else{
+                
+                await pool
+                .then((r: Pool) => r.query('UPDATE component_measures SET value = ? WHERE idmeasure = ?', [mea["value"], idMeasure])
                   .catch(err => {
                     console.log(err);
                   })
                 );
-
-            }else{
               
-              await pool
-              .then((r: Pool) => r.query('UPDATE component_measures SET value = ? WHERE idmeasure = ?', [mea["value"], idMeasure])
-                .catch(err => {
-                  console.log(err);
-                })
-              );
-            
-            }   
-  
+              }   
+    
+            }
+          }else{
+            console.log("Component Deleted");
+            await this.deleteComponentAndMeasures(comp['idcomponent']);
+            this.updateComponentMeasures(this.projectsKeys);
           }
 
         }         
@@ -490,16 +497,11 @@ class RefreshAPIModule {
       console.log("Components' Measures Updated!");     
     } catch (error) {   
 
-      if (JSON.stringify((respMeasures).includes("not found"))){
-        console.log("Component Deleted");
-        await this.deleteComponentAndMeasures(comp['idcomponent']);
-        this.updateComponentMeasures(this.projectsKeys);
-      } 
-      
+      console.log(error);
+           
     }  
   }
 }
 
 export const refreshModule = new RefreshAPIModule();
 refreshModule.main();
-
