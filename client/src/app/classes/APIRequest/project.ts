@@ -9,6 +9,7 @@ export interface Project{
     qualifier: string;
     lastAnalysis: Date;
     projectLink: string;
+    version: string;
     project_measure : Measure [];
     component : Component [];
 

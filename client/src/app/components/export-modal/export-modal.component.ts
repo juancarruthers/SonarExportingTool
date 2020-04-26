@@ -1,7 +1,7 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AlertComponent } from '../alert/alert.component';
-import { ProjectsService } from '../../services/projects.service';
+import { ProjectsService } from '../../services/projects/projects.service';
 import { forkJoin } from 'rxjs';
 
 import { SweetAlert } from '../sweetAlert/sweetAlert';
@@ -144,6 +144,8 @@ export class ExportModalComponent implements OnInit {
   }
 
   exportComponentMeasures(p_projectsMeasures: Project[]): void{
+  
+    this.projectsExported.sort((a,b) => a - b);    
     
     forkJoin(this.projectsService.makeMultipleRequest(this.projectsExported, this.compMetricsExported))
       .subscribe(
@@ -187,6 +189,7 @@ export class ExportModalComponent implements OnInit {
       break;
 
       case 'csv':
+        this.download.generateCsvFile(p_projects,this.progressModal, this.compMetricsExported[0]);
       break;    
     }
 

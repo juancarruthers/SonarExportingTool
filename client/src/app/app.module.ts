@@ -17,7 +17,8 @@ import { TwoOptionModalComponent } from './components/two-option-modal/two-optio
 import { CompMetricsTableComponent } from './components/comp-metrics-table/comp-metrics-table.component';
 
 //Services
-import { ProjectsService } from './services/projects.service';
+import { ProjectsService } from './services/projects/projects.service';
+import { AuthService } from './services/auth/auth.service';
 
 
 @NgModule({
@@ -38,7 +39,8 @@ import { ProjectsService } from './services/projects.service';
     SweetAlert2Module.forRoot()
   ],
   providers: [ 
-    ProjectsService
+    ProjectsService,
+    AuthService
    ],
   bootstrap: [AppComponent]
 })

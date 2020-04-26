@@ -16,7 +16,7 @@ class RefreshAPIModule {
   private refreshProjects : Project[];
   private newProjects : Project[];
   private organization: string;
-  private projectsKeys: string
+  private projectsKeys: string;
 
   constructor(){
     this.refreshProjects = [];
@@ -28,22 +28,29 @@ class RefreshAPIModule {
   public async main(): Promise<number>{
     await this.searchLastAnalysis();
     await this.updateProjects();
+    console.log('Projects Updated!');
 
     //Insertion of NEW PROJECTS    
     this.projectsKeys = this.listKeyProjects(this.newProjects);
     await this.updateComponents(this.projectsKeys);
+    console.log("Projects' Components Inserted!");
 
     await this.updateProjectMeasures(this.projectsKeys);
+    console.log("Projects' Measures Inserted!");
 
     await this.updateComponentMeasures(this.projectsKeys);
+    console.log("Components' Measures Inserted!");  
 
     //UPDATE of ALREADY LOADED PROJECTS    
     this.projectsKeys = this.listKeyProjects(this.refreshProjects);
     await this.updateComponents(this.projectsKeys);
+    console.log("Projects' Components Updated!");
      
     await this.updateProjectMeasures(this.projectsKeys);
+    console.log("Projects' Measures Updated!");
     
     await this.updateComponentMeasures(this.projectsKeys);
+    console.log("Components' Measures Updated!"); 
     
     await this.updateDateLastAnalysis();
   
@@ -125,7 +132,7 @@ class RefreshAPIModule {
   }
 
   private async updateDateLastAnalysis(): Promise<void>{
-    let date = new Date(Date.now());
+    let date = new Date();
     await pool
       .then((r: Pool) => r
       .query('UPDATE lastUpdate SET date = ? WHERE id = 1', date)
@@ -229,12 +236,24 @@ class RefreshAPIModule {
       for(let proj of response){
 
         let timestamp = proj["lastAnalysisDate"].split('T');
-        let date = timestamp[0].split('-');
+        let date : number[] = timestamp[0].split('-');
+        let time = timestamp[1].split('+');
+        let hours: number [] = time[0].split(':');
+        hours[0] = hours[0] - 2;
+        if (hours[0] < 0){
+          hours[0] = hours[0] + 24;
+          date[2] = date[2] - 1;
+        }
+        let timestampAnalysis = new Date();
+        timestampAnalysis.setUTCFullYear(date[0]);
+        timestampAnalysis.setUTCMonth(date[1] - 1);
+        timestampAnalysis.setUTCDate(date[2]);
+        timestampAnalysis.setUTCHours(hours[0]);
+        timestampAnalysis.setUTCMinutes(hours[1]);
+        timestampAnalysis.setUTCSeconds(hours[2]);
 
-        let timestampAnalysis = new Date(date[0], date[1] -1, date[2]);
 
         if (timestampAnalysis > dateLastAnalysis){
-
 
           let respProj = new Project(proj["key"], proj["name"], proj["qualifier"], timestampAnalysis);
 
@@ -279,8 +298,6 @@ class RefreshAPIModule {
           );
 
       }
-
-      console.log('Projects Updated!');
       
     } catch (error) {
       console.log(error);
@@ -338,16 +355,12 @@ class RefreshAPIModule {
         }
 
       }
-
-      console.log("Projects' Components Updated!");
       
     } catch (error) {
 
       console.log(error);
       
-    }
-
-    
+    }   
     
   }  
 
@@ -408,16 +421,12 @@ class RefreshAPIModule {
         }
 
       }
-
-      console.log("Projects' Measures Updated!");
       
     } catch (error) {
       console.log(error);
     }
     
   }
-
-
   
   private async updateComponentMeasures(p_projectsKeyList: string): Promise<void>{
 
@@ -494,7 +503,7 @@ class RefreshAPIModule {
         }         
 
       }
-      console.log("Components' Measures Updated!");     
+         
     } catch (error) {   
 
       console.log(error);

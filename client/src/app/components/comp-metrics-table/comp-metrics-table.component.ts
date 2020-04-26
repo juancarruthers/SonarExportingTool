@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ExportModalComponent } from '../export-modal/export-modal.component';
-import { ProjectsService } from '../../services/projects.service';
+import { ProjectsService } from '../../services/projects/projects.service';
 import { Metric } from 'src/app/classes/APIRequest/metric';
 
 @Component({
@@ -49,7 +49,7 @@ export class CompMetricsTableComponent implements OnInit {
     this.compMetricsExported = new Array<number>();
   }
 
-  addElement(p_checked: boolean, p_idmetric: number): void{
+  checkElement(p_checked: boolean, p_idmetric: number): void{
 
     if (p_checked) {
 

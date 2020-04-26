@@ -1,6 +1,6 @@
-import { ProjectsService } from './../../services/projects.service';
+import { ProjectsService } from './../../services/projects/projects.service';
 import { Component, OnInit } from '@angular/core';
-import { Project } from 'src/app/classes/APIRequest/project';
+import { Project } from '../../classes/APIRequest/project';
 
 @Component({
   selector: 'app-table',
@@ -36,7 +36,7 @@ export class TableComponent implements OnInit {
     
   }
 
-  addElement(p_checked: boolean, p_idproject: number){
+  checkElement(p_checked: boolean, p_idproject: number): void{
 
     if (p_checked) {
 
@@ -50,7 +50,7 @@ export class TableComponent implements OnInit {
 
   }
 
-  checkAll(){
+  checkAll(): void{
 
     for(let id of this.projects){ 
 

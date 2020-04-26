@@ -32,16 +32,23 @@ class RefreshAPIModule {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.searchLastAnalysis();
             yield this.updateProjects();
+            console.log('Projects Updated!');
             //Insertion of NEW PROJECTS    
             this.projectsKeys = this.listKeyProjects(this.newProjects);
             yield this.updateComponents(this.projectsKeys);
+            console.log("Projects' Components Inserted!");
             yield this.updateProjectMeasures(this.projectsKeys);
+            console.log("Projects' Measures Inserted!");
             yield this.updateComponentMeasures(this.projectsKeys);
+            console.log("Components' Measures Inserted!");
             //UPDATE of ALREADY LOADED PROJECTS    
             this.projectsKeys = this.listKeyProjects(this.refreshProjects);
             yield this.updateComponents(this.projectsKeys);
+            console.log("Projects' Components Updated!");
             yield this.updateProjectMeasures(this.projectsKeys);
+            console.log("Projects' Measures Updated!");
             yield this.updateComponentMeasures(this.projectsKeys);
+            console.log("Components' Measures Updated!");
             yield this.updateDateLastAnalysis();
             return 1;
         });
@@ -111,7 +118,7 @@ class RefreshAPIModule {
     }
     updateDateLastAnalysis() {
         return __awaiter(this, void 0, void 0, function* () {
-            let date = new Date(Date.now());
+            let date = new Date();
             yield database_1.default
                 .then((r) => r
                 .query('UPDATE lastUpdate SET date = ? WHERE id = 1', date))
@@ -193,7 +200,20 @@ class RefreshAPIModule {
                 for (let proj of response) {
                     let timestamp = proj["lastAnalysisDate"].split('T');
                     let date = timestamp[0].split('-');
-                    let timestampAnalysis = new Date(date[0], date[1] - 1, date[2]);
+                    let time = timestamp[1].split('+');
+                    let hours = time[0].split(':');
+                    hours[0] = hours[0] - 2;
+                    if (hours[0] < 0) {
+                        hours[0] = hours[0] + 24;
+                        date[2] = date[2] - 1;
+                    }
+                    let timestampAnalysis = new Date();
+                    timestampAnalysis.setUTCFullYear(date[0]);
+                    timestampAnalysis.setUTCMonth(date[1] - 1);
+                    timestampAnalysis.setUTCDate(date[2]);
+                    timestampAnalysis.setUTCHours(hours[0]);
+                    timestampAnalysis.setUTCMinutes(hours[1]);
+                    timestampAnalysis.setUTCSeconds(hours[2]);
                     if (timestampAnalysis > dateLastAnalysis) {
                         let respProj = new project_1.Project(proj["key"], proj["name"], proj["qualifier"], timestampAnalysis);
                         if (yield this.checkProjectExists(respProj.getKey())) {
@@ -227,7 +247,6 @@ class RefreshAPIModule {
                         console.log(err);
                     }));
                 }
-                console.log('Projects Updated!');
             }
             catch (error) {
                 console.log(error);
@@ -266,7 +285,6 @@ class RefreshAPIModule {
                         cont = cont + 1;
                     }
                 }
-                console.log("Projects' Components Updated!");
             }
             catch (error) {
                 console.log(error);
@@ -311,7 +329,6 @@ class RefreshAPIModule {
                         }
                     }
                 }
-                console.log("Projects' Measures Updated!");
             }
             catch (error) {
                 console.log(error);
@@ -370,7 +387,6 @@ class RefreshAPIModule {
                         }
                     }
                 }
-                console.log("Components' Measures Updated!");
             }
             catch (error) {
                 console.log(error);

@@ -4,6 +4,7 @@ import * as FileSaver from 'file-saver';
 import  { j2xParser } from 'fast-xml-parser/src/parser';
 import { Project } from './APIRequest/project';
 
+
 export class Download {
 
   private zip: JSZip;
@@ -52,6 +53,49 @@ export class Download {
   
     }
     
+  }
+
+  async generateCsvFile(p_projectMeasures: Project[], p_progressModal: SweetAlert, p_componentMetrics: number): Promise<void>{
+    try {
+      for(let proj of p_projectMeasures){ 
+        let projectsFile = 'key,type,name,description,domain,value\n';
+        let name : string = proj.name.replace(' ', '-');
+        
+        for (let projMea of proj.project_measure){
+          projectsFile = projectsFile + projMea.key + ',' + projMea.type + ',' + projMea.name + ',' + projMea.description + ',' + projMea.domain+ ',' + projMea.value+ '\n';
+        }
+      
+        
+        if (p_componentMetrics != 0){
+          let componentsMetricsFile = 'name, qualifier, path, language, domain, key, type, name, description, value \n';
+          
+          this.zip.folder(name);
+          this.zip.file<"string">(name + '/' + name + ".csv", projectsFile);
+         
+          for(let compMea of proj.component){
+
+            for (let mea of compMea.component_measure){
+            
+              componentsMetricsFile = componentsMetricsFile + compMea.name + ',' + compMea.qualifier + ',' + compMea.path + ',' + compMea.language+ ',' + mea.domain + ',' +  mea.key + ',' + mea.type + ',' + mea.name + ',' + mea.description  + ',' + mea.value + '\n';
+            
+            }
+          }
+
+          this.zip.file<"string">(name + "/Components.csv", componentsMetricsFile);
+          
+       
+        }else{
+          this.zip.file<"string">(name + ".csv", projectsFile);
+        }        
+  
+      }    
+      
+    } catch (error) {
+      p_progressModal.close();
+      p_progressModal.error(error);
+       
+    }
+
   }
 
 

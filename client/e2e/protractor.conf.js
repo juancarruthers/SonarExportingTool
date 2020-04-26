@@ -4,6 +4,9 @@
 
 const { SpecReporter } = require('jasmine-spec-reporter');
 
+var path = require('path');
+var downloadsPath = path.resolve(__dirname, './downloads');
+
 /**
  * @type { import("protractor").Config }
  */
@@ -13,7 +16,17 @@ exports.config = {
     './src/**/*.e2e-spec.ts'
   ],
   capabilities: {
-    browserName: 'chrome'
+    browserName: 'chrome',
+    chromeOptions: {
+
+      prefs: {
+          download: {
+              prompt_for_download: false,
+              directory_upgrade: true,
+              default_directory:  downloadsPath
+          }
+      }
+    }
   },
   directConnect: true,
   baseUrl: 'http://localhost:4200/',

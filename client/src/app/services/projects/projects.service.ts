@@ -4,9 +4,9 @@ import { delay } from 'rxjs/operators';
 import { Observable } from 'rxjs/internal/Observable';
 
 // Interfaces
-import { Project } from '../classes/APIRequest/project'
-import { Metric } from '../classes/APIRequest/metric';
-import { Component } from '../classes/APIRequest/component';
+import { Project } from '../../classes/APIRequest/project'
+import { Metric } from '../../classes/APIRequest/metric';
+import { Component } from '../../classes/APIRequest/component';
 
 @Injectable({
   providedIn: 'root'

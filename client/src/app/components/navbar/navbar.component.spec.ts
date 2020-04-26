@@ -1,14 +1,21 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NavbarComponent } from './navbar.component';
+import { AuthService } from '../../services/auth/auth.service';
 
-describe('NavbarComponent', () => {
+describe('NavbarComponent Test', () => {
   let component: NavbarComponent;
   let fixture: ComponentFixture<NavbarComponent>;
 
   beforeEach(async(() => {
+
+    const authService = jasmine.createSpyObj('AuthService', ['']);
+
     TestBed.configureTestingModule({
-      declarations: [ NavbarComponent ]
+      declarations: [ NavbarComponent ],
+      providers: [
+        { provide: AuthService, useValue: authService } 
+      ]
     })
     .compileComponents();
   }));

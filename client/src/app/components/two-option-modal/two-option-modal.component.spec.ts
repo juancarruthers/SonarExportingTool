@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TwoOptionModalComponent } from './two-option-modal.component';
 
-describe('TwoOptionModalComponent', () => {
+describe('TwoOptionModalComponent Test', () => {
   let component: TwoOptionModalComponent;
   let fixture: ComponentFixture<TwoOptionModalComponent>;
 

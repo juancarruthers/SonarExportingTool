@@ -20,7 +20,7 @@ class ProjectController {
         return __awaiter(this, void 0, void 0, function* () {
             const query = yield database_1.default
                 .then((r) => r
-                .query('SELECT * FROM projects'))
+                .query('SELECT * FROM projects ORDER BY lastAnalysis DESC'))
                 .catch(err => {
                 console.log(err);
             });
@@ -43,7 +43,7 @@ class ProjectController {
             for (let proj of queryProject) {
                 let queryMeasures = yield database_1.default
                     .then((r) => r
-                    .query('SELECT m.key, m.type, m.name, m.description, m.domain, pm.value FROM project_measures AS pm JOIN metrics as m ON pm.idmetric = m.idmetric WHERE idproject = ? AND m.idmetric IN (?) ORDER BY m.domain, m.name ASC', [proj['idproject'], metricsIds]))
+                    .query('SELECT m.domain, m.key, m.name, m.description, m.type, pm.value FROM project_measures AS pm JOIN metrics as m ON pm.idmetric = m.idmetric WHERE idproject = ? AND m.idmetric IN (?) ORDER BY m.domain, m.name ASC', [proj['idproject'], metricsIds]))
                     .catch(err => {
                     console.log(err);
                 });

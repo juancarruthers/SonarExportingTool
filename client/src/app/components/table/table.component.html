@@ -10,19 +10,21 @@
                     <th scope="col">Key</th>
                     <th scope="col">Project</th>
                     <th scope="col">Last Analysis</th>
+                    <th scope="col">Version</th>
                     <th scope="col">Link to Sonar Cloud</th>
                     <th scope="col">Link to Project</th>
-                    <th scope="col"><input type="checkbox" (change)="checkAll()"></th>
+                    <th scope="col"><input id="checkAll" type="checkbox" (change)="checkAll()"></th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let project of projects">
                     <td>{{ project.key }}</td>
                     <td>{{ project.name }}</td>
-                    <td>{{ project.lastAnalysis }}</td>                   
+                    <td>{{ project.lastAnalysis }}</td>
+                    <td>{{ project.version }}</td>                   
                     <td><a href="{{ 'https://sonarcloud.io/dashboard?id=unne.sonar%3A' + project.name.toLowerCase().replace(' ', '-') }}">Sonar Cloud Measures</a></td>
                     <td><a href="{{ project.projectLink }}"></a>Project</td>
-                    <td><input type="checkbox" id="{{ 'checkbox' + project.idproject }}" (change)="addElement($event.target.checked, project.idproject)"></td>
+                    <td><input type="checkbox" id="{{ 'checkbox' + project.idproject }}" (change)="checkElement($event.target.checked, project.idproject)"></td>
                   </tr>
                   
                   </tbody>

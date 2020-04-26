@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { ProjectsService }  from '../../services/projects.service';
+import { ProjectsService }  from '../../services/projects/projects.service';
 import { ExportModalComponent } from '../export-modal/export-modal.component';
 import { TwoOptionModalComponent } from '../two-option-modal/two-option-modal.component';
 import { Metric } from '../../classes/APIRequest/metric';
@@ -26,7 +26,7 @@ export class MetricsTableComponent implements OnInit {
     
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
 
     this.twoOptionModal.title = 'Export Components Measures';
     this.twoOptionModal.description = 'Would you like to export the components measures also?'
@@ -57,7 +57,7 @@ export class MetricsTableComponent implements OnInit {
     
   }
 
-  addElement(p_checked: boolean, p_idmetric: number){
+  checkElement(p_checked: boolean, p_idmetric: number): void{
 
     if (p_checked) {
 
@@ -71,7 +71,7 @@ export class MetricsTableComponent implements OnInit {
 
   }
 
-  checkAll(){
+  checkAll(): void{
 
     for(let id of this.metrics){ 
 
@@ -80,7 +80,7 @@ export class MetricsTableComponent implements OnInit {
     }
  }
 
-  export(){
+  export(): void{
     this.exportModal.projectsExported = this.projectsExported;
     this.exportModal.projMetricsExported = this.metricsExported;
     this.exportModal.compMetricsExported = [0];

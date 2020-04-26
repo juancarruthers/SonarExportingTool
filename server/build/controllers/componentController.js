@@ -35,7 +35,7 @@ class ComponentController {
                 for (let comp of queryComponent) {
                     let queryMeasures = yield database_1.default
                         .then((r) => r
-                        .query('SELECT m.key, m.type, m.name, m.description, m.domain, cm.value FROM component_measures AS cm JOIN metrics as m ON m.idmetric = cm.idmetric WHERE idcomponent = ? AND m.idmetric IN (?) ORDER BY m.domain, m.name ASC', [comp['idcomponent'], metricsIds]))
+                        .query('SELECT m.domain, m.key, m.name, m.description, m.type, cm.value FROM component_measures AS cm JOIN metrics as m ON m.idmetric = cm.idmetric WHERE idcomponent = ? AND m.idmetric IN (?) ORDER BY m.domain, m.name ASC', [comp['idcomponent'], metricsIds]))
                         .catch(err => {
                         console.log(err);
                     });

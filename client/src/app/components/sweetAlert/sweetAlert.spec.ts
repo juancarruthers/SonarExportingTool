@@ -1,6 +1,6 @@
 import { SweetAlert } from './sweetAlert';
 
-describe('Download Test', () => {
+describe('SweetAlert Test', () => {
 
   let sweet : SweetAlert; 
 
