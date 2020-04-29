@@ -1,0 +1,38 @@
+@import "../../../variables"; 
+@import "../../../../node_modules/bootstrap/scss/bootstrap"; 
+@import "../../../../node_modules/bootswatch/dist/sandstone/bootswatch";
+
+$border-focus-color :transparent;
+
+
+// White links against a dark background
+.navbar-dark {
+    .navbar-brand {
+
+      @include hover() {
+
+        outline-color: $border-focus-color;
+      }
+    }
+  
+    .navbar-nav {
+      .nav-link {
+
+        outline-color: $border-focus-color;   
+
+        @include hover() {
+            outline-color: $border-focus-color;            
+        }
+
+        font-size: 0.75rem;
+
+      }
+
+    }
+
+}
+
+  
+
+
+
