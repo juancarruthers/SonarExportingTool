@@ -1,4 +1,5 @@
 
+
 //Imports
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -19,6 +20,7 @@ import { CompMetricsTableComponent } from './components/comp-metrics-table/comp-
 //Services
 import { ProjectsService } from './services/projects/projects.service';
 import { AuthService } from './services/auth/auth.service';
+import { CookieService } from 'ngx-cookie-service';
 
 
 @NgModule({
@@ -40,7 +42,8 @@ import { AuthService } from './services/auth/auth.service';
   ],
   providers: [ 
     ProjectsService,
-    AuthService
+    AuthService,
+    CookieService
    ],
   bootstrap: [AppComponent]
 })

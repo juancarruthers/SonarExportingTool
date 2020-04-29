@@ -1,3 +1,4 @@
+import { CookieService } from 'ngx-cookie-service';
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 
@@ -8,9 +9,20 @@ import { AuthService } from '../../services/auth/auth.service';
 })
 export class NavbarComponent implements OnInit {
 
-  constructor(public authService: AuthService) { }
+  user = '';
+
+  constructor(public authService: AuthService, private cookieService: CookieService) {}
 
   ngOnInit(): void {
+  }
+
+  isLoggedIn(): boolean{
+    if (this.cookieService.get('logged') == 'true'){
+      this.user = this.cookieService.get('user');
+      return true;
+    }else{
+      return false;
+    }
   }
 
 }

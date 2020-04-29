@@ -23,6 +23,7 @@
     "fast-xml-parser": "^3.16.0",
     "file-saver": "^2.0.2",
     "jszip": "^3.3.0",
+    "ngx-cookie-service": "^3.0.4",
     "rxjs": "~6.5.4",
     "sweetalert2": "^9.10.11",
     "tslib": "^1.10.0",
