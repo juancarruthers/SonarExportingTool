@@ -11,7 +11,7 @@ import { Project } from 'src/app/classes/APIRequest/project';
 @Component({
   selector: 'app-export-modal',
   templateUrl: './export-modal.component.html',
-  styleUrls: ['./export-modal.component.css']
+  styleUrls: ['./export-modal.component.scss']
 })
 export class ExportModalComponent implements OnInit {
 

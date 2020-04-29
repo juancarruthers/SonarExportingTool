@@ -6,7 +6,7 @@ import { Metric } from 'src/app/classes/APIRequest/metric';
 @Component({
   selector: 'app-comp-metrics-table',
   templateUrl: './comp-metrics-table.component.html',
-  styleUrls: ['./comp-metrics-table.component.css']
+  styleUrls: ['./comp-metrics-table.component.scss']
 })
 export class CompMetricsTableComponent implements OnInit {
 
