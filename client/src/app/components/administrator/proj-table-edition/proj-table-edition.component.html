@@ -1,0 +1,39 @@
+<div class="container-fluid pt-4 pb-4">
+    <h2 class="text-center mb-2"><strong>Projects Hosted in SonarCloud</strong></h2>
+        <div class="row">
+          <button (click)="pingApi()">Ping API</button>
+
+          <pre *ngIf="responseJson">
+          <code>{{ responseJson | json }}</code>
+          </pre>
+
+                <table class="table table-responsive-xl table-hover">
+                <caption>List of Projects in Sonar Cloud</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Key</th>
+                        <th scope="col">Project</th>
+                        <th scope="col">Last Analysis</th>
+                        <th scope="col">Version</th>
+                        <th scope="col">Link to Sonar Cloud</th>
+                        <th scope="col">Link to Project</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let project of projects">
+                        <td>{{ project.key }}</td>
+                        <td>{{ project.name }}</td>
+                        <td>{{ project.lastAnalysis }}</td>
+                        <td>{{ project.version }}</td>                   
+                        <td><a href="{{ 'https://sonarcloud.io/dashboard?id=unne.sonar%3A' + project.name.toLowerCase().replace(' ', '-') }}">Sonar Cloud Measures</a></td>
+                        <td><a href="{{ project.projectLink }}"></a>Project</td>
+                      </tr>
+                      
+                      </tbody>
+                  </table>
+
+    
+        </div>
+
+    
+    </div>

@@ -1,5 +1,3 @@
-
-
 //Imports
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -16,11 +14,13 @@ import { AlertComponent } from './components/alert/alert.component';
 import { MetricsTableComponent } from './components/metrics-table/metrics-table.component';
 import { TwoOptionModalComponent } from './components/two-option-modal/two-option-modal.component';
 import { CompMetricsTableComponent } from './components/comp-metrics-table/comp-metrics-table.component';
+import { ProjTableEditionComponent } from './components/administrator/proj-table-edition/proj-table-edition.component';
 
 //Services
 import { ProjectsService } from './services/projects/projects.service';
 import { AuthService } from './services/auth/auth.service';
 import { CookieService } from 'ngx-cookie-service';
+
 
 
 @NgModule({
@@ -32,7 +32,8 @@ import { CookieService } from 'ngx-cookie-service';
     AlertComponent,
     MetricsTableComponent,
     TwoOptionModalComponent,
-    CompMetricsTableComponent
+    CompMetricsTableComponent,
+    ProjTableEditionComponent
   ],
   imports: [
     BrowserModule,

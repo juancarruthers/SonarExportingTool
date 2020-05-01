@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
 import pool from '../database';
 import { Pool } from 'promise-mysql';
-import { Project } from '../models/project'
-
+import { Project } from '../models/project';
 
 class ProjectController {
 
@@ -21,6 +20,14 @@ class ProjectController {
         res.json(query);
 
     }   
+
+    public async editProject (req:Request, res:Response): Promise<void>{
+
+        const { idproj } = req.params;
+
+        
+        res.send(idproj);
+    } 
 
     public async listProjectsMeasures (req:Request, res:Response){ 
         const { idproj } = req.params;

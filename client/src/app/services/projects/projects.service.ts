@@ -1,12 +1,20 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { delay } from 'rxjs/operators';
-import { Observable } from 'rxjs/internal/Observable';
+import { delay, mergeMap, catchError } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
 
 // Interfaces
 import { Project } from '../../classes/APIRequest/project'
 import { Metric } from '../../classes/APIRequest/metric';
 import { Component } from '../../classes/APIRequest/component';
+
+
+
+
+
+
+import { AuthService } from './../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +26,7 @@ export class ProjectsService {
   API_URI: string;
   httpHeaders: HttpHeaders;
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient, private auth:AuthService) { 
     this.API_URI = 'http://localhost:3000/api/projects';
     this.httpHeaders = new HttpHeaders({
       'Content-Type':'application/json; charset=utf-8',
@@ -117,4 +125,17 @@ export class ProjectsService {
 
   }
 
+  prueba(): Observable<any>{
+    let url = `${this.API_URI}/edit/1`;
+    return this.auth.getTokenSilently()
+            .pipe(
+              mergeMap(token => {
+                let headers = new HttpHeaders ({ Authorization: `Bearer ${token}` });
+                return this.http.get(url, {headers});
+              }),
+              catchError(err => throwError(err))
+            );
+  }
+
+ 
 }

@@ -8,7 +8,7 @@ $border-focus-color :transparent;
 // White links against a dark background
 .navbar-dark {
     .navbar-brand {
-
+      outline-color: $border-focus-color;
       @include hover() {
 
         outline-color: $border-focus-color;

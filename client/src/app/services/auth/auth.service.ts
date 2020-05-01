@@ -10,14 +10,14 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthService {
-  redirectUrl = 'http://localhost:4200';
 
   // Create an observable of Auth0 instance of client
   auth0Client : Observable<Auth0Client> = from(
     createAuth0Client({
       domain: "carruthers.auth0.com",
       client_id: "2u9njACfO2cQsqWUhlgiKuMaQCCJSZH5",
-      redirect_uri: `${window.location.origin}`
+      redirect_uri: `${window.location.origin}`,
+      audience: "https://admin.sonarexportingtool.com"
     })
   ).pipe(
     shareReplay(1), // Every subscription receives the same shared value
@@ -29,18 +29,9 @@ export class AuthService {
   // from: Convert that resulting promise into an observable
   isAuthenticated = this.auth0Client.pipe(
     concatMap((client: Auth0Client) => from(client.isAuthenticated())),
-    tap((res) => {
-      this.loggedIn = res;
-      this.cookieService.set('logged', res + '');
-      if (res){
-        this.getUser().subscribe((user) => {
-          this.cookieService.set('user', user.nickname);
-        });   
-      }else{
-        this.cookieService.delete('user');
-      }
-    })
+    tap(res => this.loggedIn = res)
   );
+
   handleRedirectCallback = this.auth0Client.pipe(
     concatMap((client: Auth0Client) => from(client.handleRedirectCallback()))
   );
@@ -90,12 +81,10 @@ export class AuthService {
     // Ensure Auth0 client instance exists
     this.auth0Client.subscribe((client: Auth0Client) => {
       // Call method to log in
-      let p : RedirectLoginOptions;
-      
+         
       client.loginWithRedirect({
-
-        redirect_uri: this.redirectUrl,
-        appState: { target: redirectPath },
+        redirect_uri: `${window.location.origin}`,
+        appState: { target: redirectPath }
       });
     });
   }
@@ -104,7 +93,7 @@ export class AuthService {
     // Call when app reloads after user logs in with Auth0
     const params = window.location.search;
     if (params.includes('code=') && params.includes('state=')) {
-      let targetRoute: string; // Path to redirect to after login processsed
+      let targetRoute: string; // Path to redirect to after login processed
       const authComplete = this.handleRedirectCallback.pipe(
         // Have client, now call method to handle auth callback redirect
         tap(cbRes => {
@@ -112,7 +101,8 @@ export class AuthService {
           targetRoute = cbRes.appState && cbRes.appState.target ? cbRes.appState.target : '/';
         }),
         concatMap(() => {
-          // Redirect callback complete; get user and login status
+          // Redirect callback complete; get user and login status          
+         
           return combineLatest([
             this.getUser(),
             this.isAuthenticated
@@ -123,12 +113,14 @@ export class AuthService {
       // Response will be an array of user and login status
       authComplete.subscribe(([user, loggedIn]) => {
         // Redirect to target route after callback processing
+        this.cookieService.set('loggedIn',loggedIn+'',1);
+        this.cookieService.set('user',user.nickname,1);
         this.router.navigate([targetRoute]);
       });
     }
   }
 
-  logout() {
+  async logout() {
     // Ensure Auth0 client instance exists
     this.auth0Client.subscribe((client: Auth0Client) => {
       // Call method to log out
@@ -136,7 +128,16 @@ export class AuthService {
         client_id: "2u9njACfO2cQsqWUhlgiKuMaQCCJSZH5",
         returnTo: `${window.location.origin}`
       });
-    });
+      this.cookieService.deleteAll();
+    });  
+     
+  }
+
+  //Get token to access the Administrators API
+  getTokenSilently(options?): Observable<string> {
+    return this.auth0Client.pipe(
+      concatMap((client: Auth0Client) => from(client.getTokenSilently(options)))
+    );
   }
 
 }

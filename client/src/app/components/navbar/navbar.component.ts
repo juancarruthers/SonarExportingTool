@@ -9,20 +9,22 @@ import { AuthService } from '../../services/auth/auth.service';
 })
 export class NavbarComponent implements OnInit {
 
-  user = '';
+  user : string = '';
 
   constructor(public authService: AuthService, private cookieService: CookieService) {}
 
   ngOnInit(): void {
+    
   }
 
   isLoggedIn(): boolean{
-    if (this.cookieService.get('logged') == 'true'){
-      this.user = this.cookieService.get('user');
-      return true;
-    }else{
-      return false;
-    }
+    this.user = this.cookieService.get('user');
+    return (this.cookieService.get('loggedIn') == 'true');
+    //this.user = this.cookieService.get('user');
+  }
+
+  async logout(){
+    await this.authService.logout();
   }
 
 }

@@ -27,6 +27,12 @@ class ProjectController {
             res.json(query);
         });
     }
+    editProject(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { idproj } = req.params;
+            res.send(idproj);
+        });
+    }
     listProjectsMeasures(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { idproj } = req.params;

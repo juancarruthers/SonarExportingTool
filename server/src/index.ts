@@ -1,9 +1,10 @@
-import express, { Application } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import { CronJob } from 'cron';
 
-import projectsRoutes from './routes/projectsRoutes';
+import publicRoutes from './routes/publicRoutes';
+import adminRoutes from './routes/adminRoutes';
 import { refreshModule } from './refreshAPIModule';
 
 class Server {
@@ -15,6 +16,7 @@ class Server {
         this.config();
         this.routes();
         this.startRefreshModuleJob();
+        this.errorHandlingConfig();
     }
 
     config(): void {
@@ -29,7 +31,8 @@ class Server {
 
     routes(): void {
 
-        this.app.use(projectsRoutes);
+      this.app.use(publicRoutes);
+      this.app.use(adminRoutes);
 
     }
 
@@ -48,7 +51,22 @@ class Server {
         job.start();
     }
 
+    errorHandlingConfig(){
+        this.app
+        .use((err: Error, req: Request, res: Response, next: NextFunction) => {
+            res.status(400).send('Need Authentication token to make that request');
+            next();
+        },
+        (err: Error, req: Request, res: Response, next: NextFunction) => {
+            console.log(err.stack);
+            res.status(500).send('Server does not know how to handle the situation');
+            next();
+        }
+        );
+    }
+
 }
 
 const server = new Server();
+
 server.start();

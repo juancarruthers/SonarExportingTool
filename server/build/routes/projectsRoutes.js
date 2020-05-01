@@ -16,6 +16,7 @@ class ProjectRoutes {
         this.router.get('/api/projects/measures/:idproj/:idmet', projectController_1.projectController.listProjectsMeasures);
         this.router.get('/api/projects/components/measures/:idproj/:idmet', componentController_1.componentController.listComponentsMeasures);
         this.router.get('/api/projects/components/measures/count/:idproj/:idmet', componentController_1.componentController.countComponentsMeasures);
+        this.router.get('/api/projects/edit/:idproj/:field/:value', projectController_1.projectController.editProject);
     }
 }
 const projectRoutes = new ProjectRoutes();
