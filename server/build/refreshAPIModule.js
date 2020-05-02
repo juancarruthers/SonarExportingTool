@@ -17,15 +17,11 @@ const url_1 = require("url");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const fs_1 = require("fs");
 const path_1 = require("path");
-const project_1 = require("./models/project");
-const project_measure_1 = require("./models/project_measure");
-const component_measure_1 = require("./models/component_measure");
-const component_1 = require("./models/component");
 class RefreshAPIModule {
     constructor() {
         this.refreshProjects = [];
         this.newProjects = [];
-        this.organization = 'unne-sonar-corpus';
+        this.organization = 'juancarruthers-github'; //'unne-sonar-corpus';
         this.projectsKeys = '';
     }
     main() {
@@ -161,7 +157,7 @@ class RefreshAPIModule {
     listKeyProjects(p_projects) {
         let keyList = "";
         for (let project of p_projects) {
-            keyList = keyList + project.getKey() + ',';
+            keyList = keyList + project[0] + ',';
         }
         keyList = keyList.replace(/\,$/, '');
         return keyList;
@@ -215,8 +211,8 @@ class RefreshAPIModule {
                     timestampAnalysis.setUTCMinutes(hours[1]);
                     timestampAnalysis.setUTCSeconds(hours[2]);
                     if (timestampAnalysis > dateLastAnalysis) {
-                        let respProj = new project_1.Project(proj["key"], proj["name"], proj["qualifier"], timestampAnalysis);
-                        if (yield this.checkProjectExists(respProj.getKey())) {
+                        let respProj = [proj["key"], proj["name"], proj["qualifier"], timestampAnalysis];
+                        if (yield this.checkProjectExists(proj["key"])) {
                             this.refreshProjects.push(respProj);
                         }
                         else {
@@ -233,16 +229,16 @@ class RefreshAPIModule {
     updateProjects() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                for (let proj of this.newProjects) {
+                if (this.newProjects.length > 0) {
                     yield database_1.default
-                        .then((r) => r.query('INSERT INTO projects set ?', [proj])
+                        .then((r) => r.query('INSERT INTO `projects` (`key`,`name`,`qualifier`,`lastAnalysis`) VALUES  ?', [this.newProjects])
                         .catch(err => {
                         console.log(err);
                     }));
                 }
                 for (let proj of this.refreshProjects) {
                     yield database_1.default
-                        .then((r) => r.query('UPDATE projects AS p SET p.lastAnalysis = ? WHERE p.key = ?', [proj.getLastAnalysis(), proj.getKey()])
+                        .then((r) => r.query('UPDATE projects AS p SET p.lastAnalysis = ? WHERE p.key = ?', [proj[3], proj[0]])
                         .catch(err => {
                         console.log(err);
                     }));
@@ -261,6 +257,7 @@ class RefreshAPIModule {
                     .catch(err => {
                     console.log(err);
                 }));
+                let components = [];
                 for (let proj of projectsKeys) {
                     let url = "https://sonarcloud.io/api/components/tree?component=" + proj['key'] + "&p=1&ps=500";
                     let api_query = yield this.APIGetRequest(url, '');
@@ -274,17 +271,18 @@ class RefreshAPIModule {
                         response_components = api_query["components"];
                         for (let comp of response_components) {
                             if (!(yield this.checkComponentExists(proj["idproject"], comp["path"]))) {
-                                let respComp = new component_1.Component(proj["idproject"], comp["name"], comp["qualifier"], comp["path"], comp["language"]);
-                                database_1.default
-                                    .then((r) => r.query('INSERT INTO components set ?', [respComp])
-                                    .catch(err => {
-                                    console.log(err);
-                                }));
+                                let respComp = [proj["idproject"], comp["name"], comp["qualifier"], comp["path"], comp["language"]];
+                                components.push(respComp);
                             }
                         }
                         cont = cont + 1;
                     }
                 }
+                database_1.default
+                    .then((r) => r.query('INSERT INTO `components` (`idproject`,`name`,`qualifier`,`path`,`language`) VALUES ?', [components])
+                    .catch(err => {
+                    console.log(err);
+                }));
             }
             catch (error) {
                 console.log(error);
@@ -299,6 +297,7 @@ class RefreshAPIModule {
                     .catch(err => {
                     console.log(err);
                 }));
+                let projectMeasures = [];
                 for (let proj of projectsKeys) {
                     //eliminada metricas quality_profiles, quality_gate_details, sonarjava_feedback
                     let url = "https://sonarcloud.io/api/measures/component?component=" + proj['key'] + "&metricKeys=new_technical_debt, blocker_violations, bugs, classes, code_smells, cognitive_complexity, comment_lines, comment_lines_data, comment_lines_density, class_complexity, file_complexity, function_complexity, complexity_in_classes, complexity_in_functions, branch_coverage, new_branch_coverage, conditions_to_cover, new_conditions_to_cover, confirmed_issues, coverage, new_coverage, critical_violations, complexity, last_commit_date, development_cost, new_development_cost, directories, duplicated_blocks, new_duplicated_blocks, duplicated_files, duplicated_lines, duplicated_lines_density, new_duplicated_lines, new_duplicated_lines_density, duplications_data, effort_to_reach_maintainability_rating_a, executable_lines_data, false_positive_issues, file_complexity_distribution, files, function_complexity_distribution, functions, generated_lines, generated_ncloc, info_violations, violations, line_coverage, new_line_coverage, lines, ncloc, ncloc_language_distribution, lines_to_cover, new_lines_to_cover, sqale_rating, new_maintainability_rating, major_violations, minor_violations, ncloc_data, new_blocker_violations, new_bugs, new_code_smells, new_critical_violations, new_info_violations, new_violations, new_lines, new_major_violations, new_minor_violations, new_security_hotspots, new_vulnerabilities, open_issues, projects, public_api, public_documented_api_density, public_undocumented_api, alert_status, reliability_rating, new_reliability_rating, reliability_remediation_effort, new_reliability_remediation_effort, reopened_issues, security_hotspots, security_rating, new_security_rating, security_remediation_effort, new_security_remediation_effort, security_review_rating, skipped_tests, statements, sqale_index, sqale_debt_ratio, new_sqale_debt_ratio, uncovered_conditions, new_uncovered_conditions, uncovered_lines, new_uncovered_lines, test_execution_time, test_errors, test_failures, tests, test_success_density, vulnerabilities, wont_fix_issues&ps=500&p=1";
@@ -313,12 +312,8 @@ class RefreshAPIModule {
                         }));
                         idMeasure = yield this.getProjectIdMeasure(proj["idproject"], idMetric['0']['idmetric']);
                         if (idMeasure == 0) {
-                            let respMeas = new project_measure_1.Project_measure(proj["idproject"], idMetric['0']['idmetric'], mea["value"]);
-                            yield database_1.default
-                                .then((r) => r.query('INSERT INTO project_measures set ?', [respMeas])
-                                .catch(err => {
-                                console.log(err);
-                            }));
+                            let respMeas = [proj["idproject"], idMetric['0']['idmetric'], mea["value"]];
+                            projectMeasures.push(respMeas);
                         }
                         else {
                             yield database_1.default
@@ -328,6 +323,13 @@ class RefreshAPIModule {
                             }));
                         }
                     }
+                }
+                if (projectMeasures.length > 0) {
+                    yield database_1.default
+                        .then((r) => r.query('INSERT INTO `project_measures` (`idproject`, `idmetric`, `value`) VALUES ?', [projectMeasures])
+                        .catch(err => {
+                        console.log(err);
+                    }));
                 }
             }
             catch (error) {
@@ -343,6 +345,7 @@ class RefreshAPIModule {
                     .catch(err => {
                     console.log(err);
                 }));
+                let componentMeasures = [];
                 for (let proj of projectsKeys) {
                     let componentsPaths = yield database_1.default
                         .then((r) => r.query('SELECT c.idcomponent, c.path FROM components AS c WHERE c.idproject = ?', proj['idproject'])
@@ -364,12 +367,8 @@ class RefreshAPIModule {
                                 }));
                                 idMeasure = yield this.getComponentIdMeasure(comp['idcomponent'], idMetric['0']['idmetric']);
                                 if (idMeasure == 0) {
-                                    let respMeas = new component_measure_1.Component_measure(comp['idcomponent'], idMetric['0']['idmetric'], mea["value"]);
-                                    yield database_1.default
-                                        .then((r) => r.query('INSERT INTO component_measures set ?', [respMeas])
-                                        .catch(err => {
-                                        console.log(err);
-                                    }));
+                                    let respMeas = [comp['idcomponent'], idMetric['0']['idmetric'], mea["value"]];
+                                    componentMeasures.push(respMeas);
                                 }
                                 else {
                                     yield database_1.default
@@ -386,6 +385,13 @@ class RefreshAPIModule {
                             this.updateComponentMeasures(this.projectsKeys);
                         }
                     }
+                }
+                if (componentMeasures.length > 0) {
+                    yield database_1.default
+                        .then((r) => r.query('INSERT INTO `component_measures` (`idcomponent`, `idmetric`,`value`) VALUES ?', [componentMeasures])
+                        .catch(err => {
+                        console.log(err);
+                    }));
                 }
             }
             catch (error) {

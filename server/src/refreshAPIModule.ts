@@ -6,26 +6,22 @@ import fetch from 'node-fetch';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
-import { Project } from './models/project';
-import { Project_measure } from './models/project_measure';
-import { Component_measure } from './models/component_measure';
-import { Component } from './models/component';
-
 class RefreshAPIModule {
 
-  private refreshProjects : Project[];
-  private newProjects : Project[];
+  private refreshProjects : any[][];
+  private newProjects : any[][];
   private organization: string;
   private projectsKeys: string;
 
   constructor(){
     this.refreshProjects = [];
     this.newProjects = [];
-    this.organization = 'unne-sonar-corpus';
+    this.organization = 'juancarruthers-github';//'unne-sonar-corpus';
     this.projectsKeys = '';
   }
 
   public async main(): Promise<number>{
+
     await this.searchLastAnalysis();
     await this.updateProjects();
     console.log('Projects Updated!');
@@ -180,10 +176,10 @@ class RefreshAPIModule {
   }
 
 
-  private listKeyProjects(p_projects: Project[]): string{
+  private listKeyProjects(p_projects: any[][]): string{
     let keyList = "";
     for (let project of p_projects) {
-      keyList = keyList + project.getKey() + ',';  
+      keyList = keyList + project[0] + ',';  
          
     }
     keyList = keyList.replace(/\,$/,'');
@@ -255,9 +251,9 @@ class RefreshAPIModule {
 
         if (timestampAnalysis > dateLastAnalysis){
 
-          let respProj = new Project(proj["key"], proj["name"], proj["qualifier"], timestampAnalysis);
+          let respProj = [proj["key"], proj["name"], proj["qualifier"], timestampAnalysis];
 
-          if (await this.checkProjectExists(respProj.getKey())){
+          if (await this.checkProjectExists(proj["key"])){
             this.refreshProjects.push(respProj);
           }else{
             this.newProjects.push(respProj);
@@ -276,22 +272,21 @@ class RefreshAPIModule {
 
   private async updateProjects(): Promise<void>{
     try {
+      if (this.newProjects.length > 0){
 
-      for(let proj of this.newProjects){
-        
         await pool
-          .then((r: Pool) => r.query('INSERT INTO projects set ?', [proj])
-            .catch(err => {
-              console.log(err);
-            })
-          );
+            .then((r: Pool) => r.query('INSERT INTO `projects` (`key`,`name`,`qualifier`,`lastAnalysis`) VALUES  ?', [this.newProjects])
+              .catch(err => {
+                console.log(err);
+              })
+            );
 
       }
 
       for(let proj of this.refreshProjects){
         
         await pool
-          .then((r: Pool) => r.query('UPDATE projects AS p SET p.lastAnalysis = ? WHERE p.key = ?', [proj.getLastAnalysis(), proj.getKey()])
+          .then((r: Pool) => r.query('UPDATE projects AS p SET p.lastAnalysis = ? WHERE p.key = ?', [proj[3], proj[0]])
             .catch(err => {
               console.log(err);
             })
@@ -315,6 +310,8 @@ class RefreshAPIModule {
             console.log(err);
           })
         );
+
+      let components : any[][] = [];
 
       for (let proj of projectsKeys){
 
@@ -340,13 +337,9 @@ class RefreshAPIModule {
 
             if (!await this.checkComponentExists(proj["idproject"], comp["path"])){
 
-              let respComp = new Component(proj["idproject"], comp["name"], comp["qualifier"], comp["path"], comp["language"]);
-              pool
-                .then((r: Pool) => r.query('INSERT INTO components set ?', [respComp])
-                  .catch(err => {
-                    console.log(err);
-                  })
-                );
+              let respComp = [proj["idproject"], comp["name"], comp["qualifier"], comp["path"], comp["language"]];
+              components.push(respComp);
+              
             }
           }
           
@@ -355,6 +348,12 @@ class RefreshAPIModule {
         }
 
       }
+      pool
+        .then((r: Pool) => r.query('INSERT INTO `components` (`idproject`,`name`,`qualifier`,`path`,`language`) VALUES ?', [components])
+          .catch(err => {
+            console.log(err);
+          })
+        );
       
     } catch (error) {
 
@@ -375,6 +374,7 @@ class RefreshAPIModule {
             console.log(err);
           })
         );
+      let projectMeasures : any[][] = [];
 
       for (let proj of projectsKeys){
 
@@ -400,13 +400,9 @@ class RefreshAPIModule {
 
           if (idMeasure == 0){
 
-            let respMeas = new Project_measure(proj["idproject"], idMetric['0']['idmetric'], mea["value"]);
-            await pool
-            .then((r: Pool) => r.query('INSERT INTO project_measures set ?', [respMeas])
-              .catch(err => {
-                console.log(err);
-              })
-            );
+            let respMeas = [proj["idproject"], idMetric['0']['idmetric'], mea["value"]];
+            projectMeasures.push(respMeas);
+            
           }else{
             
             await pool
@@ -420,6 +416,15 @@ class RefreshAPIModule {
 
         }
 
+      }
+
+      if (projectMeasures.length > 0){
+        await pool
+            .then((r: Pool) => r.query('INSERT INTO `project_measures` (`idproject`, `idmetric`, `value`) VALUES ?', [projectMeasures])
+              .catch(err => {
+                console.log(err);
+              })
+            );
       }
       
     } catch (error) {
@@ -438,6 +443,7 @@ class RefreshAPIModule {
             console.log(err);
           })
         );
+      let componentMeasures : any[][] = [];
 
       for (let proj of projectsKeys){
 
@@ -474,13 +480,8 @@ class RefreshAPIModule {
 
               if (idMeasure == 0){
 
-                let respMeas = new Component_measure(comp['idcomponent'], idMetric['0']['idmetric'], mea["value"]);
-                await pool
-                  .then((r: Pool) => r.query('INSERT INTO component_measures set ?', [respMeas])
-                    .catch(err => {
-                      console.log(err);
-                    })
-                  );
+                let respMeas = [comp['idcomponent'], idMetric['0']['idmetric'], mea["value"]];
+                componentMeasures.push(respMeas);
 
               }else{
                 
@@ -502,6 +503,15 @@ class RefreshAPIModule {
 
         }         
 
+      }
+
+      if(componentMeasures.length > 0){
+        await pool
+                  .then((r: Pool) => r.query('INSERT INTO `component_measures` (`idcomponent`, `idmetric`,`value`) VALUES ?', [componentMeasures])
+                    .catch(err => {
+                      console.log(err);
+                    })
+                  );
       }
          
     } catch (error) {   

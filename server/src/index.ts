@@ -10,8 +10,11 @@ import { refreshModule } from './refreshAPIModule';
 class Server {
 
     public app: Application;
+    public cronJob? : CronJob;
+    public port: number;
 
     constructor(){
+        this.port = 3000;
         this.app = express();
         this.config();
         this.routes();
@@ -21,7 +24,7 @@ class Server {
 
     config(): void {
 
-        this.app.set('port', process.env.PORT || 3000);
+        this.app.set('port', process.env.PORT || this.port);
         this.app.use(morgan('dev'));
         this.app.use(cors());
         this.app.use(express.json());
@@ -45,10 +48,8 @@ class Server {
     }
 
     startRefreshModuleJob(): void{
-        let job = new CronJob ('00 00 02 * * *', async function() {
-            await refreshModule.main();
-        });
-        job.start();
+        this.cronJob = new CronJob ( '00 00 02 * * *', () => refreshModule.main());  
+        this.cronJob.start();     
     }
 
     errorHandlingConfig(){
@@ -67,6 +68,6 @@ class Server {
 
 }
 
-const server = new Server();
+export const server = new Server();
 
 server.start();
