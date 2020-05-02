@@ -47,7 +47,7 @@ class AdminRoutes {
 
     config(): void {
         // Define an endpoint that must be called with an access token
-        this.router.get("/api/projects/edit/:idproj", this.checkJwt, projectController.editProject);
+        this.router.put("/api/projects/edit", this.checkJwt, projectController.editProject);
 
     }
 

@@ -1,6 +1,9 @@
 import { ProjectsService } from './../../../services/projects/projects.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Project } from '../../../classes/APIRequest/project';
+import { Router } from '@angular/router';
+import { SweetAlert } from '../../sweetAlert/sweetAlert';
+import { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
   selector: 'app-proj-table-edition',
@@ -13,12 +16,10 @@ export class ProjTableEditionComponent implements OnInit {
     projects: Project[];
 
     //Arguments for the API Request
-    projectsExported: number[];
+    projectsChanged: number[];
 
-    responseJson: string;
   
-    constructor( private projectsService: ProjectsService) { 
-      
+    constructor( private projectsService: ProjectsService, private router: Router) {
     }
   
     ngOnInit(): void {
@@ -29,20 +30,40 @@ export class ProjTableEditionComponent implements OnInit {
           },
           err=> console.log(err)
         )
-      this.projectsExported = new Array<number>();
+      this.projectsChanged = new Array<number>();
     }
-  
-    ngOnDestroy():void{
-    
-      this.projectsService.setExportedProjects(this.projectsExported);
+
+    ngOnDestroy(){
+
+    }
+
+    addProject(p_idproject: number){
+      if (this.projectsChanged.indexOf(p_idproject) == -1){
+        this.projectsChanged.push(p_idproject);
+      }
+    }
+
+    saveChanges(){
+      let changes : string [][] = [];
+      for (let i = 0; i < this.projectsChanged.length; i++) {
+        let link = (document.getElementById('inpLink' + this.projectsChanged[i]) as HTMLInputElement).value;
+        let version = (document.getElementById('inpVersion' + this.projectsChanged[i]) as HTMLInputElement).value;
+        let change = [link, version, this.projectsChanged[i]+''];
+        changes.push(change);
+      }
+      this.projectsService.editProjects(changes)
+      .subscribe((response) => {
+        let alert = new SweetAlert();
+        let result : SweetAlertIcon;
+        if (response.includes('success')){
+          result = 'success';
+        }else{
+          result = 'error';
+        }
+        alert.completed(response, result);
+        this.router.navigateByUrl('/projects/edit');
+      })
       
-    }
-
-
-    pingApi() {
-      this.projectsService.prueba().subscribe(
-        res => this.responseJson = res
-      );
     }
 
 }

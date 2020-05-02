@@ -69,9 +69,7 @@ export class ProjectsService {
   */
   
   getProjects(): Observable<Project[]>{
-    let headers = this.httpHeaders;
-
-    return this.http.get<Project[]>(`${this.API_URI}`, {headers});
+    return this.http.get<Project[]>(`${this.API_URI}`);
   }
 
   getProjectMetrics(): Observable<Metric[]>{
@@ -125,13 +123,18 @@ export class ProjectsService {
 
   }
 
-  prueba(): Observable<any>{
-    let url = `${this.API_URI}/edit/1`;
+
+  /*
+    Private Services
+  */
+
+  editProjects(p_projectsChanges: string[][]): Observable<string>{
+    let url = `${this.API_URI}/edit`;
     return this.auth.getTokenSilently()
             .pipe(
               mergeMap(token => {
                 let headers = new HttpHeaders ({ Authorization: `Bearer ${token}` });
-                return this.http.get(url, {headers});
+                return this.http.put<string>(url, p_projectsChanges ,{headers});
               }),
               catchError(err => throwError(err))
             );

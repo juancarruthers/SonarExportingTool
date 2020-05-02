@@ -1,4 +1,4 @@
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 
 export class SweetAlert {
@@ -22,6 +22,24 @@ export class SweetAlert {
 
   update(p_title: string): void{
     document.getElementById("action").innerHTML = p_title;
+  }
+
+  completed(p_text : string, p_result : SweetAlertIcon):void{
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top',
+      showConfirmButton: false,
+      timer: 3000,
+      onOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    })
+    
+    Toast.fire({
+      icon: p_result,
+      title: p_text
+    })
   }
 
   close(): void{

@@ -1,21 +1,14 @@
-<div class="container-fluid pt-4 pb-4">
+<div class="container pt-4 pb-4">
     <h2 class="text-center mb-2"><strong>Projects Hosted in SonarCloud</strong></h2>
         <div class="row">
-          <button (click)="pingApi()">Ping API</button>
-
-          <pre *ngIf="responseJson">
-          <code>{{ responseJson | json }}</code>
-          </pre>
-
+          <div class="col-xl-10">
                 <table class="table table-responsive-xl table-hover">
                 <caption>List of Projects in Sonar Cloud</caption>
                     <thead>
                       <tr>
                         <th scope="col">Key</th>
-                        <th scope="col">Project</th>
-                        <th scope="col">Last Analysis</th>
-                        <th scope="col">Version</th>
-                        <th scope="col">Link to Sonar Cloud</th>
+                        <th scope="col">Project</th>                      
+                        <th scope="col">Version</th>                        
                         <th scope="col">Link to Project</th>
                       </tr>
                     </thead>
@@ -23,15 +16,36 @@
                       <tr *ngFor="let project of projects">
                         <td>{{ project.key }}</td>
                         <td>{{ project.name }}</td>
-                        <td>{{ project.lastAnalysis }}</td>
-                        <td>{{ project.version }}</td>                   
-                        <td><a href="{{ 'https://sonarcloud.io/dashboard?id=unne.sonar%3A' + project.name.toLowerCase().replace(' ', '-') }}">Sonar Cloud Measures</a></td>
-                        <td><a href="{{ project.projectLink }}"></a>Project</td>
+
+                        <td >
+                          <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                            </div>
+                            <input value="{{ project.version }}" type="text" class="form-control" id="{{ 'inpVersion' + project.idproject }}" (focus)="addProject(project.idproject)">
+                          </div>
+                        </td>
+                        
+
+
+                        <td >
+                          <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                            </div>
+                            <input value="{{ project.projectLink }}" type="text" class="form-control" id="{{ 'inpLink' + project.idproject }}" (focus)="addProject(project.idproject)" >
+                          </div>
+                        </td>
+
                       </tr>
                       
                       </tbody>
                   </table>
+                </div>
+                <div class="col-xl-2">
+                  <button class="btn btn-primary btn-block" (click)="saveChanges()">
+                    <em class="fas fa-save"></em> Save Changes</button>
 
+                </div>
+                
     
         </div>
 

@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import pool from '../database';
 import { Pool } from 'promise-mysql';
-import { Project } from '../models/project';
 
 class ProjectController {
 
@@ -10,7 +9,7 @@ class ProjectController {
 
     public async listProjects (req:Request, res:Response): Promise<void>{
 
-        const query : Project [] = await pool
+        const query = await pool
             .then((r: Pool) => r
             .query('SELECT * FROM projects ORDER BY lastAnalysis DESC')
             )
@@ -22,11 +21,18 @@ class ProjectController {
     }   
 
     public async editProject (req:Request, res:Response): Promise<void>{
-
-        const { idproj } = req.params;
-
-        
-        res.send(idproj);
+        console.log(req.body);
+        for (let projectUpdate of req.body){
+            await pool 
+            .then((r: Pool) => r
+                .query('UPDATE projects SET projectLink = ?, version = ? WHERE idproject = ?', projectUpdate)
+                )
+                .catch(err =>{
+                    console.log(err)
+                    res.json('Request could not be fullfilled');
+                });  
+        }   
+        res.json('Request completed successfully');
     } 
 
     public async listProjectsMeasures (req:Request, res:Response){ 
