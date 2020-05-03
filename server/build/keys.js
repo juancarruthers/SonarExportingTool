@@ -5,6 +5,6 @@ exports.default = {
         host: 'localhost',
         user: 'admin',
         password: 'admin',
-        database: 'sonar',
+        database: 'prueba',
     }
 };

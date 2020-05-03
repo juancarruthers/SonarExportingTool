@@ -5,7 +5,7 @@ import { CronJob } from 'cron';
 
 import publicRoutes from './routes/publicRoutes';
 import adminRoutes from './routes/adminRoutes';
-import { refreshModule } from './refreshAPIModule';
+import { refreshModule } from './refreshAPI/refreshAPIModule';
 
 class Server {
 

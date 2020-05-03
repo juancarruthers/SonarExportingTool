@@ -9,7 +9,7 @@ const cors_1 = __importDefault(require("cors"));
 const cron_1 = require("cron");
 const publicRoutes_1 = __importDefault(require("./routes/publicRoutes"));
 const adminRoutes_1 = __importDefault(require("./routes/adminRoutes"));
-const refreshAPIModule_1 = require("./refreshAPIModule");
+const refreshAPIModule_1 = require("./refreshAPI/refreshAPIModule");
 class Server {
     constructor() {
         this.port = 3000;
