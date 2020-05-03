@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -18,9 +9,10 @@ const cors_1 = __importDefault(require("cors"));
 const cron_1 = require("cron");
 const publicRoutes_1 = __importDefault(require("./routes/publicRoutes"));
 const adminRoutes_1 = __importDefault(require("./routes/adminRoutes"));
-const refreshAPIModule_1 = require("./refreshAPIModule");
+const refreshAPIModule_1 = require("./refreshAPI/refreshAPIModule");
 class Server {
     constructor() {
+        this.port = 3000;
         this.app = express_1.default();
         this.config();
         this.routes();
@@ -28,7 +20,7 @@ class Server {
         this.errorHandlingConfig();
     }
     config() {
-        this.app.set('port', process.env.PORT || 3000);
+        this.app.set('port', process.env.PORT || this.port);
         this.app.use(morgan_1.default('dev'));
         this.app.use(cors_1.default());
         this.app.use(express_1.default.json());
@@ -44,12 +36,8 @@ class Server {
         });
     }
     startRefreshModuleJob() {
-        let job = new cron_1.CronJob('00 00 02 * * *', function () {
-            return __awaiter(this, void 0, void 0, function* () {
-                yield refreshAPIModule_1.refreshModule.main();
-            });
-        });
-        job.start();
+        this.cronJob = new cron_1.CronJob('00 00 02 * * *', () => refreshAPIModule_1.refreshModule.main());
+        this.cronJob.start();
     }
     errorHandlingConfig() {
         this.app
@@ -63,5 +51,5 @@ class Server {
         });
     }
 }
-const server = new Server();
-server.start();
+exports.server = new Server();
+exports.server.start();

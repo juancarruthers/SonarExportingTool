@@ -29,7 +29,6 @@ class ProjectController {
     }
     editProject(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(req.body);
             for (let projectUpdate of req.body) {
                 yield database_1.default
                     .then((r) => r
