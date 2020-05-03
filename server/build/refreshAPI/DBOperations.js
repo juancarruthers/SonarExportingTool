@@ -14,7 +14,53 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database"));
 class DBOperations {
-    //GETS
+    /*
+     --->>>QUERIES FOR ROWS
+    */
+    //PROJECTS
+    getProjectKeys(p_projectsKeyList) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let projectsKeys;
+            if (p_projectsKeyList.length > 0) {
+                projectsKeys = yield database_1.default
+                    .then((r) => r
+                    .query('SELECT `idproject`, `key` FROM projects WHERE `key` IN (?)', [p_projectsKeyList])
+                    .catch(err => {
+                    console.log(err);
+                }));
+            }
+            else {
+                projectsKeys = [];
+            }
+            //Return tuple with values idproject and key
+            return projectsKeys;
+        });
+    }
+    getProjectLastAnalysis(p_projKey) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const lastAnalysis = yield database_1.default
+                .then((r) => r
+                .query('SELECT `lastAnalysis` FROM projects WHERE `key` = ?', p_projKey)
+                .catch(err => {
+                console.log(err);
+            }));
+            return lastAnalysis[0]['lastAnalysis'];
+        });
+    }
+    //COMPONENTS
+    getComponentPathsOfProyects(p_project) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const componentsPath = yield database_1.default
+                .then((r) => r
+                .query('SELECT c.idcomponent, c.path FROM components AS c WHERE c.idproject = ?', p_project)
+                .catch(err => {
+                console.log(err);
+            }));
+            //Return tuple with values idcomponent and path
+            return componentsPath;
+        });
+    }
+    //MEASURES
     getProjectIdMeasure(p_idproject, p_idmetric) {
         return __awaiter(this, void 0, void 0, function* () {
             const queryIdmeasure = yield database_1.default
@@ -51,6 +97,7 @@ class DBOperations {
             return value;
         });
     }
+    //METRICS
     getMetricId(p_metricKey) {
         return __awaiter(this, void 0, void 0, function* () {
             const idMetric = yield database_1.default
@@ -62,6 +109,7 @@ class DBOperations {
             return idMetric[0]['idmetric'];
         });
     }
+    //LASTUPDATE TABLE
     getDateLastAnalysis() {
         return __awaiter(this, void 0, void 0, function* () {
             const queryDateLastAnalysis = yield database_1.default
@@ -73,31 +121,45 @@ class DBOperations {
             return queryDateLastAnalysis[0]['date'];
         });
     }
-    getProjectKeys(p_projectsKeyList) {
+    /*
+     --->>>QUERIES FOR BOOLEANS (CHECKS EXISTANCE)
+    */
+    //PROJECTS
+    checkProjectExists(p_projectKey) {
         return __awaiter(this, void 0, void 0, function* () {
-            const projectsKeys = yield database_1.default
+            const querykeyProj = yield database_1.default
                 .then((r) => r
-                .query('SELECT `idproject`, `key` FROM projects WHERE `key` IN (?)', [p_projectsKeyList])
+                .query('SELECT p.key FROM projects AS p WHERE p.key = ?', p_projectKey)
                 .catch(err => {
                 console.log(err);
             }));
-            //Return tuple with values idproject and key
-            return projectsKeys;
+            let value = true;
+            if (querykeyProj.length == 0) {
+                value = false;
+            }
+            return value;
         });
     }
-    getComponentPathsOfProyects(p_project) {
+    //COMPONENTS
+    checkComponentExists(p_idproject, p_componentPath) {
         return __awaiter(this, void 0, void 0, function* () {
-            const componentsPath = yield database_1.default
+            const queryNameComp = yield database_1.default
                 .then((r) => r
-                .query('SELECT c.idcomponent, c.path FROM components AS c WHERE c.idproject = ?', p_project)
+                .query('SELECT c.name FROM components AS c WHERE c.idproject = ? AND c.path = ?', [p_idproject, p_componentPath])
                 .catch(err => {
                 console.log(err);
             }));
-            //Return tuple with values idcomponent and path
-            return componentsPath;
+            let value = true;
+            if (queryNameComp.length == 0) {
+                value = false;
+            }
+            return value;
         });
     }
-    //INSERT
+    /*
+     --->>>INSERTIONS
+    */
+    //PROJECTS
     insertProjects(p_projects) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database_1.default
@@ -108,6 +170,7 @@ class DBOperations {
             }));
         });
     }
+    //COMPONENTS
     insertComponents(p_components) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database_1.default
@@ -118,6 +181,7 @@ class DBOperations {
             }));
         });
     }
+    //PROJECTS' MEASURES
     insertProjectMeasures(p_measures) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database_1.default
@@ -128,6 +192,7 @@ class DBOperations {
             }));
         });
     }
+    //COMPONENTS' MEASURES
     insertComponentMeasures(p_measures) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database_1.default
@@ -138,7 +203,9 @@ class DBOperations {
             }));
         });
     }
-    //DELETE
+    /*
+     --->>>DELETES
+    */
     deleteComponentAndMeasures(p_idcomponent) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database_1.default
@@ -155,7 +222,20 @@ class DBOperations {
             }));
         });
     }
-    //UPDATE
+    deleteProjectsNotFullyLoad() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield database_1.default
+                .then((r) => r
+                .query('DELETE FROM projects WHERE idproject NOT IN (SELECT idproject FROM project_measures GROUP BY idproject);')
+                .catch(err => {
+                console.log(err);
+            }));
+        });
+    }
+    /*
+     --->>>UPDATES
+    */
+    //LASTUPDATE TABLE
     updateDateLastAnalysis() {
         return __awaiter(this, void 0, void 0, function* () {
             const date = new Date();
@@ -167,6 +247,7 @@ class DBOperations {
             }));
         });
     }
+    //LASTANALYSIS OF A PROJECT
     updateProjLastAnalysis(p_projectKey, p_dateLastAnalysis) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database_1.default
@@ -177,6 +258,7 @@ class DBOperations {
             }));
         });
     }
+    //PROJECT MEASURE
     updateProjMeasure(p_idmeasure, p_measureValue) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database_1.default
@@ -187,6 +269,7 @@ class DBOperations {
             }));
         });
     }
+    //COMPONENT MEASURE
     updateCompMeasure(p_idmeasure, p_measureValue) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database_1.default
@@ -197,37 +280,10 @@ class DBOperations {
             }));
         });
     }
-    //CHECK EXISTANCE
-    checkProjectExists(p_projectKey) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const querykeyProj = yield database_1.default
-                .then((r) => r
-                .query('SELECT p.key FROM projects AS p WHERE p.key = ?', p_projectKey)
-                .catch(err => {
-                console.log(err);
-            }));
-            let value = true;
-            if (querykeyProj.length == 0) {
-                value = false;
-            }
-            return value;
-        });
-    }
-    checkComponentExists(p_idproject, p_componentPath) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const queryNameComp = yield database_1.default
-                .then((r) => r
-                .query('SELECT c.name FROM components AS c WHERE c.idproject = ? AND c.path = ?', [p_idproject, p_componentPath])
-                .catch(err => {
-                console.log(err);
-            }));
-            let value = true;
-            if (queryNameComp.length == 0) {
-                value = false;
-            }
-            return value;
-        });
-    }
+    /*
+     --->>>TRANSACTIONAL OPERATIONS
+    */
+    //BEGIN AND END SEGMENTS OF A TRANSACTION (START TRANSACTION, COMMIT, ROLLBACK)
     transactionalOperation(p_operation) {
         return __awaiter(this, void 0, void 0, function* () {
             yield database_1.default
@@ -238,6 +294,7 @@ class DBOperations {
             }));
         });
     }
+    //TURNS ON AND OFF THE AUTOCOMMIT PROPERTY OF THE DATABASE (1 : ON, 0 : OFF)
     transactionalAutoCommit(p_state) {
         return __awaiter(this, void 0, void 0, function* () {
             yield (yield (yield database_1.default).getConnection())

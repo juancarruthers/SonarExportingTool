@@ -15,43 +15,84 @@ class RefreshAPIModule {
   constructor(){
     this.refreshProjects = [];
     this.newProjects = [];
-    this.insertBlock = 500;
+    this.insertBlock = 750;
   }
 
   public async main(): Promise<number>{
 
-    console.time('DBTime');
-
+    console.time('DBTime'); 
+    let flagTransactions : boolean = true;
     await this.searchLastAnalysis();
+
     await this.updateProjects();
     console.timeLog('DBTime', 'Projects Updated!');
 
-    //Insertion of NEW PROJECTS    
+    //Insertion of NEW PROJECTS
     let keysString = this.listKeyProjects(this.newProjects);
     this.projectsKeys = await database.getProjectKeys(keysString);
 
-    await this.updateComponents();
-    console.timeLog('DBTime', "Projects' Components Inserted!");
+    await database.transactionalAutoCommit(0);
+     
+    try {  
 
-    await this.updateProjectMeasures();
-    console.timeLog('DBTime', "Projects' Measures Inserted!");
+      for (let projectKey of this.projectsKeys) { 
+        
+        await database.transactionalOperation('START TRANSACTION');
 
-    await this.updateComponentMeasures();
-    console.timeLog('DBTime', "Components' Measures Inserted!");
+        await this.updateComponents(projectKey);
+        console.timeLog('DBTime', projectKey['key'] + " Components Inserted!");
+
+        await this.updateProjectMeasures(projectKey);
+        console.timeLog('DBTime', projectKey['key'] + " Measures Inserted!");
+
+        await this.updateComponentMeasures(projectKey);
+        console.timeLog('DBTime', projectKey['key'] + " Components' Measures Inserted!");
+
+        await database.transactionalOperation('COMMIT');
+
+      }
+
+    } catch (error) {
+      console.timeLog('DBTime',error);
+      await database.transactionalOperation('ROLLBACK');
+      await database.deleteProjectsNotFullyLoad();
+      flagTransactions = false;
+    }
 
     //UPDATE of ALREADY LOADED PROJECTS    
     keysString = this.listKeyProjects(this.refreshProjects);
     this.projectsKeys = await database.getProjectKeys(keysString);
-    await this.updateComponents();
-    console.timeLog('DBTime', "Projects' Components Updated!");
+
+    try {  
+
+      for (let projectKey of this.projectsKeys) { 
+        
+        await database.transactionalOperation('START TRANSACTION');
+
+        await this.updateComponents(projectKey);
+        console.timeLog('DBTime', projectKey['key'] + " Components Updated!");
      
-    await this.updateProjectMeasures();
-    console.timeLog('DBTime', "Projects' Measures Updated!");
+        await this.updateProjectMeasures(projectKey);
+        console.timeLog('DBTime', projectKey['key'] + " Measures Updated!");
     
-    await this.updateComponentMeasures();
-    console.timeLog('DBTime', "Components' Measures Updated!");
-    
-    await database.updateDateLastAnalysis();
+        await this.updateComponentMeasures(projectKey);
+        console.timeLog('DBTime', projectKey['key'] + " Components' Measures Updated!");
+
+        await database.transactionalOperation('COMMIT');
+
+      }
+
+    } catch (error) {
+      console.timeLog('DBTime',error);
+      await database.transactionalOperation('ROLLBACK');
+      flagTransactions = false;
+    }
+
+    await database.transactionalAutoCommit(1);
+     
+    if (flagTransactions){
+      await database.updateDateLastAnalysis();
+    }
 
     console.timeLog('DBTime', "Finish Refreshing");
     console.timeEnd('DBTime');
@@ -107,7 +148,10 @@ class RefreshAPIModule {
             let respProj = [proj.key , proj.name, proj.qualifier, timestampAnalysis];
   
             if (await database.checkProjectExists(proj.key)){
-              this.refreshProjects.push(respProj);
+              //Refresh Only if the project was not refreshed before! (Exception Happened)
+              if ((await database.getProjectLastAnalysis(proj.key)) < dateLastAnalysis){
+                this.refreshProjects.push(respProj);
+              }
             }else{
               this.newProjects.push(respProj);
             }
@@ -147,41 +191,37 @@ class RefreshAPIModule {
   }
 
 
-  private async updateComponents(): Promise<void>{
+  private async updateComponents(p_project : any): Promise<void>{
     try {      
       let compToInsert : any[][] = [];
         
-      for (let proj of this.projectsKeys){
+      let url = 'https://sonarcloud.io/api/components/tree?component=' + p_project['key'] + '&p=1&ps=1';
+    
+      let pages = await sonarAPI.numberPages(url);
 
-        let url = 'https://sonarcloud.io/api/components/tree?component=' + proj['key'] + '&p=1&ps=1';
-      
-        let pages = await sonarAPI.numberPages(url);
+      let components: Component[];
 
-        let components: Component[];
+      for (let i = 1; i <= pages; i++) {
 
-        for (let i = 1; i <= pages; i++) {
+        components = await sonarAPI.getComponents(p_project['key'], i);
+        
+        for (let component of components) {
 
-          components = await sonarAPI.getComponents(proj['key'], i);
-          
-          for (let component of components) {
+          if (!await database.checkComponentExists(p_project["idproject"], component.path)){
 
-            if (!await database.checkComponentExists(proj["idproject"], component.path)){
-
-              let respComp = [proj["idproject"], component.name , component.qualifier, component.path, component.language];
-              compToInsert.push(respComp);
-              
-            }
+            let respComp = [p_project["idproject"], component.name , component.qualifier, component.path, component.language];
+            compToInsert.push(respComp);
             
           }
-
-          if (compToInsert.length >= this.insertBlock){
-            await database.insertComponents(compToInsert);
-            compToInsert = [];
-          }             
-
+          
         }
 
-      }
+        if (compToInsert.length >= this.insertBlock){
+          await database.insertComponents(compToInsert);
+          compToInsert = [];
+        }             
+
+      }   
 
       if (compToInsert.length > 0){
         await database.insertComponents(compToInsert);
@@ -196,44 +236,35 @@ class RefreshAPIModule {
   }  
 
   
-  private async updateProjectMeasures(): Promise<void>{
+  private async updateProjectMeasures(p_project : any): Promise<void>{
 
     try {
 
       let projMeaToInsert : any[][] = [];
 
-      for (let proj of this.projectsKeys){
-
-        let projMeasures = await sonarAPI.getProjectMeasures(proj['key']);
-        
-        let idMeasure : number;
+      let projMeasures = await sonarAPI.getProjectMeasures(p_project['key']);
       
-        for(let measure of projMeasures){
+      let idMeasure : number;
+    
+      for(let measure of projMeasures){
 
-          let idMetric = await database.getMetricId(measure.metric);
+        let idMetric = await database.getMetricId(measure.metric);
 
-          idMeasure = await database.getProjectIdMeasure(proj["idproject"], idMetric) ;
+        idMeasure = await database.getProjectIdMeasure(p_project["idproject"], idMetric) ;
 
-          if (idMeasure == 0){
+        if (idMeasure == 0){
 
-            let respMeas = [proj["idproject"], idMetric, measure.value];
-            projMeaToInsert.push(respMeas);
-            
-          }else{
-            
-            await database.updateProjMeasure(idMeasure, measure.value);
+          let respMeas = [p_project["idproject"], idMetric, measure.value];
+          projMeaToInsert.push(respMeas);
           
-          }
-
-        }
-
-        if (projMeaToInsert.length >= this.insertBlock){
-          await database.insertProjectMeasures(projMeaToInsert);
-          projMeaToInsert = [];
+        }else{
+          
+          await database.updateProjMeasure(idMeasure, measure.value);
+        
         }
 
       }
-
+      
       if (projMeaToInsert.length > 0){
         await database.insertProjectMeasures(projMeaToInsert);
       }
@@ -244,58 +275,53 @@ class RefreshAPIModule {
     
   }
   
-  private async updateComponentMeasures(): Promise<void>{
+  private async updateComponentMeasures(p_project: any): Promise<void>{
 
     try {
 
       let compMeaToInsert : any[][] = [];
 
-      for (let proj of this.projectsKeys){
+      let componentsPaths = await database.getComponentPathsOfProyects(p_project['idproject']);
+        
+      for(let comp of componentsPaths){
 
-        let componentsPaths = await database.getComponentPathsOfProyects(proj['idproject']);
-          
-        for(let comp of componentsPaths){
+        let compMeasures = await sonarAPI.getComponentMeasures(p_project['key'] + ':' + comp['path']);
 
-          let compMeasures = await sonarAPI.getComponentMeasures(proj['key'] + ':' + comp['path']);
+        if (compMeasures[0].metric != 'not found'){
 
-          if (compMeasures[0].metric != 'not found'){
+          let idMeasure : number;
 
-            let idMeasure : number;
+          for(let measure of compMeasures){
 
-            for(let measure of compMeasures){
+            let idMetric = await database.getMetricId(measure.metric)
 
-              let idMetric = await database.getMetricId(measure.metric)
+            idMeasure = await database.getComponentIdMeasure(comp['idcomponent'], idMetric) ;
 
-              idMeasure = await database.getComponentIdMeasure(comp['idcomponent'], idMetric) ;
+            if (idMeasure == 0){
 
-              if (idMeasure == 0){
-
-                let respMeas = [comp['idcomponent'], idMetric, measure.value];
-                compMeaToInsert.push(respMeas);
-                
-              }else{
-                
-                await database.updateCompMeasure(idMeasure, measure.value);
+              let respMeas = [comp['idcomponent'], idMetric, measure.value];
+              compMeaToInsert.push(respMeas);
               
-              }   
-    
-            }
-
-          }else{
-            console.log("Component Deleted");
-            await database.deleteComponentAndMeasures(comp['idcomponent']);
-            this.updateComponentMeasures(); //FIJARSE <<<<<<<<<<<<<<<---------------------------
+            }else{
+              
+              await database.updateCompMeasure(idMeasure, measure.value);
+            
+            }   
+  
           }
 
-          if(compMeaToInsert.length >= this.insertBlock){
-            await database.insertComponentMeasures(compMeaToInsert);
-            console.timeLog('DBTime', compMeaToInsert.length + " components' measures inserted of " + proj['idproject']);
-            compMeaToInsert = [];
-          }
-
+        }else{
+          console.log("Component Deleted");
+          await database.deleteComponentAndMeasures(comp['idcomponent']);
+          this.updateComponentMeasures(p_project); //FIJARSE <<<<<<<<<<<<<<<---------------------------
         }
 
-      }
+        if(compMeaToInsert.length >= this.insertBlock){
+          await database.insertComponentMeasures(compMeaToInsert);
+          compMeaToInsert = [];
+        }
+
+      }   
 
       if(compMeaToInsert.length > 0){
         await database.insertComponentMeasures(compMeaToInsert);
