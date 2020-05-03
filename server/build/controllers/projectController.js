@@ -29,8 +29,17 @@ class ProjectController {
     }
     editProject(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { idproj } = req.params;
-            res.send(idproj);
+            console.log(req.body);
+            for (let projectUpdate of req.body) {
+                yield database_1.default
+                    .then((r) => r
+                    .query('UPDATE projects SET projectLink = ?, version = ? WHERE idproject = ?', projectUpdate))
+                    .catch(err => {
+                    console.log(err);
+                    res.json('Request could not be fullfilled');
+                });
+            }
+            res.json('Request completed successfully');
         });
     }
     listProjectsMeasures(req, res) {
