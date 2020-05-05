@@ -17,6 +17,8 @@ class RefreshAPIModule {
         this.refreshProjects = [];
         this.newProjects = [];
         this.insertBlock = 750;
+        this.startTime = this.getTimeSeconds();
+        this.limitTime = 14400; //Time in Seconds
     }
     main() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -25,20 +27,27 @@ class RefreshAPIModule {
             yield this.searchLastAnalysis();
             yield this.updateProjects();
             console.timeLog('DBTime', 'Projects Updated!');
-            //Insertion of NEW PROJECTS
+            /*
+            --->>>Insertion of NEW PROJECTS
+            */
             let keysString = this.listKeyProjects(this.newProjects);
             this.projectsKeys = yield DBOperations_1.database.getProjectKeys(keysString);
             yield DBOperations_1.database.transactionalAutoCommit(0);
             try {
-                for (let projectKey of this.projectsKeys) {
+                for (let i = 0; i < this.projectsKeys.length; i++) {
                     yield DBOperations_1.database.transactionalOperation('START TRANSACTION');
-                    yield this.updateComponents(projectKey);
-                    console.timeLog('DBTime', projectKey['key'] + " Components Inserted!");
-                    yield this.updateProjectMeasures(projectKey);
-                    console.timeLog('DBTime', projectKey['key'] + " Measures Inserted!");
-                    yield this.updateComponentMeasures(projectKey);
-                    console.timeLog('DBTime', projectKey['key'] + " Components' Measures Inserted!");
+                    yield this.updateComponents(this.projectsKeys[i]);
+                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components Inserted!");
+                    yield this.updateProjectMeasures(this.projectsKeys[i]);
+                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Measures Inserted!");
+                    yield this.updateComponentMeasures(this.projectsKeys[i]);
+                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components' Measures Inserted!");
                     yield DBOperations_1.database.transactionalOperation('COMMIT');
+                    if ((this.getTimeSeconds() - this.startTime) > this.limitTime) {
+                        yield DBOperations_1.database.deleteProjectsNotFullyLoad();
+                        i = this.projectsKeys.length;
+                        flagTransactions = false;
+                    }
                 }
             }
             catch (error) {
@@ -47,19 +56,25 @@ class RefreshAPIModule {
                 yield DBOperations_1.database.deleteProjectsNotFullyLoad();
                 flagTransactions = false;
             }
-            //UPDATE of ALREADY LOADED PROJECTS    
+            /**
+             --->>>UPDATE of ALREADY LOADED PROJECTS
+            */
             keysString = this.listKeyProjects(this.refreshProjects);
             this.projectsKeys = yield DBOperations_1.database.getProjectKeys(keysString);
             try {
-                for (let projectKey of this.projectsKeys) {
+                for (let i = 0; i < this.projectsKeys.length; i++) {
                     yield DBOperations_1.database.transactionalOperation('START TRANSACTION');
-                    yield this.updateComponents(projectKey);
-                    console.timeLog('DBTime', projectKey['key'] + " Components Updated!");
-                    yield this.updateProjectMeasures(projectKey);
-                    console.timeLog('DBTime', projectKey['key'] + " Measures Updated!");
-                    yield this.updateComponentMeasures(projectKey);
-                    console.timeLog('DBTime', projectKey['key'] + " Components' Measures Updated!");
+                    yield this.updateComponents(this.projectsKeys[i]);
+                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components Updated!");
+                    yield this.updateProjectMeasures(this.projectsKeys[i]);
+                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Measures Updated!");
+                    yield this.updateComponentMeasures(this.projectsKeys[i]);
+                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components' Measures Updated!");
                     yield DBOperations_1.database.transactionalOperation('COMMIT');
+                    if ((this.getTimeSeconds() - this.startTime) > this.limitTime) {
+                        i = this.projectsKeys.length;
+                        flagTransactions = false;
+                    }
                 }
             }
             catch (error) {
@@ -76,6 +91,18 @@ class RefreshAPIModule {
             return 1;
         });
     }
+    /*
+    --->>> GET THE ACTUAL TIME IN SECONDS
+    */
+    getTimeSeconds() {
+        const timeNanoSec = process.hrtime.bigint();
+        let timeSeconds = Number(timeNanoSec);
+        timeSeconds = timeSeconds / 1000000000;
+        return timeSeconds;
+    }
+    /*
+    --->>> CONVERTS A RETURN FROM THE API TO A STRING ARRAY FOR QUERY POURPOSES
+    */
     listKeyProjects(p_projects) {
         let keyArray = [];
         for (let project of p_projects) {
@@ -83,6 +110,9 @@ class RefreshAPIModule {
         }
         return keyArray;
     }
+    /*
+    --->>> SETS THE ATRIBUTES newProjects AND refreshProjects
+    */
     searchLastAnalysis() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -128,6 +158,9 @@ class RefreshAPIModule {
             }
         });
     }
+    /*
+    --->>> UPDATE AND INSERT THE PROJECTS OBTAINED FROM THE API
+    */
     updateProjects() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -143,6 +176,9 @@ class RefreshAPIModule {
             }
         });
     }
+    /*
+    --->>> UPDATE AND INSERT THE COMPONENTS OBTAINED FROM THE API
+    */
     updateComponents(p_project) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -172,6 +208,9 @@ class RefreshAPIModule {
             }
         });
     }
+    /*
+    --->>> UPDATE AND INSERT THE PROYECTS' MEASURES OBTAINED FROM THE API
+    */
     updateProjectMeasures(p_project) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -198,6 +237,9 @@ class RefreshAPIModule {
             }
         });
     }
+    /*
+    --->>> UPDATE AND INSERT THE COMPONENTS' MEASURES OBTAINED FROM THE API
+    */
     updateComponentMeasures(p_project) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -220,9 +262,7 @@ class RefreshAPIModule {
                         }
                     }
                     else {
-                        console.log("Component Deleted");
                         yield DBOperations_1.database.deleteComponentAndMeasures(comp['idcomponent']);
-                        this.updateComponentMeasures(p_project); //FIJARSE <<<<<<<<<<<<<<<---------------------------
                     }
                     if (compMeaToInsert.length >= this.insertBlock) {
                         yield DBOperations_1.database.insertComponentMeasures(compMeaToInsert);

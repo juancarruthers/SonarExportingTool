@@ -11,11 +11,15 @@ class RefreshAPIModule {
   private newProjects : any[][];
   private projectsKeys: any;
   private insertBlock: number;
+  private startTime: number;
+  public limitTime: number;
 
   constructor(){
     this.refreshProjects = [];
     this.newProjects = [];
     this.insertBlock = 750;
+    this.startTime = this.getTimeSeconds();
+    this.limitTime = 14400; //Time in Seconds
   }
 
   public async main(): Promise<number>{
@@ -27,7 +31,9 @@ class RefreshAPIModule {
     await this.updateProjects();
     console.timeLog('DBTime', 'Projects Updated!');
 
-    //Insertion of NEW PROJECTS
+    /*
+    --->>>Insertion of NEW PROJECTS
+    */
     let keysString = this.listKeyProjects(this.newProjects);
     this.projectsKeys = await database.getProjectKeys(keysString);
 
@@ -35,21 +41,26 @@ class RefreshAPIModule {
      
     try {  
 
-      for (let projectKey of this.projectsKeys) { 
-        
+      for (let i = 0; i < this.projectsKeys.length; i++) {
+
         await database.transactionalOperation('START TRANSACTION');
 
-        await this.updateComponents(projectKey);
-        console.timeLog('DBTime', projectKey['key'] + " Components Inserted!");
+        await this.updateComponents(this.projectsKeys[i]);
+        console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components Inserted!");
 
-        await this.updateProjectMeasures(projectKey);
-        console.timeLog('DBTime', projectKey['key'] + " Measures Inserted!");
+        await this.updateProjectMeasures(this.projectsKeys[i]);
+        console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Measures Inserted!");
 
-        await this.updateComponentMeasures(projectKey);
-        console.timeLog('DBTime', projectKey['key'] + " Components' Measures Inserted!");
+        await this.updateComponentMeasures(this.projectsKeys[i]);
+        console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components' Measures Inserted!");
 
         await database.transactionalOperation('COMMIT');
 
+        if ((this.getTimeSeconds()-this.startTime) > this.limitTime){
+          await database.deleteProjectsNotFullyLoad();
+          i = this.projectsKeys.length;
+          flagTransactions = false;
+        }
       }
 
     } catch (error) {
@@ -59,27 +70,34 @@ class RefreshAPIModule {
       flagTransactions = false;
     }
 
-    //UPDATE of ALREADY LOADED PROJECTS    
+    /**
+     --->>>UPDATE of ALREADY LOADED PROJECTS
+    */
+    
     keysString = this.listKeyProjects(this.refreshProjects);
     this.projectsKeys = await database.getProjectKeys(keysString);
 
-    try {  
-
-      for (let projectKey of this.projectsKeys) { 
-        
+    try {
+      
+      for (let i = 0; i < this.projectsKeys.length; i++) {
         await database.transactionalOperation('START TRANSACTION');
 
-        await this.updateComponents(projectKey);
-        console.timeLog('DBTime', projectKey['key'] + " Components Updated!");
+        await this.updateComponents(this.projectsKeys[i]);
+        console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components Updated!");
      
-        await this.updateProjectMeasures(projectKey);
-        console.timeLog('DBTime', projectKey['key'] + " Measures Updated!");
+        await this.updateProjectMeasures(this.projectsKeys[i]);
+        console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Measures Updated!");
     
-        await this.updateComponentMeasures(projectKey);
-        console.timeLog('DBTime', projectKey['key'] + " Components' Measures Updated!");
+        await this.updateComponentMeasures(this.projectsKeys[i]);
+        console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components' Measures Updated!");
 
         await database.transactionalOperation('COMMIT');
 
+        if ((this.getTimeSeconds()-this.startTime) > this.limitTime){
+          i = this.projectsKeys.length;
+          flagTransactions = false;
+        }
+        
       }
 
     } catch (error) {
@@ -99,6 +117,22 @@ class RefreshAPIModule {
   
     return 1;
   }
+  
+
+  /*
+  --->>> GET THE ACTUAL TIME IN SECONDS
+  */
+
+  private getTimeSeconds() : number{
+    const timeNanoSec = process.hrtime.bigint();
+    let timeSeconds = Number(timeNanoSec);
+    timeSeconds = timeSeconds / 1000000000;
+    return timeSeconds;
+  }
+
+  /*
+  --->>> CONVERTS A RETURN FROM THE API TO A STRING ARRAY FOR QUERY POURPOSES
+  */
 
   private listKeyProjects(p_projects: any[][]): string[]{
     let keyArray : string[]=[];
@@ -109,8 +143,11 @@ class RefreshAPIModule {
 
     return keyArray;
   }
-  
 
+  /*
+  --->>> SETS THE ATRIBUTES newProjects AND refreshProjects
+  */
+  
   private async searchLastAnalysis(): Promise<void>{
     try {
 
@@ -168,7 +205,9 @@ class RefreshAPIModule {
               
   }
 
-  
+  /*
+  --->>> UPDATE AND INSERT THE PROJECTS OBTAINED FROM THE API
+  */
 
   private async updateProjects(): Promise<void>{
     try {
@@ -190,6 +229,9 @@ class RefreshAPIModule {
           
   }
 
+  /*
+  --->>> UPDATE AND INSERT THE COMPONENTS OBTAINED FROM THE API
+  */
 
   private async updateComponents(p_project : any): Promise<void>{
     try {      
@@ -235,6 +277,9 @@ class RefreshAPIModule {
     
   }  
 
+  /*
+  --->>> UPDATE AND INSERT THE PROYECTS' MEASURES OBTAINED FROM THE API
+  */
   
   private async updateProjectMeasures(p_project : any): Promise<void>{
 
@@ -274,6 +319,10 @@ class RefreshAPIModule {
     }
     
   }
+
+  /*
+  --->>> UPDATE AND INSERT THE COMPONENTS' MEASURES OBTAINED FROM THE API
+  */
   
   private async updateComponentMeasures(p_project: any): Promise<void>{
 
@@ -311,9 +360,7 @@ class RefreshAPIModule {
           }
 
         }else{
-          console.log("Component Deleted");
           await database.deleteComponentAndMeasures(comp['idcomponent']);
-          this.updateComponentMeasures(p_project); //FIJARSE <<<<<<<<<<<<<<<---------------------------
         }
 
         if(compMeaToInsert.length >= this.insertBlock){
