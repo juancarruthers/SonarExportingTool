@@ -140,5 +140,17 @@ export class ProjectsService {
             );
   }
 
+  updateProjects(p_config): Observable<void>{
+    let url = `${this.API_URI}/update`;
+    return this.auth.getTokenSilently()
+            .pipe(
+              mergeMap(token => {
+                let headers = new HttpHeaders ({ Authorization: `Bearer ${token}` });
+                return this.http.post<void>(url, p_config, {headers});
+              }),
+              catchError(err => throwError(err))
+            );
+  }
+
  
 }

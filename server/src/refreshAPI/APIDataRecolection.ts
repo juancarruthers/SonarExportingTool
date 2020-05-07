@@ -1,6 +1,7 @@
 import { Measure } from '../sonarAPIInterfaces/measure';
 import { Project } from '../sonarAPIInterfaces/project';
 import { Component } from '../sonarAPIInterfaces/component';
+import { Metric } from '../sonarAPIInterfaces/metric';
 
 import { URL }  from 'url';
 import fetch from 'node-fetch';
@@ -14,7 +15,7 @@ class APIDataRecolection {
 
   constructor(){
     //ORGANIZATION
-    this.organization = 'unne-sonar-corpus';
+    this.organization = 'juancarruthers-github';//'unne-sonar-corpus';
 
     //HTTP HEADERS
     let key: string;
@@ -60,6 +61,23 @@ class APIDataRecolection {
             
         }
    
+    }
+
+    async getMetrics () : Promise<Metric[]>{
+        try {
+            const url = "https://sonarcloud.io/api/metrics/search?p=1&ps=500";
+
+            const api_query = await this.APIGetRequest(url);
+
+            const metrics = api_query["metrics"];
+
+            return metrics;
+
+        } catch (error) {
+            console.log(error);
+            return [{id: 0, key: 'error', type: '', name:'', description : '', domain:'error'}];
+        }
+        
     }
   
 

@@ -1,4 +1,5 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
+import { Server } from 'http';
 import morgan from 'morgan';
 import cors from 'cors';
 import { CronJob } from 'cron';
@@ -7,11 +8,12 @@ import publicRoutes from './routes/publicRoutes';
 import adminRoutes from './routes/adminRoutes';
 import { refreshModule } from './refreshAPI/refreshAPIModule';
 
-class Server {
+class APIServer {
 
-    public app: Application;
-    public cronJob? : CronJob;
-    public port: number;
+    private app: Application;
+    private cronJob? : CronJob;
+    private port: number;
+    private server?: Server;
 
     constructor(){
         this.port = 3000;
@@ -22,7 +24,30 @@ class Server {
         this.errorHandlingConfig();
     }
 
-    config(): void {
+    getPort(): number{
+        return this.port;
+    }
+
+    start(): void {
+
+        this.server = this.app.listen(this.app.get('port'), () => {
+            console.log('Server on port', this.app.get('port'));
+        });
+    
+    }
+
+    changeListeningPort(p_port: number): void{
+
+        if (this.server){
+            this.server.close();
+        }
+        
+        this.app.set('port', process.env.PORT || p_port);      
+        this.start();
+
+    }
+
+    private config(): void {
 
         this.app.set('port', process.env.PORT || this.port);
         this.app.use(morgan('dev'));
@@ -32,42 +57,42 @@ class Server {
 
     }
 
-    routes(): void {
+    private routes(): void {
 
       this.app.use(publicRoutes);
       this.app.use(adminRoutes);
 
     }
 
-    start(): void {
-
-        this.app.listen(this.app.get('port'), () => {
-            console.log('Server on port', this.app.get('port'));
-        });
-    
-    }
-
-    startRefreshModuleJob(): void{
-        this.cronJob = new CronJob ( '00 00 02 * * *', () => refreshModule.main());  
+    private startRefreshModuleJob(): void{
+        this.cronJob = new CronJob ( '00 00 02 * * *', async () => await refreshModule.main());  
         this.cronJob.start();     
     }
 
-    errorHandlingConfig(){
+    private errorHandlingConfig(): void{
         this.app
-        .use((err: Error, req: Request, res: Response, next: NextFunction) => {
-            res.status(400).send('Need Authentication token to make that request');
-            next();
-        },
-        (err: Error, req: Request, res: Response, next: NextFunction) => {
-            console.log(err.stack);
-            res.status(500).send('Server does not know how to handle the situation');
-            next();
-        }
+        .use(
+            (err: Error, req: Request, res: Response, next: NextFunction) => {
+
+                res.status(200).end();
+                next();
+            },
+            (err: Error, req: Request, res: Response, next: NextFunction) => {
+
+                res.status(400).send('Need Authentication token to make that request');
+                next();
+            },
+            (err: Error, req: Request, res: Response, next: NextFunction) => {
+
+                console.log(err.stack);
+                res.status(500).send('Server does not know how to handle the situation');
+                next();
+            }
         );
     }
 
 }
 
-export const server = new Server();
+export const APIserver = new APIServer();
 
-server.start();
+APIserver.start();

@@ -19,7 +19,7 @@ const path_1 = require("path");
 class APIDataRecolection {
     constructor() {
         //ORGANIZATION
-        this.organization = 'unne-sonar-corpus';
+        this.organization = 'juancarruthers-github'; //'unne-sonar-corpus';
         //HTTP HEADERS
         let key;
         const path = path_1.resolve(__dirname, '../../key.sonar');
@@ -58,6 +58,20 @@ class APIDataRecolection {
             catch (error) {
                 console.log(error);
                 return 0;
+            }
+        });
+    }
+    getMetrics() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const url = "https://sonarcloud.io/api/metrics/search?p=1&ps=500";
+                const api_query = yield this.APIGetRequest(url);
+                const metrics = api_query["metrics"];
+                return metrics;
+            }
+            catch (error) {
+                console.log(error);
+                return [{ id: 0, key: 'error', type: '', name: '', description: '', domain: 'error' }];
             }
         });
     }

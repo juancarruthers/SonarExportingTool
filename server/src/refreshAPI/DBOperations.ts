@@ -178,6 +178,18 @@ class DBOperations{
      --->>>INSERTIONS   
     */
 
+    //METRICS
+    //To adapt the data from the API to the Database send the values of p_metrics as an array of arrays, e.g. [[idmetric, key, type, name, description, domain]]
+    async insertMetrics(p_metrics: any): Promise<void>{
+        await pool
+        .then((r: Pool) => r
+            .query('INSERT INTO `projects` (`idmetric`, `key`, `type`, `name`, `description`, `domain`) VALUES  ?', [p_metrics])
+            .catch(err => {
+                console.log(err);
+            })
+        );
+    }
+
     //PROJECTS
     
     async insertProjects(p_projects: any):Promise<void>{

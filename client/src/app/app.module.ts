@@ -20,6 +20,7 @@ import { ProjTableEditionComponent } from './components/administrator/proj-table
 import { ProjectsService } from './services/projects/projects.service';
 import { AuthService } from './services/auth/auth.service';
 import { CookieService } from 'ngx-cookie-service';
+import { UpdateProjectsTabComponent } from './components/administrator/update-projects-tab/update-projects-tab.component';
 
 
 
@@ -33,7 +34,8 @@ import { CookieService } from 'ngx-cookie-service';
     MetricsTableComponent,
     TwoOptionModalComponent,
     CompMetricsTableComponent,
-    ProjTableEditionComponent
+    ProjTableEditionComponent,
+    UpdateProjectsTabComponent
   ],
   imports: [
     BrowserModule,

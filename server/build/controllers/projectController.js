@@ -32,11 +32,11 @@ class ProjectController {
             for (let projectUpdate of req.body) {
                 yield database_1.default
                     .then((r) => r
-                    .query('UPDATE projects SET projectLink = ?, version = ? WHERE idproject = ?', projectUpdate))
+                    .query('UPDATE projects SET projectLink = ?, version = ? WHERE idproject = ?', projectUpdate)
                     .catch(err => {
                     console.log(err);
                     res.json('Request could not be fullfilled');
-                });
+                }));
             }
             res.json('Request completed successfully');
         });

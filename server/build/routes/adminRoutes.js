@@ -1,10 +1,20 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const projectController_1 = require("../controllers/projectController");
+const refreshAPIModule_1 = require("../refreshAPI/refreshAPIModule");
 //Authentication Packages
 const express_jwt_1 = __importDefault(require("express-jwt"));
 const jwks_rsa_1 = __importDefault(require("jwks-rsa"));
@@ -37,6 +47,12 @@ class AdminRoutes {
     config() {
         // Define an endpoint that must be called with an access token
         this.router.put("/api/projects/edit", this.checkJwt, projectController_1.projectController.editProject);
+        this.router.post("/api/projects/update", this.checkJwt, (req, res) => __awaiter(this, void 0, void 0, function* () {
+            refreshAPIModule_1.refreshModule.listeningPort = req.body[0];
+            refreshAPIModule_1.refreshModule.limitTime = req.body[1];
+            yield refreshAPIModule_1.refreshModule.main();
+            res.json('Finish Update');
+        }));
     }
 }
 const adminRoutes = new AdminRoutes();

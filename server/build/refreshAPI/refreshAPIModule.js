@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const APIDataRecolection_1 = require("./APIDataRecolection");
 const DBOperations_1 = require("./DBOperations");
+const index_1 = require("../index");
 //MODULE TO REFRESH THE DATA FROM DATABASE DEPENDING SONAR UPDATES
 class RefreshAPIModule {
     constructor() {
@@ -19,34 +20,58 @@ class RefreshAPIModule {
         this.insertBlock = 750;
         this.startTime = this.getTimeSeconds();
         this.limitTime = 14400; //Time in Seconds
+        this.listeningPort = 0;
     }
     main() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (index_1.APIserver) {
+                index_1.APIserver.changeListeningPort(this.listeningPort);
+            }
             console.time('DBTime');
-            let flagTransactions = true;
+            let flagTransaction = true;
+            yield DBOperations_1.database.deleteProjectsNotFullyLoad();
             yield this.searchLastAnalysis();
             yield this.updateProjects();
             console.timeLog('DBTime', 'Projects Updated!');
-            /*
-            --->>>Insertion of NEW PROJECTS
-            */
-            let keysString = this.listKeyProjects(this.newProjects);
-            this.projectsKeys = yield DBOperations_1.database.getProjectKeys(keysString);
             yield DBOperations_1.database.transactionalAutoCommit(0);
+            yield this.insertNewProjects(flagTransaction);
+            yield this.refreshOldProjects(flagTransaction);
+            yield DBOperations_1.database.transactionalAutoCommit(1);
+            if (flagTransaction) {
+                yield DBOperations_1.database.updateDateLastAnalysis();
+                console.timeLog('DBTime', "Finish Refreshing");
+            }
+            else {
+                console.timeLog('DBTime', "Refreshing Process did not Finish");
+            }
+            console.timeEnd('DBTime');
+            if (index_1.APIserver) {
+                index_1.APIserver.changeListeningPort(index_1.APIserver.getPort());
+            }
+            return 1;
+        });
+    }
+    /*
+    --->>> INSERT NEW PROJECTS
+    */
+    insertNewProjects(p_flagTransaction) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const keysString = this.listKeyProjects(this.newProjects);
+            const projectsKeys = yield DBOperations_1.database.getProjectKeys(keysString);
             try {
-                for (let i = 0; i < this.projectsKeys.length; i++) {
+                for (let i = 0; i < projectsKeys.length; i++) {
                     yield DBOperations_1.database.transactionalOperation('START TRANSACTION');
-                    yield this.updateComponents(this.projectsKeys[i]);
-                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components Inserted!");
-                    yield this.updateProjectMeasures(this.projectsKeys[i]);
-                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Measures Inserted!");
-                    yield this.updateComponentMeasures(this.projectsKeys[i]);
-                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components' Measures Inserted!");
+                    yield this.updateComponents(projectsKeys[i]);
+                    console.timeLog('DBTime', projectsKeys[i]['key'] + " Components Inserted!");
+                    yield this.updateProjectMeasures(projectsKeys[i]);
+                    console.timeLog('DBTime', projectsKeys[i]['key'] + " Measures Inserted!");
+                    yield this.insertComponentMeasures(projectsKeys[i]);
+                    console.timeLog('DBTime', projectsKeys[i]['key'] + " Components' Measures Inserted!");
                     yield DBOperations_1.database.transactionalOperation('COMMIT');
                     if ((this.getTimeSeconds() - this.startTime) > this.limitTime) {
                         yield DBOperations_1.database.deleteProjectsNotFullyLoad();
-                        i = this.projectsKeys.length;
-                        flagTransactions = false;
+                        i = projectsKeys.length;
+                        p_flagTransaction = false;
                     }
                 }
             }
@@ -54,41 +79,42 @@ class RefreshAPIModule {
                 console.timeLog('DBTime', error);
                 yield DBOperations_1.database.transactionalOperation('ROLLBACK');
                 yield DBOperations_1.database.deleteProjectsNotFullyLoad();
-                flagTransactions = false;
+                p_flagTransaction = false;
             }
-            /**
-             --->>>UPDATE of ALREADY LOADED PROJECTS
-            */
-            keysString = this.listKeyProjects(this.refreshProjects);
-            this.projectsKeys = yield DBOperations_1.database.getProjectKeys(keysString);
-            try {
-                for (let i = 0; i < this.projectsKeys.length; i++) {
-                    yield DBOperations_1.database.transactionalOperation('START TRANSACTION');
-                    yield this.updateComponents(this.projectsKeys[i]);
-                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components Updated!");
-                    yield this.updateProjectMeasures(this.projectsKeys[i]);
-                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Measures Updated!");
-                    yield this.updateComponentMeasures(this.projectsKeys[i]);
-                    console.timeLog('DBTime', this.projectsKeys[i]['key'] + " Components' Measures Updated!");
-                    yield DBOperations_1.database.transactionalOperation('COMMIT');
-                    if ((this.getTimeSeconds() - this.startTime) > this.limitTime) {
-                        i = this.projectsKeys.length;
-                        flagTransactions = false;
+            return p_flagTransaction;
+        });
+    }
+    /*
+    --->>> UPDATE OLD PROJECTS
+    */
+    refreshOldProjects(p_flagTransaction) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const keysString = this.listKeyProjects(this.refreshProjects);
+            const projectsKeys = yield DBOperations_1.database.getProjectKeys(keysString);
+            if (p_flagTransaction) {
+                try {
+                    for (let i = 0; i < projectsKeys.length; i++) {
+                        yield DBOperations_1.database.transactionalOperation('START TRANSACTION');
+                        yield this.updateComponents(projectsKeys[i]);
+                        console.timeLog('DBTime', projectsKeys[i]['key'] + " Components Updated!");
+                        yield this.updateProjectMeasures(projectsKeys[i]);
+                        console.timeLog('DBTime', projectsKeys[i]['key'] + " Measures Updated!");
+                        yield this.updateComponentMeasures(projectsKeys[i]);
+                        console.timeLog('DBTime', projectsKeys[i]['key'] + " Components' Measures Updated!");
+                        yield DBOperations_1.database.transactionalOperation('COMMIT');
+                        if ((this.getTimeSeconds() - this.startTime) > this.limitTime) {
+                            i = projectsKeys.length;
+                            p_flagTransaction = false;
+                        }
                     }
                 }
+                catch (error) {
+                    console.timeLog('DBTime', error);
+                    yield DBOperations_1.database.transactionalOperation('ROLLBACK');
+                    p_flagTransaction = false;
+                }
             }
-            catch (error) {
-                console.timeLog('DBTime', error);
-                yield DBOperations_1.database.transactionalOperation('ROLLBACK');
-                flagTransactions = false;
-            }
-            yield DBOperations_1.database.transactionalAutoCommit(1);
-            if (flagTransactions) {
-                yield DBOperations_1.database.updateDateLastAnalysis();
-            }
-            console.timeLog('DBTime', "Finish Refreshing");
-            console.timeEnd('DBTime');
-            return 1;
+            return p_flagTransaction;
         });
     }
     /*
@@ -238,7 +264,36 @@ class RefreshAPIModule {
         });
     }
     /*
-    --->>> UPDATE AND INSERT THE COMPONENTS' MEASURES OBTAINED FROM THE API
+    --->>> INSERT THE NEW COMPONENTS' MEASURES GOT FROM THE API
+    */
+    insertComponentMeasures(p_project) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let compMeaToInsert = [];
+                let componentsPaths = yield DBOperations_1.database.getComponentPathsOfProyects(p_project['idproject']);
+                for (let comp of componentsPaths) {
+                    let compMeasures = yield APIDataRecolection_1.sonarAPI.getComponentMeasures(p_project['key'] + ':' + comp['path']);
+                    for (let measure of compMeasures) {
+                        let idMetric = yield DBOperations_1.database.getMetricId(measure.metric);
+                        let respMeas = [comp['idcomponent'], idMetric, measure.value];
+                        compMeaToInsert.push(respMeas);
+                    }
+                    if (compMeaToInsert.length >= this.insertBlock) {
+                        yield DBOperations_1.database.insertComponentMeasures(compMeaToInsert);
+                        compMeaToInsert = [];
+                    }
+                }
+                if (compMeaToInsert.length > 0) {
+                    yield DBOperations_1.database.insertComponentMeasures(compMeaToInsert);
+                }
+            }
+            catch (error) {
+                console.log(error);
+            }
+        });
+    }
+    /*
+    --->>> UPDATE THE COMPONENTS' MEASURES OBTAINED FROM THE API
     */
     updateComponentMeasures(p_project) {
         return __awaiter(this, void 0, void 0, function* () {

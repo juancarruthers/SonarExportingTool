@@ -124,11 +124,11 @@ export class AuthService {
     // Ensure Auth0 client instance exists
     this.auth0Client.subscribe((client: Auth0Client) => {
       // Call method to log out
+      this.cookieService.deleteAll();
       client.logout({
         client_id: "2u9njACfO2cQsqWUhlgiKuMaQCCJSZH5",
         returnTo: `${window.location.origin}`
       });
-      this.cookieService.deleteAll();
     });  
      
   }

@@ -159,6 +159,18 @@ class DBOperations {
     /*
      --->>>INSERTIONS
     */
+    //METRICS
+    //To adapt the data from the API to the Database send the values of p_metrics as an array of arrays, e.g. [[idmetric, key, type, name, description, domain]]
+    insertMetrics(p_metrics) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield database_1.default
+                .then((r) => r
+                .query('INSERT INTO `projects` (`idmetric`, `key`, `type`, `name`, `description`, `domain`) VALUES  ?', [p_metrics])
+                .catch(err => {
+                console.log(err);
+            }));
+        });
+    }
     //PROJECTS
     insertProjects(p_projects) {
         return __awaiter(this, void 0, void 0, function* () {
