@@ -48,9 +48,8 @@ class AdminRoutes {
         // Define an endpoint that must be called with an access token
         this.router.put("/api/projects/edit", this.checkJwt, projectController_1.projectController.editProject);
         this.router.post("/api/projects/update", this.checkJwt, (req, res) => __awaiter(this, void 0, void 0, function* () {
-            refreshAPIModule_1.refreshModule.listeningPort = req.body[0];
-            refreshAPIModule_1.refreshModule.limitTime = req.body[1];
-            yield refreshAPIModule_1.refreshModule.main();
+            const refreshModule = new refreshAPIModule_1.RefreshAPIModule(req.body[0], req.body[1]);
+            yield refreshModule.main();
             res.json('Finish Update');
         }));
     }

@@ -14,40 +14,36 @@ const DBOperations_1 = require("./DBOperations");
 const index_1 = require("../index");
 //MODULE TO REFRESH THE DATA FROM DATABASE DEPENDING SONAR UPDATES
 class RefreshAPIModule {
-    constructor() {
+    constructor(p_listeningPort, p_limitTime) {
+        this.database = new DBOperations_1.DBOperations();
         this.refreshProjects = [];
         this.newProjects = [];
         this.insertBlock = 750;
         this.startTime = this.getTimeSeconds();
-        this.limitTime = 14400; //Time in Seconds
-        this.listeningPort = 0;
+        this.limitTime = p_limitTime; //Time in Seconds
+        this.listeningPort = p_listeningPort;
     }
     main() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (index_1.APIserver) {
-                index_1.APIserver.changeListeningPort(this.listeningPort);
-            }
+            index_1.APIserver.changeListeningPort(this.listeningPort);
             console.time('DBTime');
             let flagTransaction = true;
-            yield DBOperations_1.database.deleteProjectsNotFullyLoad();
+            yield this.database.deleteProjectsNotFullyLoad();
             yield this.searchLastAnalysis();
             yield this.updateProjects();
             console.timeLog('DBTime', 'Projects Updated!');
-            yield DBOperations_1.database.transactionalAutoCommit(0);
             yield this.insertNewProjects(flagTransaction);
             yield this.refreshOldProjects(flagTransaction);
-            yield DBOperations_1.database.transactionalAutoCommit(1);
             if (flagTransaction) {
-                yield DBOperations_1.database.updateDateLastAnalysis();
+                yield this.database.updateDateLastAnalysis();
                 console.timeLog('DBTime', "Finish Refreshing");
             }
             else {
                 console.timeLog('DBTime', "Refreshing Process did not Finish");
             }
             console.timeEnd('DBTime');
-            if (index_1.APIserver) {
-                index_1.APIserver.changeListeningPort(index_1.APIserver.getPort());
-            }
+            index_1.APIserver.changeListeningPort(index_1.APIserver.getPort());
+            this.database.closeConnection();
             return 1;
         });
     }
@@ -57,19 +53,19 @@ class RefreshAPIModule {
     insertNewProjects(p_flagTransaction) {
         return __awaiter(this, void 0, void 0, function* () {
             const keysString = this.listKeyProjects(this.newProjects);
-            const projectsKeys = yield DBOperations_1.database.getProjectKeys(keysString);
+            const projectsKeys = yield this.database.getProjectKeys(keysString);
             try {
                 for (let i = 0; i < projectsKeys.length; i++) {
-                    yield DBOperations_1.database.transactionalOperation('START TRANSACTION');
+                    yield this.database.transactionalOperation('START TRANSACTION');
                     yield this.updateComponents(projectsKeys[i]);
                     console.timeLog('DBTime', projectsKeys[i]['key'] + " Components Inserted!");
                     yield this.updateProjectMeasures(projectsKeys[i]);
                     console.timeLog('DBTime', projectsKeys[i]['key'] + " Measures Inserted!");
                     yield this.insertComponentMeasures(projectsKeys[i]);
                     console.timeLog('DBTime', projectsKeys[i]['key'] + " Components' Measures Inserted!");
-                    yield DBOperations_1.database.transactionalOperation('COMMIT');
+                    yield this.database.transactionalOperation('COMMIT');
                     if ((this.getTimeSeconds() - this.startTime) > this.limitTime) {
-                        yield DBOperations_1.database.deleteProjectsNotFullyLoad();
+                        yield this.database.deleteProjectsNotFullyLoad();
                         i = projectsKeys.length;
                         p_flagTransaction = false;
                     }
@@ -77,8 +73,8 @@ class RefreshAPIModule {
             }
             catch (error) {
                 console.timeLog('DBTime', error);
-                yield DBOperations_1.database.transactionalOperation('ROLLBACK');
-                yield DBOperations_1.database.deleteProjectsNotFullyLoad();
+                yield this.database.transactionalOperation('ROLLBACK');
+                yield this.database.deleteProjectsNotFullyLoad();
                 p_flagTransaction = false;
             }
             return p_flagTransaction;
@@ -90,18 +86,18 @@ class RefreshAPIModule {
     refreshOldProjects(p_flagTransaction) {
         return __awaiter(this, void 0, void 0, function* () {
             const keysString = this.listKeyProjects(this.refreshProjects);
-            const projectsKeys = yield DBOperations_1.database.getProjectKeys(keysString);
+            const projectsKeys = yield this.database.getProjectKeys(keysString);
             if (p_flagTransaction) {
                 try {
                     for (let i = 0; i < projectsKeys.length; i++) {
-                        yield DBOperations_1.database.transactionalOperation('START TRANSACTION');
+                        yield this.database.transactionalOperation('START TRANSACTION');
                         yield this.updateComponents(projectsKeys[i]);
                         console.timeLog('DBTime', projectsKeys[i]['key'] + " Components Updated!");
                         yield this.updateProjectMeasures(projectsKeys[i]);
                         console.timeLog('DBTime', projectsKeys[i]['key'] + " Measures Updated!");
                         yield this.updateComponentMeasures(projectsKeys[i]);
                         console.timeLog('DBTime', projectsKeys[i]['key'] + " Components' Measures Updated!");
-                        yield DBOperations_1.database.transactionalOperation('COMMIT');
+                        yield this.database.transactionalOperation('COMMIT');
                         if ((this.getTimeSeconds() - this.startTime) > this.limitTime) {
                             i = projectsKeys.length;
                             p_flagTransaction = false;
@@ -110,7 +106,7 @@ class RefreshAPIModule {
                 }
                 catch (error) {
                     console.timeLog('DBTime', error);
-                    yield DBOperations_1.database.transactionalOperation('ROLLBACK');
+                    yield this.database.transactionalOperation('ROLLBACK');
                     p_flagTransaction = false;
                 }
             }
@@ -144,7 +140,7 @@ class RefreshAPIModule {
             try {
                 const url = 'https://sonarcloud.io/api/projects/search?organization=' + APIDataRecolection_1.sonarAPI.organization + '&p=1&ps=1';
                 const pages = yield APIDataRecolection_1.sonarAPI.numberPages(url);
-                const dateLastAnalysis = yield DBOperations_1.database.getDateLastAnalysis();
+                const dateLastAnalysis = yield this.database.getDateLastAnalysis();
                 for (let i = 1; i <= pages; i++) {
                     let projects = yield APIDataRecolection_1.sonarAPI.getProjects(i);
                     for (let proj of projects) {
@@ -166,9 +162,9 @@ class RefreshAPIModule {
                         timestampAnalysis.setUTCSeconds(hours[2]);
                         if (timestampAnalysis > dateLastAnalysis) {
                             let respProj = [proj.key, proj.name, proj.qualifier, timestampAnalysis];
-                            if (yield DBOperations_1.database.checkProjectExists(proj.key)) {
+                            if (yield this.database.checkProjectExists(proj.key)) {
                                 //Refresh Only if the project was not refreshed before! (Exception Happened)
-                                if ((yield DBOperations_1.database.getProjectLastAnalysis(proj.key)) < dateLastAnalysis) {
+                                if ((yield this.database.getProjectLastAnalysis(proj.key)) < dateLastAnalysis) {
                                     this.refreshProjects.push(respProj);
                                 }
                             }
@@ -191,10 +187,10 @@ class RefreshAPIModule {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 if (this.newProjects.length > 0) {
-                    yield DBOperations_1.database.insertProjects(this.newProjects);
+                    yield this.database.insertProjects(this.newProjects);
                 }
                 for (let proj of this.refreshProjects) {
-                    yield DBOperations_1.database.updateProjLastAnalysis(proj[0], proj[3]);
+                    yield this.database.updateProjLastAnalysis(proj[0], proj[3]);
                 }
             }
             catch (error) {
@@ -215,18 +211,18 @@ class RefreshAPIModule {
                 for (let i = 1; i <= pages; i++) {
                     components = yield APIDataRecolection_1.sonarAPI.getComponents(p_project['key'], i);
                     for (let component of components) {
-                        if (!(yield DBOperations_1.database.checkComponentExists(p_project["idproject"], component.path))) {
+                        if (!(yield this.database.checkComponentExists(p_project["idproject"], component.path))) {
                             let respComp = [p_project["idproject"], component.name, component.qualifier, component.path, component.language];
                             compToInsert.push(respComp);
                         }
                     }
                     if (compToInsert.length >= this.insertBlock) {
-                        yield DBOperations_1.database.insertComponents(compToInsert);
+                        yield this.database.insertComponents(compToInsert);
                         compToInsert = [];
                     }
                 }
                 if (compToInsert.length > 0) {
-                    yield DBOperations_1.database.insertComponents(compToInsert);
+                    yield this.database.insertComponents(compToInsert);
                 }
             }
             catch (error) {
@@ -244,18 +240,18 @@ class RefreshAPIModule {
                 let projMeasures = yield APIDataRecolection_1.sonarAPI.getProjectMeasures(p_project['key']);
                 let idMeasure;
                 for (let measure of projMeasures) {
-                    let idMetric = yield DBOperations_1.database.getMetricId(measure.metric);
-                    idMeasure = yield DBOperations_1.database.getProjectIdMeasure(p_project["idproject"], idMetric);
+                    let idMetric = yield this.database.getMetricId(measure.metric);
+                    idMeasure = yield this.database.getProjectIdMeasure(p_project["idproject"], idMetric);
                     if (idMeasure == 0) {
                         let respMeas = [p_project["idproject"], idMetric, measure.value];
                         projMeaToInsert.push(respMeas);
                     }
                     else {
-                        yield DBOperations_1.database.updateProjMeasure(idMeasure, measure.value);
+                        yield this.database.updateProjMeasure(idMeasure, measure.value);
                     }
                 }
                 if (projMeaToInsert.length > 0) {
-                    yield DBOperations_1.database.insertProjectMeasures(projMeaToInsert);
+                    yield this.database.insertProjectMeasures(projMeaToInsert);
                 }
             }
             catch (error) {
@@ -270,21 +266,21 @@ class RefreshAPIModule {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let compMeaToInsert = [];
-                let componentsPaths = yield DBOperations_1.database.getComponentPathsOfProyects(p_project['idproject']);
+                let componentsPaths = yield this.database.getComponentPathsOfProyects(p_project['idproject']);
                 for (let comp of componentsPaths) {
                     let compMeasures = yield APIDataRecolection_1.sonarAPI.getComponentMeasures(p_project['key'] + ':' + comp['path']);
                     for (let measure of compMeasures) {
-                        let idMetric = yield DBOperations_1.database.getMetricId(measure.metric);
+                        let idMetric = yield this.database.getMetricId(measure.metric);
                         let respMeas = [comp['idcomponent'], idMetric, measure.value];
                         compMeaToInsert.push(respMeas);
                     }
                     if (compMeaToInsert.length >= this.insertBlock) {
-                        yield DBOperations_1.database.insertComponentMeasures(compMeaToInsert);
+                        yield this.database.insertComponentMeasures(compMeaToInsert);
                         compMeaToInsert = [];
                     }
                 }
                 if (compMeaToInsert.length > 0) {
-                    yield DBOperations_1.database.insertComponentMeasures(compMeaToInsert);
+                    yield this.database.insertComponentMeasures(compMeaToInsert);
                 }
             }
             catch (error) {
@@ -299,33 +295,33 @@ class RefreshAPIModule {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let compMeaToInsert = [];
-                let componentsPaths = yield DBOperations_1.database.getComponentPathsOfProyects(p_project['idproject']);
+                let componentsPaths = yield this.database.getComponentPathsOfProyects(p_project['idproject']);
                 for (let comp of componentsPaths) {
                     let compMeasures = yield APIDataRecolection_1.sonarAPI.getComponentMeasures(p_project['key'] + ':' + comp['path']);
                     if (compMeasures[0].metric != 'not found') {
                         let idMeasure;
                         for (let measure of compMeasures) {
-                            let idMetric = yield DBOperations_1.database.getMetricId(measure.metric);
-                            idMeasure = yield DBOperations_1.database.getComponentIdMeasure(comp['idcomponent'], idMetric);
+                            let idMetric = yield this.database.getMetricId(measure.metric);
+                            idMeasure = yield this.database.getComponentIdMeasure(comp['idcomponent'], idMetric);
                             if (idMeasure == 0) {
                                 let respMeas = [comp['idcomponent'], idMetric, measure.value];
                                 compMeaToInsert.push(respMeas);
                             }
                             else {
-                                yield DBOperations_1.database.updateCompMeasure(idMeasure, measure.value);
+                                yield this.database.updateCompMeasure(idMeasure, measure.value);
                             }
                         }
                     }
                     else {
-                        yield DBOperations_1.database.deleteComponentAndMeasures(comp['idcomponent']);
+                        yield this.database.deleteComponentAndMeasures(comp['idcomponent']);
                     }
                     if (compMeaToInsert.length >= this.insertBlock) {
-                        yield DBOperations_1.database.insertComponentMeasures(compMeaToInsert);
+                        yield this.database.insertComponentMeasures(compMeaToInsert);
                         compMeaToInsert = [];
                     }
                 }
                 if (compMeaToInsert.length > 0) {
-                    yield DBOperations_1.database.insertComponentMeasures(compMeaToInsert);
+                    yield this.database.insertComponentMeasures(compMeaToInsert);
                 }
             }
             catch (error) {
@@ -334,5 +330,4 @@ class RefreshAPIModule {
         });
     }
 }
-exports.refreshModule = new RefreshAPIModule();
-exports.refreshModule.main();
+exports.RefreshAPIModule = RefreshAPIModule;

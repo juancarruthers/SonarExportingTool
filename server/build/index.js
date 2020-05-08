@@ -55,7 +55,10 @@ class APIServer {
         this.app.use(adminRoutes_1.default);
     }
     startRefreshModuleJob() {
-        this.cronJob = new cron_1.CronJob('00 00 02 * * *', () => __awaiter(this, void 0, void 0, function* () { return yield refreshAPIModule_1.refreshModule.main(); }));
+        this.cronJob = new cron_1.CronJob('00 00 02 * * *', () => __awaiter(this, void 0, void 0, function* () {
+            const refreshModule = new refreshAPIModule_1.RefreshAPIModule(0, 14400);
+            yield refreshModule.main();
+        }));
         this.cronJob.start();
     }
     errorHandlingConfig() {

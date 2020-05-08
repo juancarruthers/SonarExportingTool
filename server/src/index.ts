@@ -6,7 +6,7 @@ import { CronJob } from 'cron';
 
 import publicRoutes from './routes/publicRoutes';
 import adminRoutes from './routes/adminRoutes';
-import { refreshModule } from './refreshAPI/refreshAPIModule';
+import { RefreshAPIModule } from './refreshAPI/refreshAPIModule';
 
 class APIServer {
 
@@ -65,7 +65,10 @@ class APIServer {
     }
 
     private startRefreshModuleJob(): void{
-        this.cronJob = new CronJob ( '00 00 02 * * *', async () => await refreshModule.main());  
+        this.cronJob = new CronJob ( '00 00 02 * * *', async () => {
+            const refreshModule = new RefreshAPIModule(0, 14400);
+            await refreshModule.main();
+        });  
         this.cronJob.start();     
     }
 

@@ -14,55 +14,51 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database"));
 class ComponentController {
-    constructor() {
-    }
     listComponentsMeasures(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { idproj } = req.params;
-            const projArray = idproj.split(',');
-            const { idmet } = req.params;
-            let queryComponent;
-            if (projArray.length == 1) {
-                const projectsIds = idproj.split(',');
-                const metricsIds = idmet.split(',');
-                queryComponent = yield database_1.default
-                    .then((r) => r
-                    .query('SELECT * FROM components AS c WHERE idproject IN ( ? ) ORDER BY c.idproject ASC', [projectsIds]))
-                    .catch(err => {
-                    console.log(err);
-                });
-                let index = 0;
-                for (let comp of queryComponent) {
-                    let queryMeasures = yield database_1.default
-                        .then((r) => r
-                        .query('SELECT m.domain, m.key, m.name, m.description, m.type, cm.value FROM component_measures AS cm JOIN metrics as m ON m.idmetric = cm.idmetric WHERE idcomponent = ? AND m.idmetric IN (?) ORDER BY m.domain, m.name ASC', [comp['idcomponent'], metricsIds]))
-                        .catch(err => {
-                        console.log(err);
-                    });
-                    comp['component_measure'] = queryMeasures;
-                    queryComponent[index] = comp;
-                    index = index + 1;
+            try {
+                const { idproj } = req.params;
+                const projArray = idproj.split(',');
+                const { idmet } = req.params;
+                let queryComponent;
+                if (projArray.length == 1) {
+                    const projectsIds = idproj.split(',');
+                    const metricsIds = idmet.split(',');
+                    queryComponent = yield database_1.default
+                        .query('SELECT * FROM components AS c WHERE idproject IN ( ? ) ORDER BY c.idproject ASC', [projectsIds]);
+                    let index = 0;
+                    for (let comp of queryComponent) {
+                        const queryMeasures = yield database_1.default
+                            .query('SELECT m.domain, m.key, m.name, m.description, m.type, cm.value FROM component_measures AS cm JOIN metrics as m ON m.idmetric = cm.idmetric WHERE idcomponent = ? AND m.idmetric IN (?) ORDER BY m.domain, m.name ASC', [comp['idcomponent'], metricsIds]);
+                        comp['component_measure'] = queryMeasures;
+                        queryComponent[index] = comp;
+                        index = index + 1;
+                    }
                 }
+                else {
+                    queryComponent = "You can request only for one project's components' measures at a time.";
+                }
+                res.json(queryComponent);
             }
-            else {
-                queryComponent = "You can request only for one project's components' measures at a time.";
+            catch (error) {
+                console.log(error);
             }
-            res.json(queryComponent);
         });
     }
     countComponentsMeasures(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { idproj } = req.params;
-            const { idmet } = req.params;
-            const projectsIds = idproj.split(',');
-            const metricsIds = idmet.split(',');
-            let queryComponent = yield database_1.default
-                .then((r) => r
-                .query('SELECT count(idmeasure) AS count FROM component_measures AS cm JOIN components AS c ON c.idcomponent = cm.idcomponent WHERE c.idproject IN ( ? ) AND cm.idmetric IN ( ? ) ', [projectsIds, metricsIds]))
-                .catch(err => {
-                console.log(err);
-            });
-            res.json(queryComponent[0]['count']);
+            try {
+                const { idproj } = req.params;
+                const { idmet } = req.params;
+                const projectsIds = idproj.split(',');
+                const metricsIds = idmet.split(',');
+                let queryComponent = yield database_1.default
+                    .query('SELECT count(idmeasure) AS count FROM component_measures AS cm JOIN components AS c ON c.idcomponent = cm.idcomponent WHERE c.idproject IN ( ? ) AND cm.idmetric IN ( ? ) ', [projectsIds, metricsIds]);
+                res.json(queryComponent[0]['count']);
+            }
+            catch (error) {
+                console.log(error);
+            }
         });
     }
 }

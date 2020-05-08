@@ -1,12 +1,10 @@
 import { Router } from 'express';
 import { projectController } from '../controllers/projectController';
-import { refreshModule } from '../refreshAPI/refreshAPIModule';
+import { RefreshAPIModule } from '../refreshAPI/refreshAPIModule';
 
 //Authentication Packages
 import jwt from "express-jwt";
 import jwksRsa  from "jwks-rsa";
-import { APIserver } from '..';
-
 
 class AdminRoutes {
 
@@ -51,9 +49,7 @@ class AdminRoutes {
         // Define an endpoint that must be called with an access token
         this.router.put("/api/projects/edit", this.checkJwt, projectController.editProject);
         this.router.post("/api/projects/update", this.checkJwt, async (req, res) => {
-
-            refreshModule.listeningPort = req.body[0];
-            refreshModule.limitTime = req.body[1];
+            const refreshModule = new RefreshAPIModule(req.body[0], req.body[1]);
             await refreshModule.main();
             res.json('Finish Update');
         });
