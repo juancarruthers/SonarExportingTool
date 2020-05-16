@@ -1,6 +1,5 @@
-import { CookieService } from 'ngx-cookie-service';
 import { Injectable } from '@angular/core';
-import createAuth0Client, { RedirectLoginOptions } from '@auth0/auth0-spa-js';
+import createAuth0Client from '@auth0/auth0-spa-js';
 import Auth0Client from '@auth0/auth0-spa-js/dist/typings/Auth0Client';
 import { from, of, Observable, BehaviorSubject, combineLatest, throwError } from 'rxjs';
 import { tap, catchError, concatMap, shareReplay } from 'rxjs/operators';
@@ -29,7 +28,22 @@ export class AuthService {
   // from: Convert that resulting promise into an observable
   isAuthenticated = this.auth0Client.pipe(
     concatMap((client: Auth0Client) => from(client.isAuthenticated())),
-    tap(res => this.loggedIn = res)
+    tap((res) => {
+      this.loggedIn = res;
+      
+      if(res){
+        if (!localStorage.getItem('loggedIn')){         
+          this.getUser().subscribe((user) => {
+            localStorage.setItem('loggedIn','true');
+            localStorage.setItem('user',user.nickname);
+          });
+        }
+      }else{
+        if (localStorage.getItem('loggedIn')){
+          localStorage.clear();
+        }
+      }
+    })
   );
 
   handleRedirectCallback = this.auth0Client.pipe(
@@ -41,7 +55,7 @@ export class AuthService {
   // Create a local property for login status
   loggedIn: boolean = null;
 
-  constructor(private router: Router, private cookieService: CookieService) {
+  constructor(private router: Router) {
     // On initial load, check authentication state with authorization server
     // Set up local auth streams if user is already authenticated
     this.localAuthSetup();
@@ -113,8 +127,6 @@ export class AuthService {
       // Response will be an array of user and login status
       authComplete.subscribe(([user, loggedIn]) => {
         // Redirect to target route after callback processing
-        this.cookieService.set('loggedIn',loggedIn+'',1);
-        this.cookieService.set('user',user.nickname,1);
         this.router.navigate([targetRoute]);
       });
     }
@@ -124,7 +136,6 @@ export class AuthService {
     // Ensure Auth0 client instance exists
     this.auth0Client.subscribe((client: Auth0Client) => {
       // Call method to log out
-      this.cookieService.deleteAll();
       client.logout({
         client_id: "2u9njACfO2cQsqWUhlgiKuMaQCCJSZH5",
         returnTo: `${window.location.origin}`

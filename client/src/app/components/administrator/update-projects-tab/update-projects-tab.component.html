@@ -1,1 +1,60 @@
-<button (click)="updateProjects()">UPDATE</button>
+<div class="container pt-4">
+    <h2 class="text-center"><strong>Update Projects</strong></h2>
+    <div class="card">
+        <div class="card-header">
+          <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" id="tabNew" type="button" (click)="changeTab(1)">Add</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="tabUpdate" type="button" (click)="changeTab(2)">Update</a>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <table  class="table table-responsive-xl table-hover">
+            <caption>{{projects.length + " Projects"}}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Key</th>
+                    <th scope="col">Project</th>
+                    <th scope="col">Last Analysis</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let project of projects">
+                    <td>{{ project[0] }}</td>
+                    <td>{{ project[1] }}</td>
+                    <td>{{ project[3] }}</td>
+                    
+                  </tr>         
+                  </tbody>
+              </table>
+        
+          </div>
+        <div class="card-footer">
+
+          <div class="row mt-2 mb-2">
+            
+              <div class="col-md-6">
+                <label for="max-time">Maximum Time in Seconds to terminate the update:</label>
+                <input #limit="ngModel" [(ngModel)]="upMaxTime" name="limit" type="number" class="form-control" min="1" (blur)="checkTime()">
+              </div>
+              <div class="col-md-6">
+                <label for="port">Port:</label>
+                <input #port="ngModel" [(ngModel)]="upPort" name="port" type="number" class="form-control" min="0" max="65535" (blur)="checkPort()">
+              </div>
+          
+          </div>
+
+          <app-alert></app-alert>
+          
+          <button type="button" class="btn btn-primary"  id="updateButton" (click)="update()">
+            <em class="fas fa-sync-alt"></em> Update</button> 
+         
+        </div>
+      </div>
+      <app-confirmation-modal></app-confirmation-modal>
+    
+</div>
+

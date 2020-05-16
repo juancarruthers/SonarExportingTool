@@ -23,12 +23,17 @@ class RefreshAPIModule {
         this.limitTime = p_limitTime; //Time in Seconds
         this.listeningPort = p_listeningPort;
     }
+    getNewProjects() {
+        return this.newProjects;
+    }
+    getRefreshProjects() {
+        return this.refreshProjects;
+    }
     main() {
         return __awaiter(this, void 0, void 0, function* () {
             index_1.APIserver.changeListeningPort(this.listeningPort);
             console.time('DBTime');
             let flagTransaction = true;
-            yield this.database.deleteProjectsNotFullyLoad();
             yield this.searchLastAnalysis();
             yield this.updateProjects();
             console.timeLog('DBTime', 'Projects Updated!');

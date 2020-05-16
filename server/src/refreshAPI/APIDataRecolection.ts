@@ -15,7 +15,7 @@ class APIDataRecolection {
 
   constructor(){
     //ORGANIZATION
-    this.organization = 'unne-sonar-corpus';
+    this.organization = /*'juancarruthers-github'*/'unne-sonar-corpus';
 
     //HTTP HEADERS
     let key: string;

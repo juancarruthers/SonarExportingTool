@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -9,10 +10,15 @@ export class TwoOptionModalComponent implements OnInit {
 
   title: string;
   description: string;
+  yesUrl: string;
 
-  constructor() { }
+  constructor(private router:Router) { }
 
   ngOnInit(): void {
+  }
+
+  yesOption(): void{
+    this.router.navigateByUrl(this.yesUrl);
   }
 
 }

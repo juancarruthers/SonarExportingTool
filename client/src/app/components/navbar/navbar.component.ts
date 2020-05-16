@@ -1,4 +1,3 @@
-import { CookieService } from 'ngx-cookie-service';
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 
@@ -9,18 +8,21 @@ import { AuthService } from '../../services/auth/auth.service';
 })
 export class NavbarComponent implements OnInit {
 
-  user : string = '';
+  user : string;
 
-  constructor(public authService: AuthService, private cookieService: CookieService) {}
+  constructor(public authService: AuthService) {}
 
-  ngOnInit(): void {
-    
-  }
+  ngOnInit(): void {}
 
   isLoggedIn(): boolean{
-    this.user = this.cookieService.get('user');
-    return (this.cookieService.get('loggedIn') == 'true');
-    //this.user = this.cookieService.get('user');
+    let loggedIn: boolean = false;
+    if (localStorage.getItem('loggedIn')){
+      this.user = localStorage.getItem('user');
+      loggedIn = true;
+    }else{
+      this.user = '';
+    }
+    return loggedIn;
   }
 
   async logout(){

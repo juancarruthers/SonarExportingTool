@@ -16,7 +16,7 @@ export class TableComponent implements OnInit {
   projectsExported: number[];
 
   constructor( private projectsService: ProjectsService) { 
-    
+    this.projects = [];
   }
 
   ngOnInit(): void {

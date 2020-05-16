@@ -15,12 +15,11 @@ class ProjectController {
 
     public async editProject (req:Request, res:Response): Promise<void>{
         try {
-
             for (let projectUpdate of req.body){
                 await pool
-                    .query('UPDATE projects SET projectLink = ?, version = ? WHERE idproject = ?', projectUpdate);
-                res.json('Request completed successfully');
+                    .query('UPDATE projects SET projectLink = ?, version = ? WHERE idproject = ?', projectUpdate);               
             }  
+            res.json('Request completed successfully');
 
         } catch (error) {
             console.log(error)

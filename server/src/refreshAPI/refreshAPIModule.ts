@@ -27,13 +27,19 @@ export class RefreshAPIModule {
     this.listeningPort = p_listeningPort;
   }
 
+  getNewProjects(): any[][]{
+    return this.newProjects;
+  }
+
+  getRefreshProjects(): any[][]{
+    return this.refreshProjects;
+  }
+
   public async main(): Promise<number>{
 
     APIserver.changeListeningPort(this.listeningPort);
     console.time('DBTime');
-    let flagTransaction : boolean = true; 
-    
-    await this.database.deleteProjectsNotFullyLoad(); 
+    let flagTransaction : boolean = true;  
     await this.searchLastAnalysis();
     await this.updateProjects();
     console.timeLog('DBTime', 'Projects Updated!');  
@@ -170,7 +176,7 @@ export class RefreshAPIModule {
   --->>> SETS THE ATRIBUTES newProjects AND refreshProjects
   */
   
-  private async searchLastAnalysis(): Promise<void>{
+  async searchLastAnalysis(): Promise<void>{
     try {
 
       const url = 'https://sonarcloud.io/api/projects/search?organization=' + sonarAPI.organization + '&p=1&ps=1';     

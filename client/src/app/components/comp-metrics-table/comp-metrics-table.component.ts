@@ -22,7 +22,7 @@ export class CompMetricsTableComponent implements OnInit {
   @ViewChild(ExportModalComponent) exportModal:ExportModalComponent;
 
   constructor(private projectsService: ProjectsService, private cdr: ChangeDetectorRef) { 
-    
+    this.metrics = []
   }
 
   ngAfterViewInit(): void{

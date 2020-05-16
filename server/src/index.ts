@@ -7,6 +7,7 @@ import { CronJob } from 'cron';
 import publicRoutes from './routes/publicRoutes';
 import adminRoutes from './routes/adminRoutes';
 import { RefreshAPIModule } from './refreshAPI/refreshAPIModule';
+import { DBOperations } from './refreshAPI/DBOperations';
 
 class APIServer {
 
@@ -94,8 +95,14 @@ class APIServer {
         );
     }
 
+    async checkDatabaseConsistency(): Promise<void>{
+        let database = new DBOperations();
+        await database.deleteProjectsNotFullyLoad();
+    }
+
 }
 
 export const APIserver = new APIServer();
 
+APIserver.checkDatabaseConsistency();
 APIserver.start();

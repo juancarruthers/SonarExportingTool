@@ -19,6 +19,7 @@ const cron_1 = require("cron");
 const publicRoutes_1 = __importDefault(require("./routes/publicRoutes"));
 const adminRoutes_1 = __importDefault(require("./routes/adminRoutes"));
 const refreshAPIModule_1 = require("./refreshAPI/refreshAPIModule");
+const DBOperations_1 = require("./refreshAPI/DBOperations");
 class APIServer {
     constructor() {
         this.port = 3000;
@@ -75,6 +76,13 @@ class APIServer {
             next();
         });
     }
+    checkDatabaseConsistency() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let database = new DBOperations_1.DBOperations();
+            yield database.deleteProjectsNotFullyLoad();
+        });
+    }
 }
 exports.APIserver = new APIServer();
+exports.APIserver.checkDatabaseConsistency();
 exports.APIserver.start();

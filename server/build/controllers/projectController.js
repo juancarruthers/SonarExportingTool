@@ -32,8 +32,8 @@ class ProjectController {
                 for (let projectUpdate of req.body) {
                     yield database_1.default
                         .query('UPDATE projects SET projectLink = ?, version = ? WHERE idproject = ?', projectUpdate);
-                    res.json('Request completed successfully');
                 }
+                res.json('Request completed successfully');
             }
             catch (error) {
                 console.log(error);

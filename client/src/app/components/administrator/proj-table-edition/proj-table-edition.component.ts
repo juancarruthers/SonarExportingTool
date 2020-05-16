@@ -1,7 +1,6 @@
 import { ProjectsService } from './../../../services/projects/projects.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Project } from '../../../classes/APIRequest/project';
-import { Router } from '@angular/router';
 import { SweetAlert } from '../../sweetAlert/sweetAlert';
 import { SweetAlertIcon } from 'sweetalert2';
 
@@ -19,7 +18,7 @@ export class ProjTableEditionComponent implements OnInit {
     projectsChanged: number[];
 
   
-    constructor( private projectsService: ProjectsService, private router: Router) {
+    constructor( private projectsService: ProjectsService ) {
     }
   
     ngOnInit(): void {
@@ -33,8 +32,8 @@ export class ProjTableEditionComponent implements OnInit {
       this.projectsChanged = new Array<number>();
     }
 
-    ngOnDestroy(){
-
+    ngOnChanges(): void{
+      //this.ngOnInit();
     }
 
     addProject(p_idproject: number){
@@ -61,7 +60,7 @@ export class ProjTableEditionComponent implements OnInit {
           result = 'error';
         }
         alert.completed(response, result);
-        this.router.navigateByUrl('/projects/edit');
+        //this.router.navigateByUrl('/projects/edit');
       })
       
     }

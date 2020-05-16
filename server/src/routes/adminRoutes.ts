@@ -5,6 +5,7 @@ import { RefreshAPIModule } from '../refreshAPI/refreshAPIModule';
 //Authentication Packages
 import jwt from "express-jwt";
 import jwksRsa  from "jwks-rsa";
+import { refreshAPIController } from '../controllers/refreshAPIController';
 
 class AdminRoutes {
 
@@ -48,11 +49,8 @@ class AdminRoutes {
     config(): void {
         // Define an endpoint that must be called with an access token
         this.router.put("/api/projects/edit", this.checkJwt, projectController.editProject);
-        this.router.post("/api/projects/update", this.checkJwt, async (req, res) => {
-            const refreshModule = new RefreshAPIModule(req.body[0], req.body[1]);
-            await refreshModule.main();
-            res.json('Finish Update');
-        });
+        this.router.post("/api/projects/update", this.checkJwt, refreshAPIController.refreshProjects);
+        this.router.get("/api/projects/update/list", this.checkJwt, refreshAPIController.getProjectsToUpdate);
 
     }
 
