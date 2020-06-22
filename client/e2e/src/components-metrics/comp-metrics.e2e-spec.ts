@@ -65,7 +65,7 @@ describe('Component Metrics Test', () => {
   it("should initialize the app again in Project's page", () =>  {
     browser.refresh();
     browser.sleep(100);
-    expect(page.getTableCaptionText()).toContain("Sonar Cloud");
+    expect(page.getTableCaptionText()).toContain("Projects");
   });
 
 });
