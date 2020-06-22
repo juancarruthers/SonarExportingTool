@@ -27,7 +27,7 @@ export class ProjectsService {
   httpHeaders: HttpHeaders;
 
   constructor(private http: HttpClient, private auth:AuthService) { 
-    this.API_URI = 'http://localhost:3000/api/projects';
+    this.API_URI = 'http://localhost:3000/api/projects';//'https://sonar-exporting-tool.tk/api/projects';
     this.httpHeaders = new HttpHeaders({
       'Content-Type':'application/json; charset=utf-8',
       'Cache-Control': 'private, max-age=3600, must-revalidate'
