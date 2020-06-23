@@ -5,7 +5,7 @@ cd projects;
 for project in $(ls)
 do
     cd ${project};
-    ../../sonar-scanner-4.2.0.1873-linux/bin/sonar-scanner -Dsonar.organization=${organization} -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${token} 2>&1 | tee ../../tmp;
+    ../../sonar-scanner/bin/sonar-scanner -Dsonar.organization=${organization} -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${token} 2>&1 | tee ../../tmp;
     search=$(grep 'EXECUTION SUCCESS' ../../tmp);
     if test -z "$search"
     then    
