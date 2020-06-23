@@ -12,7 +12,7 @@ describe('Projects Page Test', () => {
 
   it('should stay in the same page', () => {
     page.getSelectMetricsButton().click();
-    expect(page.getTableCaptionText()).toContain("Sonar Cloud");
+    expect(page.getTableCaptionText()).toContain("Projects");
   })
 
   it('should select projects and open the project metrics page', () => {
