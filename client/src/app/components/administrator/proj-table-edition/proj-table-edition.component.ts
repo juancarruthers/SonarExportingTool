@@ -19,6 +19,7 @@ export class ProjTableEditionComponent implements OnInit {
 
   
     constructor( private projectsService: ProjectsService ) {
+      this.projects = [];
     }
   
     ngOnInit(): void {
