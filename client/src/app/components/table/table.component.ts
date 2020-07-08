@@ -1,6 +1,8 @@
+import { SearchBoxComponent } from './../search-bar/search-box.component';
 import { ProjectsService } from './../../services/projects/projects.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Project } from '../../classes/APIRequest/project';
+
 
 @Component({
   selector: 'app-table',
@@ -15,7 +17,11 @@ export class TableComponent implements OnInit {
   //Arguments for the API Request
   projectsExported: number[];
 
-  constructor( private projectsService: ProjectsService) { 
+  //To sort the elements
+  allProjects: Project[];
+  @ViewChild(SearchBoxComponent) searchBox: SearchBoxComponent;
+
+  constructor( private projectsService: ProjectsService, private cdr: ChangeDetectorRef) { 
     this.projects = [];
   }
 
@@ -24,10 +30,19 @@ export class TableComponent implements OnInit {
       .subscribe(
         res=> {
           this.projects = res;
+          this.allProjects = this.projects;
+
         },
         err=> console.log(err)
       )
-    this.projectsExported = new Array<number>();
+    let exported = this.projectsService.getExportedProjects();
+    if (exported.length == 0){
+      this.projectsExported = new Array<number>();
+    }else{
+      this.projectsExported = exported;
+      setTimeout(() => { this.searchBox.checkSelected(exported); }, 50);
+    }
+    
   }
 
   ngOnDestroy():void{
@@ -50,13 +65,39 @@ export class TableComponent implements OnInit {
 
   }
 
-  checkAll(): void{
+  checkAll(p_checked: boolean): void{
 
     for(let id of this.projects){ 
-
-      document.getElementById('checkbox'+ id.idproject).click(); 
-
+      let checkBox = document.getElementById('checkbox'+ id.idproject) as HTMLInputElement; 
+      if (checkBox.checked != p_checked){
+        checkBox.click();
+      }
+    }
+    if(this.projectsExported.length != this.allProjects.length){
+      (document.getElementById('checkAll') as HTMLInputElement).checked = false;
     }
  }
+
+ //To sort elements
+
+  ngAfterViewInit(): void {
+    this.searchBox.comboBox = [{'value' : 'lastAnalysis', 'text' : 'Last Analysis'}, {'value' : 'name', 'text':'Name'}];
+    this.searchBox.orderComboBox = 'desc';
+    this.searchBox.sortProperty = 'lastAnalysis';
+    this.cdr.detectChanges();
+  }
+
+  sortContent(): void{
+    let property = this.searchBox.sortProperty;
+    this.projects.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+  }
+
+  searchBoxChanges(): void {
+    this.projects = this.searchBox.searchBoxChanges(this.allProjects);
+    let idProjects = this.projects.map(proj => proj.idproject);
+    idProjects = this.projectsExported.filter(id => idProjects.includes(id));
+    setTimeout(() => { this.searchBox.checkSelected(idProjects); }, 10);
+    
+  }
 
 }

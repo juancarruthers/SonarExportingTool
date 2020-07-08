@@ -1,5 +1,6 @@
 <div class="container-fluid pt-4 pb-4">
 <h2 class="text-center mb-2"><strong>Projects Hosted in SonarCloud</strong></h2>
+<app-search-box (assignedContent)="searchBoxChanges()" (sortedContent)="sortContent()"></app-search-box>
     <div class="row">
 
         <div class="col-xl-11">
@@ -8,12 +9,12 @@
                 <thead>
                   <tr>
                     <th scope="col">Key</th>
-                    <th scope="col">Project</th>
+                    <th scope="col">Name</th>
                     <th scope="col">Last Analysis</th>
                     <th scope="col">Version</th>
                     <th scope="col">Link to Sonar Cloud</th>
                     <th scope="col">Link to Project</th>
-                    <th scope="col"><input id="checkAll" type="checkbox" (change)="checkAll()"></th>
+                    <th scope="col"><input id="checkAll" type="checkbox" (change)="checkAll($event.target.checked)"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -22,7 +23,7 @@
                     <td>{{ project.name }}</td>
                     <td>{{ project.lastAnalysis }}</td>
                     <td>{{ project.version }}</td>                   
-                    <td><a href="{{ 'https://sonarcloud.io/dashboard?id=unne.sonar%3A' + project.name.toLowerCase().replace(' ', '-') }}">Sonar Cloud Measures</a></td>
+                    <td><a href="{{ 'https://sonarcloud.io/dashboard?id=' + project.key.replace(':', '%3A') }}">Sonar Cloud Measures</a></td>
                     <td><a href="{{ project.projectLink }}">Project</a></td>
                     <td><input type="checkbox" id="{{ 'checkbox' + project.idproject }}" (change)="checkElement($event.target.checked, project.idproject)"></td>
                   </tr>
@@ -32,7 +33,9 @@
         </div>
 
         <div class="col-xl-1">
+          <div class="pt-1 sticky-top">
           <a [routerLink]="['/projects/metrics']" class="btn btn-primary btn-block">Select Metrics</a>
+          </div>
         </div>
 
     </div>

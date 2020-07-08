@@ -1,8 +1,10 @@
+import { Router } from '@angular/router';
 import { ProjectsService } from './../../../services/projects/projects.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Project } from '../../../classes/APIRequest/project';
 import { SweetAlert } from '../../sweetAlert/sweetAlert';
 import { SweetAlertIcon } from 'sweetalert2';
+import { SearchBoxComponent } from '../../search-bar/search-box.component';
 
 @Component({
   selector: 'app-proj-table-edition',
@@ -17,8 +19,11 @@ export class ProjTableEditionComponent implements OnInit {
     //Arguments for the API Request
     projectsChanged: number[];
 
+    //To sort the elements
+    allProjects: Project[];
+    @ViewChild(SearchBoxComponent) searchBox: SearchBoxComponent;
   
-    constructor( private projectsService: ProjectsService ) {
+    constructor( private projectsService: ProjectsService, private cdr: ChangeDetectorRef, private router: Router ) {
       this.projects = [];
     }
   
@@ -27,14 +32,11 @@ export class ProjTableEditionComponent implements OnInit {
         .subscribe(
           res=> {
             this.projects = res;
+            this.allProjects = this.projects;
           },
           err=> console.log(err)
         )
       this.projectsChanged = new Array<number>();
-    }
-
-    ngOnChanges(): void{
-      //this.ngOnInit();
     }
 
     addProject(p_idproject: number){
@@ -61,9 +63,32 @@ export class ProjTableEditionComponent implements OnInit {
           result = 'error';
         }
         alert.completed(response, result);
-        //this.router.navigateByUrl('/projects/edit');
+        this.searchBox.clearTextBox();
+        this.projects = this.allProjects;
+        this.projectsChanged = [];
       })
       
     }
+
+  //To sort elements
+
+  ngAfterViewInit(): void {
+    this.searchBox.comboBox = [{'value' : 'lastAnalysis', 'text' : 'Last Analysis'}, {'value' : 'name', 'text':'Name'}];
+    this.searchBox.orderComboBox = 'desc';
+    this.searchBox.sortProperty = 'lastAnalysis';
+    this.cdr.detectChanges();
+  }
+
+  sortContent(): void{
+    let property = this.searchBox.sortProperty;
+    this.projects.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+  }
+
+  searchBoxChanges(): void {
+    this.projects = this.searchBox.searchBoxChanges(this.allProjects);
+    let idProjects = this.projects.map(proj => proj.idproject);
+    this.projectsChanged = this.projectsChanged.filter(id => idProjects.includes(id));
+    
+  }
 
 }

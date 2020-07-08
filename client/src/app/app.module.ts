@@ -22,6 +22,7 @@ import { UpdateProjectsTabComponent } from './components/administrator/update-pr
 import { ProjectsService } from './services/projects/projects.service';
 import { AuthService } from './services/auth/auth.service';
 import { ConfirmationModalComponent } from './components/administrator/update-projects-tab/confirmation-modal/confirmation-modal.component';
+import { SearchBoxComponent } from './components/search-bar/search-box.component';
 
 
 
@@ -37,7 +38,8 @@ import { ConfirmationModalComponent } from './components/administrator/update-pr
     CompMetricsTableComponent,
     ProjTableEditionComponent,
     UpdateProjectsTabComponent,
-    ConfirmationModalComponent
+    ConfirmationModalComponent,
+    SearchBoxComponent
   ],
   imports: [
     BrowserModule,

@@ -1,18 +1,26 @@
 <div class="container-fluid pt-4 pb-4">
   <h2 class="text-center mb-2"><strong>Project's Metrics</strong></h2>
-      <div class="row">
   
-          <div class="col-xl-11">
+  <app-search-box (assignedContent)="searchBoxChanges()" (sortedContent)="sortContent()"></app-search-box>
+      <div class="row">
+
+        <div class="col-xl-1">
+          <div class="pt-1 sticky-top">
+            <a [routerLink]="['/projects']" class="btn btn-primary mb-1 btn-block"><em class="fas fa-arrow-circle-left"></em></a>
+          </div>
+        </div>
+  
+          <div class="col-xl-10">
             <table class="table table-responsive-xl table-hover">
               <caption>{{metrics.length + " Project's Metrics"}}</caption>
                 <thead>
                   <tr>
                     <th scope="col">Domain</th>
                     <th scope="col">Key</th>
-                    <th scope="col">Metric</th> 
+                    <th scope="col">Name</th> 
                     <th scope="col">Description</th>                 
                     <th scope="col">Type</th>                    
-                    <th scope="col"><input id="checkAll" type="checkbox" (change)="checkAll()"></th>
+                    <th scope="col"><input id="checkAll" type="checkbox" (change)="checkAll($event.target.checked)"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -30,8 +38,10 @@
         </div>
 
         <div class="col-xl-1">
+          <div class="pt-1 sticky-top">
             <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#twoOption" id="exportButton" (click)="export()">
                 <em class="fas fa-file-export"></em> Export</button>
+          </div>
         </div>
 
     </div>

@@ -3,6 +3,7 @@ import { ProjectsService }  from '../../services/projects/projects.service';
 import { ExportModalComponent } from '../export-modal/export-modal.component';
 import { TwoOptionModalComponent } from '../two-option-modal/two-option-modal.component';
 import { Metric } from '../../classes/APIRequest/metric';
+import { SearchBoxComponent } from '../search-bar/search-box.component';
 
 @Component({
   selector: 'app-metrics-table',
@@ -22,11 +23,20 @@ export class MetricsTableComponent implements OnInit {
   @ViewChild(ExportModalComponent) exportModal:ExportModalComponent;
   @ViewChild(TwoOptionModalComponent) twoOptionModal:TwoOptionModalComponent;
 
+  //To sort the elements
+  allMetrics: Metric[];
+  @ViewChild(SearchBoxComponent) searchBox: SearchBoxComponent;
+
   constructor(private projectsService: ProjectsService, private cdr: ChangeDetectorRef) { 
-    
+    this.metrics = []
   }
 
   ngAfterViewInit(): void {
+
+    //To sort elements
+    this.searchBox.comboBox = [{'value' : 'domain', 'text' : 'Domain'}, {'value' : 'name', 'text':'Name'}, {'value' : 'type', 'text':'Type'}];
+    this.searchBox.orderComboBox = 'asc';
+    this.searchBox.sortProperty = 'domain';
 
     this.twoOptionModal.title = 'Export Components Measures';
     this.twoOptionModal.description = 'Would you like to export the components measures also?'
@@ -42,14 +52,22 @@ export class MetricsTableComponent implements OnInit {
       .subscribe(
         res=> {
           this.metrics = res;
+          this.allMetrics = this.metrics;
         },
         err=> console.log(err)
       )
     this.projectsExported = this.projectsService.getExportedProjects();
     if (this.projectsExported.length == 0){
       window.location.href = '';
-    }
-    this.metricsExported = new Array<number>();
+    }else{
+      let exportedMet = this.projectsService.getExportedProjectsMetrics();
+      if (exportedMet.length == 0){
+        this.metricsExported = new Array<number>();
+      }else{
+        this.metricsExported = exportedMet;
+        setTimeout(() => { this.searchBox.checkSelected(exportedMet); }, 50);
+      }
+    }  
   }
 
   ngOnDestroy():void{
@@ -72,12 +90,16 @@ export class MetricsTableComponent implements OnInit {
 
   }
 
-  checkAll(): void{
+  checkAll(p_checked: boolean): void{
 
     for(let id of this.metrics){ 
-
-      document.getElementById('checkbox'+ id.idmetric).click(); 
-
+      let checkBox = document.getElementById('checkbox'+ id.idmetric) as HTMLInputElement; 
+      if (checkBox.checked != p_checked){
+        checkBox.click();
+      }
+    }
+    if(this.metricsExported.length != this.allMetrics.length){
+      (document.getElementById('checkAll') as HTMLInputElement).checked = false;
     }
  }
 
@@ -85,6 +107,21 @@ export class MetricsTableComponent implements OnInit {
     this.exportModal.projectsExported = this.projectsExported;
     this.exportModal.projMetricsExported = this.metricsExported;
     this.exportModal.compMetricsExported = [0];
+  }
+
+  //To sort elements
+
+  sortContent(): void{
+    let property = this.searchBox.sortProperty;
+    this.metrics.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+  }
+
+  searchBoxChanges(): void {
+    this.metrics = this.searchBox.searchBoxChanges(this.allMetrics);
+    let idMetrics = this.metrics.map(met => met.idmetric);
+    idMetrics = this.metricsExported.filter(id => idMetrics.includes(id));
+    setTimeout(() => { this.searchBox.checkSelected(idMetrics); }, 10);
+    
   }
 
 }

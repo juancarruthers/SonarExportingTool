@@ -1,0 +1,29 @@
+<nav class="container mt-2 mb-2">
+  
+  <div class="form-inline">
+
+        <div class="mr-1">
+          <small>Sort by:</small>
+        </div>
+        <select class="custom-select custom-select-sm mr-2" (change)=sortContent($event.target.value)>
+          <option *ngFor="let option of comboBox" value="{{option.value}}">{{option.text}}</option>
+        </select>
+      
+
+      <div *ngIf='orderComboBox=="desc"' class="mr-5 mt-1 mb-1">
+        <button type="button" id="sortIcon" (click)='changeDirection()' class="btn btn-sm btn-light"><em class="fas fa-sort-amount-down"></em></button>
+      </div>
+
+      <div *ngIf='orderComboBox=="asc"' class="mr-5 mt-1 mb-1">
+        <button id="sortIcon" (click)='changeDirection()' class="btn btn-sm btn-light"><em class="fas fa-sort-amount-down-alt"></em></button>
+      </div>
+      <div class="input-group" >
+      <input class="form-control form-control-sm py-2 border-right-0 border" type="search" placeholder="Search by name" aria-label="Search" id="searchedText" (input)="assignContent()">
+      <span class="input-group-append">
+        <div class="input-group-text bg-transparent"><em class="fa fa-search"></em></div>      
+      </span>
+
+    </div>
+  
+  </div>
+</nav>

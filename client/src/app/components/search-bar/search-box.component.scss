@@ -1,0 +1,14 @@
+@import "../../../../node_modules/bootstrap/scss/bootstrap"; 
+
+.form-control:focus {
+    outline: 0 !important;
+    border-color: initial;
+    box-shadow: none;
+}
+
+.custom-select:focus {
+    outline: 0 !important;
+    box-shadow: none;
+}
+
+
