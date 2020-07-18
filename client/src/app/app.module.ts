@@ -23,6 +23,7 @@ import { ProjectsService } from './services/projects/projects.service';
 import { AuthService } from './services/auth/auth.service';
 import { ConfirmationModalComponent } from './components/administrator/update-projects-tab/confirmation-modal/confirmation-modal.component';
 import { SearchBoxComponent } from './components/search-bar/search-box.component';
+import { PaginatorComponent } from './components/paginator/paginator.component';
 
 
 
@@ -39,7 +40,8 @@ import { SearchBoxComponent } from './components/search-bar/search-box.component
     ProjTableEditionComponent,
     UpdateProjectsTabComponent,
     ConfirmationModalComponent,
-    SearchBoxComponent
+    SearchBoxComponent,
+    PaginatorComponent
   ],
   imports: [
     BrowserModule,

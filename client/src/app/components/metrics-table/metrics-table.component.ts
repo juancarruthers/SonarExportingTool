@@ -4,6 +4,7 @@ import { ExportModalComponent } from '../export-modal/export-modal.component';
 import { TwoOptionModalComponent } from '../two-option-modal/two-option-modal.component';
 import { Metric } from '../../classes/APIRequest/metric';
 import { SearchBoxComponent } from '../search-bar/search-box.component';
+import { PaginatorComponent } from '../paginator/paginator.component';
 
 @Component({
   selector: 'app-metrics-table',
@@ -27,6 +28,9 @@ export class MetricsTableComponent implements OnInit {
   allMetrics: Metric[];
   @ViewChild(SearchBoxComponent) searchBox: SearchBoxComponent;
 
+  //pagination
+  @ViewChild(PaginatorComponent) paginator: PaginatorComponent;
+
   constructor(private projectsService: ProjectsService, private cdr: ChangeDetectorRef) { 
     this.metrics = []
   }
@@ -47,27 +51,29 @@ export class MetricsTableComponent implements OnInit {
 
   }
 
-  ngOnInit(): void {   
-    this.projectsService.getProjectMetrics()
-      .subscribe(
-        res=> {
-          this.metrics = res;
-          this.allMetrics = this.metrics;
-        },
-        err=> console.log(err)
-      )
+  ngOnInit(): void { 
+
     this.projectsExported = this.projectsService.getExportedProjects();
     if (this.projectsExported.length == 0){
       window.location.href = '';
-    }else{
-      let exportedMet = this.projectsService.getExportedProjectsMetrics();
-      if (exportedMet.length == 0){
-        this.metricsExported = new Array<number>();
-      }else{
-        this.metricsExported = exportedMet;
-        setTimeout(() => { this.searchBox.checkSelected(exportedMet); }, 50);
-      }
-    }  
+    } 
+
+    this.projectsService.getProjectMetrics()
+      .subscribe(
+        res=> {
+          this.allMetrics = res;
+          this.paginator.setPagination(this.allMetrics);
+          let exportedMet = this.projectsService.getExportedProjectsMetrics();
+          if (exportedMet.length == 0){
+            this.metricsExported = new Array<number>();
+          }else{
+            this.metricsExported = exportedMet;
+          }
+          this.showMore();
+        },
+        err=> console.log(err)
+      )
+    
   }
 
   ngOnDestroy():void{
@@ -113,15 +119,29 @@ export class MetricsTableComponent implements OnInit {
 
   sortContent(): void{
     let property = this.searchBox.sortProperty;
-    this.metrics.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+    if (this.paginator.topReached()){
+      this.metrics.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+    }else{  
+      //pagination  
+      this.paginator.elements.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+      this.showMore();
+    }
   }
 
   searchBoxChanges(): void {
     this.metrics = this.searchBox.searchBoxChanges(this.allMetrics);
+    //pagination
+    this.paginator.setPagination(this.metrics);
+    this.showMore();
+  }
+
+  //pagination
+
+  showMore(): void{     
+    this.metrics = this.paginator.showMore();
     let idMetrics = this.metrics.map(met => met.idmetric);
     idMetrics = this.metricsExported.filter(id => idMetrics.includes(id));
     setTimeout(() => { this.searchBox.checkSelected(idMetrics); }, 10);
-    
   }
 
 }

@@ -3,6 +3,7 @@ import { ExportModalComponent } from '../export-modal/export-modal.component';
 import { ProjectsService } from '../../services/projects/projects.service';
 import { Metric } from 'src/app/classes/APIRequest/metric';
 import { SearchBoxComponent } from '../search-bar/search-box.component';
+import { PaginatorComponent } from '../paginator/paginator.component';
 
 @Component({
   selector: 'app-comp-metrics-table',
@@ -26,6 +27,9 @@ export class CompMetricsTableComponent implements OnInit {
   allMetrics: Metric[];
   @ViewChild(SearchBoxComponent) searchBox: SearchBoxComponent;
 
+  //pagination
+  @ViewChild(PaginatorComponent) paginator: PaginatorComponent;
+
   constructor(private projectsService: ProjectsService, private cdr: ChangeDetectorRef) { 
     this.metrics = []
   }
@@ -44,15 +48,7 @@ export class CompMetricsTableComponent implements OnInit {
   }
 
   ngOnInit(): void {   
-    this.projectsService.getComponentMetrics()
-      .subscribe(
-        res=> {
-          this.metrics = res;
-          this.allMetrics = this.metrics;
-        },
-        err=> console.log(err)
-      )
-      
+
     this.projectsExported = this.projectsService.getExportedProjects();
     this.projMetricsExported = this.projectsService.getExportedProjectsMetrics();
     if (this.projMetricsExported.length == 0){
@@ -60,6 +56,18 @@ export class CompMetricsTableComponent implements OnInit {
     }else{
       this.compMetricsExported = new Array<number>();
     }
+
+    this.projectsService.getComponentMetrics()
+      .subscribe(
+        res=> {
+          this.allMetrics = res;
+          this.paginator.setPagination(this.allMetrics);
+          this.showMore();
+        },
+        err=> console.log(err)
+      )
+      
+    
     
   }
 
@@ -101,15 +109,30 @@ export class CompMetricsTableComponent implements OnInit {
 
   sortContent(): void{
     let property = this.searchBox.sortProperty;
-    this.metrics.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+    if (this.paginator.topReached()){
+      this.metrics.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+    }else{  
+      //pagination  
+      this.paginator.elements.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+      this.showMore();
+    }
   }
 
   searchBoxChanges(): void {
     this.metrics = this.searchBox.searchBoxChanges(this.allMetrics);
+    //pagination
+    this.paginator.setPagination(this.metrics);
+    this.showMore();
+    
+  }
+
+  //pagination
+
+  showMore(): void{     
+    this.metrics = this.paginator.showMore();
     let idMetrics = this.metrics.map(met => met.idmetric);
     idMetrics = this.compMetricsExported.filter(id => idMetrics.includes(id));
     setTimeout(() => { this.searchBox.checkSelected(idMetrics); }, 10);
-    
   }
 
 }

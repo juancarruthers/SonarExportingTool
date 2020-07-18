@@ -1,0 +1,4 @@
+<div class="d-flex justify-content-center">
+  <p *ngIf="!topReached()">{{elemPerPage*actualPage}} of {{elements.length}} shown <a class="text-primary" type="button" (click)="pageChanged()">Show More</a></p>
+  <p *ngIf="topReached()">{{elements.length}} of {{elements.length}} shown</p>
+</div>

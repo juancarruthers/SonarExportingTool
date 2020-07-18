@@ -2,6 +2,7 @@ import { SearchBoxComponent } from './../search-bar/search-box.component';
 import { ProjectsService } from './../../services/projects/projects.service';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Project } from '../../classes/APIRequest/project';
+import { PaginatorComponent } from '../paginator/paginator.component';
 
 
 @Component({
@@ -21,6 +22,9 @@ export class TableComponent implements OnInit {
   allProjects: Project[];
   @ViewChild(SearchBoxComponent) searchBox: SearchBoxComponent;
 
+  //pagination
+  @ViewChild(PaginatorComponent) paginator: PaginatorComponent;
+
   constructor( private projectsService: ProjectsService, private cdr: ChangeDetectorRef) { 
     this.projects = [];
   }
@@ -28,21 +32,20 @@ export class TableComponent implements OnInit {
   ngOnInit(): void {
     this.projectsService.getProjects()
       .subscribe(
-        res=> {
-          this.projects = res;
-          this.allProjects = this.projects;
-
+        res=> {         
+          this.allProjects = res;
+          this.paginator.setPagination(this.allProjects);
+          let exported = this.projectsService.getExportedProjects();
+          if (exported.length == 0){
+            this.projectsExported = new Array<number>();
+          }else{
+            this.projectsExported = exported;
+          }
+          this.showMore();
+          
         },
         err=> console.log(err)
-      )
-    let exported = this.projectsService.getExportedProjects();
-    if (exported.length == 0){
-      this.projectsExported = new Array<number>();
-    }else{
-      this.projectsExported = exported;
-      setTimeout(() => { this.searchBox.checkSelected(exported); }, 50);
-    }
-    
+      )   
   }
 
   ngOnDestroy():void{
@@ -88,16 +91,31 @@ export class TableComponent implements OnInit {
   }
 
   sortContent(): void{
-    let property = this.searchBox.sortProperty;
-    this.projects.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+    let property = this.searchBox.sortProperty;   
+    if (this.paginator.topReached()){
+      this.projects.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+    }else{  
+      //pagination  
+      this.paginator.elements.sort((a, b) => this.searchBox.sortByProperty(a[property], b[property]));
+      this.showMore();
+    }
+    
   }
 
   searchBoxChanges(): void {
     this.projects = this.searchBox.searchBoxChanges(this.allProjects);
+    //pagination
+    this.paginator.setPagination(this.projects);
+    this.showMore();  
+  }
+
+  //pagination
+
+  showMore(): void{     
+    this.projects = this.paginator.showMore();
     let idProjects = this.projects.map(proj => proj.idproject);
     idProjects = this.projectsExported.filter(id => idProjects.includes(id));
     setTimeout(() => { this.searchBox.checkSelected(idProjects); }, 10);
-    
   }
 
 }

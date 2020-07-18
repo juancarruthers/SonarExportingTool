@@ -11,7 +11,7 @@
   
           <div class="col-xl-10">
             <table class="table table-responsive-xl table-hover">
-              <caption>{{metrics.length + " Component's Metrics"}}</caption>
+              <caption><app-paginator (changePage)="showMore()"></app-paginator></caption>
                 <thead>
                   <tr>
                     <th scope="col">Domain</th>
@@ -44,7 +44,6 @@
         </div>
 
     </div>
-
     <app-export-modal></app-export-modal>
 
 </div>
