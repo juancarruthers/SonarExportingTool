@@ -24,6 +24,7 @@ import { AuthService } from './services/auth/auth.service';
 import { ConfirmationModalComponent } from './components/administrator/update-projects-tab/confirmation-modal/confirmation-modal.component';
 import { SearchBoxComponent } from './components/search-bar/search-box.component';
 import { PaginatorComponent } from './components/paginator/paginator.component';
+import { AnalyzeProjectsComponent } from './components/administrator/analyze-projects/analyze-projects.component';
 
 
 
@@ -41,7 +42,8 @@ import { PaginatorComponent } from './components/paginator/paginator.component';
     UpdateProjectsTabComponent,
     ConfirmationModalComponent,
     SearchBoxComponent,
-    PaginatorComponent
+    PaginatorComponent,
+    AnalyzeProjectsComponent
   ],
   imports: [
     BrowserModule,

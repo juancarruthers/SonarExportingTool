@@ -1,0 +1,32 @@
+<div class="card container pt-4 pb-4">
+    <h2 class="text-center mb-2"><strong>Analyze Projects</strong></h2>
+    <p>To manually analyze projects without any envioronment setted:</p>
+    <ol>
+    <li>
+        Download SonarScanner from <a href="https://sonarcloud.io/documentation/analysis/scan/sonarscanner/">SonarCloud</a> website.
+    </li>
+    <li>
+        Download the <a href="https://drive.google.com/file/d/1UIcMzTUFHQ-VyyrVT9aZem2yRYFQjx0G/view?usp=sharing">zip</a> file with the script to automatize the process to upload many projects.
+    </li>
+    <li>
+        Decompress the two files downloaded.
+    </li>
+    <li>
+        Copy all the folders inside the decompressed folder of the sonar-scanner (bin, conf, jre and lib) and paste them in the sonar-scanner subfolder from the analyzeProjects folder.
+    </li>
+    <li>
+        Move the projects that are going to be analyzed in the /projects subfolder inside the analyzeProjects one.
+    </li>
+    <li>
+        Use the sonar-project.properties file as a template and update the values according to the project and then put it in the project's root directory. You can search for all the analysis parameters (depends in the language) <a href="https://sonarcloud.io/documentation/analysis/analysis-parameters/">here</a>.
+    </li>
+    <li>
+        Repeat the 6th step for every project that is going to be analyzed.
+    </li>
+    <li>
+        Run the "anlyzeProjects.sh" script.
+    </li>
+    </ol>
+    <p>* If an error appears with a project you can check it in "results.txt" file. </p>
+
+</div>
