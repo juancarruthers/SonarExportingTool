@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { projectController } from '../controllers/projectController';
-import { RefreshAPIModule } from '../refreshAPI/refreshAPIModule';
 
 //Authentication Packages
 import jwt from "express-jwt";

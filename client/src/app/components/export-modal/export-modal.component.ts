@@ -76,6 +76,9 @@ export class ExportModalComponent implements OnInit {
 
       if (flag){
 
+        this.progressModal = new SweetAlert();
+        this.progressModal.onLoad();
+        this.progressModal.update("Checking the measures to export");
         this.validateNumberOfComponentMeasures();
  
       }else{
@@ -103,6 +106,7 @@ export class ExportModalComponent implements OnInit {
 
           }else{  
 
+            this.progressModal.close();
             this.alert.text = 'You cannot export more than 3 million measures at once! You tried to export: ' + numberComponents + " components' measures" ;
             this.alert.bootstrapColor = 'danger';
             this.alert.showAlert();
@@ -119,8 +123,6 @@ export class ExportModalComponent implements OnInit {
 
   export(): void{
     this.download = new Download();
-    this.progressModal = new SweetAlert();
-    this.progressModal.onLoad();
     this.progressModal.update("Requesting for the Measures");  
     
     this.projectsService.getProjectsMeasures(this.projectsExported, this.projMetricsExported)

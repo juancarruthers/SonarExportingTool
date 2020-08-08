@@ -31,6 +31,7 @@ export class UpdateProjectsTabComponent implements OnInit {
 
   ngOnInit(){
     this.loadingModal.onLoad();
+    this.loadingModal.update("Fetching the projects to be added and updated");
     this.projectsService.getProjectsToUpdate().subscribe((response: any) => {
         
       this.newProjects = response[0];

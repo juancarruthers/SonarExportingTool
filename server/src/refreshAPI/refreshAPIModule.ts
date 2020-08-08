@@ -75,14 +75,14 @@ export class RefreshAPIModule {
 
       for (let i = 0; i < projectsKeys.length; i++) {
 
-        await this.database.transactionalOperation('START TRANSACTION');
+        await this.database.startTransaction();
         await this.updateComponents(projectsKeys[i]);
         console.timeLog('DBTime', projectsKeys[i]['key'] + " Components Inserted!");
         await this.updateProjectMeasures(projectsKeys[i]);
         console.timeLog('DBTime', projectsKeys[i]['key'] + " Measures Inserted!");
         await this.insertComponentMeasures(projectsKeys[i]);
         console.timeLog('DBTime', projectsKeys[i]['key'] + " Components' Measures Inserted!");
-        await this.database.transactionalOperation('COMMIT');
+        await this.database.commit();
 
         if ((this.getTimeSeconds()-this.startTime) > this.limitTime){
 
@@ -95,7 +95,7 @@ export class RefreshAPIModule {
     } catch (error) {
 
       console.timeLog('DBTime',error);
-      await this.database.transactionalOperation('ROLLBACK');
+      await this.database.rollback();
       await this.database.deleteProjectsNotFullyLoad();
       p_flagTransaction = false;
     }
@@ -117,14 +117,14 @@ export class RefreshAPIModule {
         
         for (let i = 0; i < projectsKeys.length; i++) {
 
-          await this.database.transactionalOperation('START TRANSACTION');
+          await this.database.startTransaction();
           await this.updateComponents(projectsKeys[i]);
           console.timeLog('DBTime', projectsKeys[i]['key'] + " Components Updated!");   
           await this.updateProjectMeasures(projectsKeys[i]);
           console.timeLog('DBTime', projectsKeys[i]['key'] + " Measures Updated!");  
           await this.updateComponentMeasures(projectsKeys[i]);
           console.timeLog('DBTime', projectsKeys[i]['key'] + " Components' Measures Updated!");
-          await this.database.transactionalOperation('COMMIT');
+          await this.database.commit();
 
           if ((this.getTimeSeconds()-this.startTime) > this.limitTime){
 
@@ -136,7 +136,7 @@ export class RefreshAPIModule {
       } catch (error) {
 
         console.timeLog('DBTime',error);
-        await this.database.transactionalOperation('ROLLBACK');
+        await this.database.rollback();
         p_flagTransaction = false;
       }
     }

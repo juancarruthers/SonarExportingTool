@@ -61,14 +61,14 @@ class RefreshAPIModule {
             const projectsKeys = yield this.database.getProjectKeys(keysString);
             try {
                 for (let i = 0; i < projectsKeys.length; i++) {
-                    yield this.database.transactionalOperation('START TRANSACTION');
+                    yield this.database.startTransaction();
                     yield this.updateComponents(projectsKeys[i]);
                     console.timeLog('DBTime', projectsKeys[i]['key'] + " Components Inserted!");
                     yield this.updateProjectMeasures(projectsKeys[i]);
                     console.timeLog('DBTime', projectsKeys[i]['key'] + " Measures Inserted!");
                     yield this.insertComponentMeasures(projectsKeys[i]);
                     console.timeLog('DBTime', projectsKeys[i]['key'] + " Components' Measures Inserted!");
-                    yield this.database.transactionalOperation('COMMIT');
+                    yield this.database.commit();
                     if ((this.getTimeSeconds() - this.startTime) > this.limitTime) {
                         yield this.database.deleteProjectsNotFullyLoad();
                         i = projectsKeys.length;
@@ -78,7 +78,7 @@ class RefreshAPIModule {
             }
             catch (error) {
                 console.timeLog('DBTime', error);
-                yield this.database.transactionalOperation('ROLLBACK');
+                yield this.database.rollback();
                 yield this.database.deleteProjectsNotFullyLoad();
                 p_flagTransaction = false;
             }
@@ -95,14 +95,14 @@ class RefreshAPIModule {
             if (p_flagTransaction) {
                 try {
                     for (let i = 0; i < projectsKeys.length; i++) {
-                        yield this.database.transactionalOperation('START TRANSACTION');
+                        yield this.database.startTransaction();
                         yield this.updateComponents(projectsKeys[i]);
                         console.timeLog('DBTime', projectsKeys[i]['key'] + " Components Updated!");
                         yield this.updateProjectMeasures(projectsKeys[i]);
                         console.timeLog('DBTime', projectsKeys[i]['key'] + " Measures Updated!");
                         yield this.updateComponentMeasures(projectsKeys[i]);
                         console.timeLog('DBTime', projectsKeys[i]['key'] + " Components' Measures Updated!");
-                        yield this.database.transactionalOperation('COMMIT');
+                        yield this.database.commit();
                         if ((this.getTimeSeconds() - this.startTime) > this.limitTime) {
                             i = projectsKeys.length;
                             p_flagTransaction = false;
@@ -111,7 +111,7 @@ class RefreshAPIModule {
                 }
                 catch (error) {
                     console.timeLog('DBTime', error);
-                    yield this.database.transactionalOperation('ROLLBACK');
+                    yield this.database.rollback();
                     p_flagTransaction = false;
                 }
             }

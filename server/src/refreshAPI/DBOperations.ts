@@ -348,9 +348,25 @@ export class DBOperations{
 
     //BEGIN AND END SEGMENTS OF A TRANSACTION (START TRANSACTION, COMMIT, ROLLBACK)
 
-    async transactionalOperation(p_operation: string) : Promise<void>{
+    async startTransaction() : Promise<void>{
         try {
-            await this.connection.query(p_operation + ';');
+            await this.connection.query('START TRANSACTION;');
+        } catch (error) {
+            console.log(error)
+        }
+    }  
+
+    async commit() : Promise<void>{
+        try {
+            await this.connection.query('COMMIT;');
+        } catch (error) {
+            console.log(error)
+        }
+    }  
+
+    async rollback() : Promise<void>{
+        try {
+            await this.connection.query('ROLLBACK;');
         } catch (error) {
             console.log(error)
         }

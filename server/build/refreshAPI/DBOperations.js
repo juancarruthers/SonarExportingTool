@@ -328,10 +328,30 @@ class DBOperations {
      --->>>TRANSACTIONAL OPERATIONS
     */
     //BEGIN AND END SEGMENTS OF A TRANSACTION (START TRANSACTION, COMMIT, ROLLBACK)
-    transactionalOperation(p_operation) {
+    startTransaction() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield this.connection.query(p_operation + ';');
+                yield this.connection.query('START TRANSACTION;');
+            }
+            catch (error) {
+                console.log(error);
+            }
+        });
+    }
+    commit() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.connection.query('COMMIT;');
+            }
+            catch (error) {
+                console.log(error);
+            }
+        });
+    }
+    rollback() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.connection.query('ROLLBACK;');
             }
             catch (error) {
                 console.log(error);
