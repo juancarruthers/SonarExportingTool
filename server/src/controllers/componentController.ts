@@ -35,9 +35,9 @@ class ComponentController {
                 
             }else{
 
-                queryComponent = "You can request only for one project's components' measures at a time.";
+                queryComponent = {"Error" : "You can request only for one project's components' measures at a time."};
             }
-            
+            res.set('Content-Type', 'application/json');
             res.json(queryComponent);
                 
         } catch (error) {
@@ -56,7 +56,8 @@ class ComponentController {
 
             let queryComponent = await pool
                 .query('SELECT count(idmeasure) AS count FROM component_measures AS cm JOIN components AS c ON c.idcomponent = cm.idcomponent WHERE c.idproject IN ( ? ) AND cm.idmetric IN ( ? ) ',[projectsIds, metricsIds]);
-
+            
+            res.set('Content-Type', 'application/json');
             res.json(queryComponent[0]['count']);
             
         } catch (error) {

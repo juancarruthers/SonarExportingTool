@@ -49,8 +49,7 @@ export class ProjTableEditionComponent implements OnInit {
       let version = (document.getElementById('inpVersion' + p_idproject) as HTMLInputElement).value;
       let index = this.allProjects.findIndex(proj => proj.idproject == p_idproject);      
       if (this.projectsChanged.indexOf(p_idproject) == -1){
-        this.projectsChanged.push(p_idproject); 
-        console.log(p_idproject);      
+        this.projectsChanged.push(p_idproject);      
       }
       this.allProjects[index].projectLink = link;
       this.allProjects[index].version = version;
@@ -61,7 +60,6 @@ export class ProjTableEditionComponent implements OnInit {
       for (const id of this.projectsChanged) {
         let index = this.allProjects.findIndex(proj => proj.idproject == id);
         let change = [this.allProjects[index].projectLink, this.allProjects[index].version, id+''];
-        console.log(index);
         changes.push(change);        
       }
       this.projectsService.editProjects(changes)

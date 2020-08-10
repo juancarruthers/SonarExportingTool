@@ -16,8 +16,7 @@ const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const cors_1 = __importDefault(require("cors"));
 const cron_1 = require("cron");
-const publicRoutes_1 = __importDefault(require("./routes/publicRoutes"));
-const adminRoutes_1 = __importDefault(require("./routes/adminRoutes"));
+const Routes_1 = __importDefault(require("./routes/Routes"));
 const refreshAPIModule_1 = require("./refreshAPI/refreshAPIModule");
 const DBOperations_1 = require("./refreshAPI/DBOperations");
 class APIServer {
@@ -52,8 +51,7 @@ class APIServer {
         this.app.use(express_1.default.urlencoded({ extended: false }));
     }
     routes() {
-        this.app.use(publicRoutes_1.default);
-        this.app.use(adminRoutes_1.default);
+        this.app.use(Routes_1.default);
     }
     startRefreshModuleJob() {
         this.cronJob = new cron_1.CronJob('00 00 02 * * *', () => __awaiter(this, void 0, void 0, function* () {
@@ -65,14 +63,11 @@ class APIServer {
     errorHandlingConfig() {
         this.app
             .use((err, req, res, next) => {
-            res.status(200).end();
-            next();
-        }, (err, req, res, next) => {
-            res.status(400).send('Need Authentication token to make that request');
-            next();
-        }, (err, req, res, next) => {
-            console.log(err.stack);
-            res.status(500).send('Server does not know how to handle the situation');
+            switch (err.name) {
+                case 'UnauthorizedError':
+                    res.status(401).json({ 'Error': 'Need Authentication token to make that request' });
+                    break;
+            }
             next();
         });
     }

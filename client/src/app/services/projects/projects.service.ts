@@ -27,7 +27,7 @@ export class ProjectsService {
   httpHeaders: HttpHeaders;
 
   constructor(private http: HttpClient, private auth:AuthService) { 
-    this.API_URI = 'http://localhost:3000/api/projects';//'https://sonar-exporting-tool.tk/api/projects';
+    this.API_URI = 'http://localhost:3000/api';//'https://sonar-exporting-tool.tk/api';
     this.httpHeaders = new HttpHeaders({
       'Content-Type':'application/json; charset=utf-8',
       'Cache-Control': 'private, max-age=3600, must-revalidate'
@@ -69,19 +69,19 @@ export class ProjectsService {
   */
   
   getProjects(): Observable<Project[]>{
-    return this.http.get<Project[]>(`${this.API_URI}`);
+    return this.http.get<Project[]>(`${this.API_URI}/projects`);
   }
 
   getProjectMetrics(): Observable<Metric[]>{
     let headers = this.httpHeaders;
 
-    return this.http.get<Metric[]>(`${this.API_URI}/metrics`, {headers});
+    return this.http.get<Metric[]>(`${this.API_URI}/metrics/projects`, {headers});
   }
 
   getComponentMetrics(): Observable<Metric[]>{
     let headers = this.httpHeaders;
 
-    return this.http.get<Metric[]>(`${this.API_URI}/components/metrics`, {headers});
+    return this.http.get<Metric[]>(`${this.API_URI}/metrics/components`, {headers});
   }
 
   getNumberComponentsMeasures(p_projectsExported: number[], p_compMetricsExported: number[]): Observable<number>{
@@ -96,7 +96,7 @@ export class ProjectsService {
   getProjectsMeasures(p_projectsExported: number[], p_metricsExported: number[]): Observable<Project[]>{
     let headers = this.httpHeaders;
     
-    return this.http.get<Project[]>(`${this.API_URI}/measures` + '/' + p_projectsExported + '/' + p_metricsExported, {headers});
+    return this.http.get<Project[]>(`${this.API_URI}/projects/measures` + '/' + p_projectsExported + '/' + p_metricsExported, {headers});
   }
 
   getComponentsMeasures(p_projectsExported: number, p_compMetricsExported: number[], p_delayTime : number): Observable<Component[]>{
@@ -129,7 +129,7 @@ export class ProjectsService {
   */
 
   editProjects(p_projectsChanges: string[][]): Observable<string>{
-    let url = `${this.API_URI}/edit`;
+    let url = `${this.API_URI}/projects`;
     return this.auth.getTokenSilently()
             .pipe(
               mergeMap(token => {
@@ -141,7 +141,7 @@ export class ProjectsService {
   }
 
   updateProjects(p_config): Observable<void>{
-    let url = `${this.API_URI}/update`;
+    let url = `${this.API_URI}/projects/update`;
     return this.auth.getTokenSilently()
             .pipe(
               mergeMap(token => {
@@ -152,8 +152,8 @@ export class ProjectsService {
             );
   }
 
-  getProjectsToUpdate(): Observable<void> {
-    let url = `${this.API_URI}/update/list`;
+  getProjectsToUpdate(): Observable<any> {
+    let url = `${this.API_URI}/projects/update`;
     return this.auth.getTokenSilently()
             .pipe(
               mergeMap(token => {

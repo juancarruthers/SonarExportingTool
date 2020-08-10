@@ -4,8 +4,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import { CronJob } from 'cron';
 
-import publicRoutes from './routes/publicRoutes';
-import adminRoutes from './routes/adminRoutes';
+import routes from './routes/Routes';
 import { RefreshAPIModule } from './refreshAPI/refreshAPIModule';
 import { DBOperations } from './refreshAPI/DBOperations';
 
@@ -60,8 +59,7 @@ class APIServer {
 
     private routes(): void {
 
-      this.app.use(publicRoutes);
-      this.app.use(adminRoutes);
+      this.app.use(routes);
 
     }
 
@@ -77,19 +75,11 @@ class APIServer {
         this.app
         .use(
             (err: Error, req: Request, res: Response, next: NextFunction) => {
-
-                res.status(200).end();
-                next();
-            },
-            (err: Error, req: Request, res: Response, next: NextFunction) => {
-
-                res.status(400).send('Need Authentication token to make that request');
-                next();
-            },
-            (err: Error, req: Request, res: Response, next: NextFunction) => {
-
-                console.log(err.stack);
-                res.status(500).send('Server does not know how to handle the situation');
+                switch (err.name) {
+                    case 'UnauthorizedError':
+                        res.status(401).json({'Error' : 'Need Authentication token to make that request'});
+                        break;
+                }              
                 next();
             }
         );

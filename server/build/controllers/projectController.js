@@ -19,6 +19,7 @@ class ProjectController {
             try {
                 const query = yield database_1.default
                     .query('SELECT * FROM projects ORDER BY lastAnalysis DESC');
+                res.set('Content-Type', 'application/json');
                 res.json(query);
             }
             catch (error) {
@@ -33,10 +34,12 @@ class ProjectController {
                     yield database_1.default
                         .query('UPDATE projects SET projectLink = ?, version = ? WHERE idproject = ?', projectUpdate);
                 }
+                res.set('Content-Type', 'application/json');
                 res.json('Request completed successfully');
             }
             catch (error) {
                 console.log(error);
+                res.set('Content-Type', 'application/json');
                 res.json('Request could not be fullfilled');
             }
         });
@@ -58,7 +61,37 @@ class ProjectController {
                     queryProject[index] = proj;
                     index = index + 1;
                 }
+                res.set('Content-Type', 'application/json');
                 res.json(queryProject);
+            }
+            catch (error) {
+                console.log(error);
+            }
+        });
+    }
+    listProjectsComponents(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { idproj } = req.params;
+                const projectsIds = idproj.split(',');
+                let queryProjects;
+                if (projectsIds.length <= 5) {
+                    queryProjects = yield database_1.default
+                        .query('SELECT p.idproject, p.key, p.name, p.qualifier, p.lastAnalysis FROM projects AS p WHERE idproject IN ( ? ) ORDER BY p.idproject ASC', [projectsIds]);
+                    let index = 0;
+                    for (let proj of queryProjects) {
+                        let queryMeasures = yield database_1.default
+                            .query('SELECT * FROM components WHERE idproject = ? ORDER BY idcomponent ASC', proj['idproject']);
+                        proj['component'] = queryMeasures;
+                        queryProjects[index] = proj;
+                        index = index + 1;
+                    }
+                }
+                else {
+                    queryProjects = { "Error": "You cannot ask for more than 5 projects at once" };
+                }
+                res.set('Content-Type', 'application/json');
+                res.json(queryProjects);
             }
             catch (error) {
                 console.log(error);

@@ -15,6 +15,7 @@ class RefreshAPIController {
         return __awaiter(this, void 0, void 0, function* () {
             const refreshModule = new refreshAPIModule_1.RefreshAPIModule(req.body[0], req.body[1]);
             yield refreshModule.main();
+            res.set('Content-Type', 'application/json');
             res.json('Finish Update');
         });
     }
@@ -22,6 +23,7 @@ class RefreshAPIController {
         return __awaiter(this, void 0, void 0, function* () {
             const refreshModule = new refreshAPIModule_1.RefreshAPIModule(0, 0);
             yield refreshModule.searchLastAnalysis();
+            res.set('Content-Type', 'application/json');
             res.json([refreshModule.getNewProjects(), refreshModule.getRefreshProjects()]);
         });
     }

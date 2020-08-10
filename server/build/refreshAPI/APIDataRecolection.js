@@ -19,7 +19,7 @@ const path_1 = require("path");
 class APIDataRecolection {
     constructor() {
         //ORGANIZATION
-        this.organization = /*'juancarruthers-github'*/ 'unne-sonar-corpus';
+        this.organization = 'juancarruthers-github' /*'unne-sonar-corpus'*/;
         //HTTP HEADERS
         let key;
         const path = path_1.resolve(__dirname, '../../key.sonar');
