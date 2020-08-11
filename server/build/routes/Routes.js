@@ -30,6 +30,7 @@ class Routes {
         this.router.get(this.rootPath + '/components/measures/:idproj/:idmet', componentController_1.componentController.listComponentsMeasures);
         this.router.get(this.rootPath + '/components/measures/count/:idproj/:idmet', componentController_1.componentController.countComponentsMeasures);
         //metrics
+        this.router.get(this.rootPath + '/metrics', metricController_1.metricController.listAllMetrics);
         this.router.get(this.rootPath + '/metrics/projects', metricController_1.metricController.listProjectMetrics);
         this.router.get(this.rootPath + '/metrics/components', metricController_1.metricController.listComponentMetrics);
         //another routes...

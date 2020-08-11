@@ -42,5 +42,18 @@ class MetricController {
             }
         });
     }
+    listAllMetrics(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const query = yield database_1.default
+                    .query('SELECT * FROM metrics AS m ORDER BY m.domain, m.key ASC');
+                res.set('Content-Type', 'application/json');
+                res.json(query);
+            }
+            catch (error) {
+                console.log(error);
+            }
+        });
+    }
 }
 exports.metricController = new MetricController();

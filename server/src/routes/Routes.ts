@@ -34,6 +34,7 @@ class Routes {
         this.router.get(this.rootPath + '/components/measures/count/:idproj/:idmet', componentController.countComponentsMeasures);
 
         //metrics
+        this.router.get(this.rootPath + '/metrics', metricController.listAllMetrics); 
         this.router.get(this.rootPath + '/metrics/projects', metricController.listProjectMetrics); 
         this.router.get(this.rootPath + '/metrics/components', metricController.listComponentMetrics); 
 

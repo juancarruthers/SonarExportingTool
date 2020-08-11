@@ -31,6 +31,18 @@ class MetricController {
             console.log(error);
         }
     }
+
+    public async listAllMetrics (req:Request, res:Response): Promise<void>{
+        try {
+            const query = await pool
+                .query('SELECT * FROM metrics AS m ORDER BY m.domain, m.key ASC');              
+            res.set('Content-Type', 'application/json');
+            res.json(query);
+            
+        } catch (error) {
+            console.log(error);
+        }
+    }
     
 
 }
