@@ -3,7 +3,7 @@ import jwt from "express-jwt";
 import jwksRsa  from "jwks-rsa";
 
 
-class TokenAuthorization {
+class TokenValidation {
 
 
     private authConfig!: {
@@ -40,10 +40,10 @@ class TokenAuthorization {
         
             audience: this.authConfig.audience,
             issuer: `https://${this.authConfig.domain}/`,
-            algorithm: ["RS256"]
+            algorithms: ["RS256"]
         });
     }
 }
 
-const tokenAuthorization = new TokenAuthorization();
-export default tokenAuthorization;
+const tokenValidation = new TokenValidation();
+export default tokenValidation;

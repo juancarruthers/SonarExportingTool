@@ -3,13 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
 //Authentication Packages
 const express_jwt_1 = __importDefault(require("express-jwt"));
 const jwks_rsa_1 = __importDefault(require("jwks-rsa"));
-class TokenAuthorization {
+class TokenValidation {
     constructor() {
-        this.router = express_1.Router();
         this.authenticationConfig();
     }
     getCheckJwt() {
@@ -32,9 +30,9 @@ class TokenAuthorization {
             }),
             audience: this.authConfig.audience,
             issuer: `https://${this.authConfig.domain}/`,
-            algorithm: ["RS256"]
+            algorithms: ["RS256"]
         });
     }
 }
-const tokenAuthorization = new TokenAuthorization();
-exports.default = tokenAuthorization;
+const tokenValidation = new TokenValidation();
+exports.default = tokenValidation;

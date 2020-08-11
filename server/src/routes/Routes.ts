@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import tokenAuthorization from '../TokenAuthorization/TokenAuthorization';
+import tokenValidation from '../TokenValidation/TokenValidation';
 import { projectController } from '../controllers/projectController';
 import { metricController } from '../controllers/metricController';
 import { componentController } from '../controllers/componentController';
@@ -19,9 +19,9 @@ class Routes {
     private config(): void {
         // Define an endpoint that must be called with an access token
         // private routes
-        this.router.put(this.rootPath + "/projects", tokenAuthorization.getCheckJwt(), projectController.editProject);
-        this.router.post(this.rootPath + "/projects/update", tokenAuthorization.getCheckJwt(), refreshAPIController.refreshProjects);
-        this.router.get(this.rootPath + "/projects/update", tokenAuthorization.getCheckJwt(), refreshAPIController.getProjectsToUpdate);
+        this.router.put(this.rootPath + "/projects", tokenValidation.getCheckJwt(), projectController.editProject);
+        this.router.post(this.rootPath + "/projects/update", tokenValidation.getCheckJwt(), refreshAPIController.refreshProjects);
+        this.router.get(this.rootPath + "/projects/update", tokenValidation.getCheckJwt(), refreshAPIController.getProjectsToUpdate);
 
         //public routes
         //projects

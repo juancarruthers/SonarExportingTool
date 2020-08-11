@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const TokenAuthorization_1 = __importDefault(require("../TokenAuthorization/TokenAuthorization"));
+const TokenValidation_1 = __importDefault(require("../TokenValidation/TokenValidation"));
 const projectController_1 = require("../controllers/projectController");
 const metricController_1 = require("../controllers/metricController");
 const componentController_1 = require("../controllers/componentController");
@@ -18,9 +18,9 @@ class Routes {
     config() {
         // Define an endpoint that must be called with an access token
         // private routes
-        this.router.put(this.rootPath + "/projects", TokenAuthorization_1.default.getCheckJwt(), projectController_1.projectController.editProject);
-        this.router.post(this.rootPath + "/projects/update", TokenAuthorization_1.default.getCheckJwt(), refreshAPIController_1.refreshAPIController.refreshProjects);
-        this.router.get(this.rootPath + "/projects/update", TokenAuthorization_1.default.getCheckJwt(), refreshAPIController_1.refreshAPIController.getProjectsToUpdate);
+        this.router.put(this.rootPath + "/projects", TokenValidation_1.default.getCheckJwt(), projectController_1.projectController.editProject);
+        this.router.post(this.rootPath + "/projects/update", TokenValidation_1.default.getCheckJwt(), refreshAPIController_1.refreshAPIController.refreshProjects);
+        this.router.get(this.rootPath + "/projects/update", TokenValidation_1.default.getCheckJwt(), refreshAPIController_1.refreshAPIController.getProjectsToUpdate);
         //public routes
         //projects
         this.router.get(this.rootPath + '/projects', projectController_1.projectController.listProjects);
