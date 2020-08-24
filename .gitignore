@@ -1,0 +1,7 @@
+#node_modules from client and server
+./server/node_modules
+./client/node_modules
+#Code built in the server
+./server/built
+./server/key.sonar
+./.vscode

@@ -5,6 +5,7 @@ import { TwoOptionModalComponent } from '../two-option-modal/two-option-modal.co
 import { Metric } from '../../classes/APIRequest/metric';
 import { SearchBoxComponent } from '../search-bar/search-box.component';
 import { PaginatorComponent } from '../paginator/paginator.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-metrics-table',
@@ -31,7 +32,7 @@ export class MetricsTableComponent implements OnInit {
   //pagination
   @ViewChild(PaginatorComponent) paginator: PaginatorComponent;
 
-  constructor(private projectsService: ProjectsService, private cdr: ChangeDetectorRef) { 
+  constructor(private projectsService: ProjectsService, private cdr: ChangeDetectorRef, private router: Router) { 
     this.metrics = []
   }
 
@@ -55,25 +56,25 @@ export class MetricsTableComponent implements OnInit {
 
     this.projectsExported = this.projectsService.getExportedProjects();
     if (this.projectsExported.length == 0){
-      window.location.href = '';
-    } 
+      this.router.navigateByUrl('/projects');
+    }else{ 
 
-    this.projectsService.getProjectMetrics()
-      .subscribe(
-        res=> {
-          this.allMetrics = res;
-          this.paginator.setPagination(this.allMetrics);
-          let exportedMet = this.projectsService.getExportedProjectsMetrics();
-          if (exportedMet.length == 0){
-            this.metricsExported = new Array<number>();
-          }else{
-            this.metricsExported = exportedMet;
-          }
-          this.showMore();
-        },
-        err=> console.log(err)
-      )
-    
+      this.projectsService.getProjectMetrics()
+        .subscribe(
+          res=> {
+            this.allMetrics = res;
+            this.paginator.setPagination(this.allMetrics);
+            let exportedMet = this.projectsService.getExportedProjectsMetrics();
+            if (exportedMet.length == 0){
+              this.metricsExported = new Array<number>();
+            }else{
+              this.metricsExported = exportedMet;
+            }
+            this.showMore();
+          },
+          err=> console.log(err)
+        );
+    }
   }
 
   ngOnDestroy():void{

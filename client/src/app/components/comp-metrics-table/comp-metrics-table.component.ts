@@ -4,6 +4,7 @@ import { ProjectsService } from '../../services/projects/projects.service';
 import { Metric } from 'src/app/classes/APIRequest/metric';
 import { SearchBoxComponent } from '../search-bar/search-box.component';
 import { PaginatorComponent } from '../paginator/paginator.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-comp-metrics-table',
@@ -30,7 +31,7 @@ export class CompMetricsTableComponent implements OnInit {
   //pagination
   @ViewChild(PaginatorComponent) paginator: PaginatorComponent;
 
-  constructor(private projectsService: ProjectsService, private cdr: ChangeDetectorRef) { 
+  constructor(private projectsService: ProjectsService, private cdr: ChangeDetectorRef, private router: Router) { 
     this.metrics = []
   }
 
@@ -52,22 +53,21 @@ export class CompMetricsTableComponent implements OnInit {
     this.projectsExported = this.projectsService.getExportedProjects();
     this.projMetricsExported = this.projectsService.getExportedProjectsMetrics();
     if (this.projMetricsExported.length == 0){
-      window.location.href = '';
+      this.router.navigateByUrl('/projects/metrics');
     }else{
-      this.compMetricsExported = new Array<number>();
-    }
-
-    this.projectsService.getComponentMetrics()
-      .subscribe(
-        res=> {
-          this.allMetrics = res;
-          this.paginator.setPagination(this.allMetrics);
-          this.showMore();
-        },
-        err=> console.log(err)
-      )
       
-    
+      this.projectsService.getComponentMetrics()
+        .subscribe(
+          res=> {
+            this.allMetrics = res;
+            this.paginator.setPagination(this.allMetrics);
+            this.compMetricsExported = new Array<number>();
+            this.showMore();
+          },
+          err=> console.log(err)
+        );
+      
+    }
     
   }
 

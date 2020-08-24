@@ -6,12 +6,19 @@ import { Routes, RouterModule } from '@angular/router';
 import { MetricsTableComponent } from './components/metrics-table/metrics-table.component';
 import { CompMetricsTableComponent } from './components/comp-metrics-table/comp-metrics-table.component';
 import { ProjTableEditionComponent } from './components/administrator/proj-table-edition/proj-table-edition.component';
+import { StartPageComponent } from './components/start-page/start-page.component';
 
 
 import { AuthGuard } from './guard/auth-guard.guard';
 
 
+
 const routes: Routes = [
+  {
+    path: '',
+    component: StartPageComponent
+  },
+
   {
     path: 'projects',
     component: TableComponent
@@ -43,7 +50,7 @@ const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '/projects',
+    redirectTo: '/',
     pathMatch: 'full'
   }
 

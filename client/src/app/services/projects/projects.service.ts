@@ -27,7 +27,7 @@ export class ProjectsService {
   httpHeaders: HttpHeaders;
 
   constructor(private http: HttpClient, private auth:AuthService) { 
-    this.API_URI = 'http://localhost:3000/api';//'https://sonar-exporting-tool.tk/api';
+    this.API_URI = 'http://201.213.85.167:3000/api';//'https://sonar-exporting-tool.tk/api';
     this.httpHeaders = new HttpHeaders({
       'Content-Type':'application/json; charset=utf-8',
       'Cache-Control': 'private, max-age=3600, must-revalidate'
@@ -87,7 +87,12 @@ export class ProjectsService {
   getNumberComponentsMeasures(p_projectsExported: number[], p_compMetricsExported: number[]): Observable<number>{
     let headers = this.httpHeaders;
 
-    return this.http.get<number>(`${this.API_URI}/components/measures/count/` + p_projectsExported + '/' + p_compMetricsExported, {headers});
+    return this.http.get<number>(`${this.API_URI}/components/${p_projectsExported}/measures/${p_compMetricsExported}/count`, {headers});
+  }
+
+  getStartPageInfo(): Observable<any>{
+    let headers = this.httpHeaders;
+    return this.http.get<any>(`${this.API_URI}/counts`, {headers});
   }
 
   /*
@@ -96,12 +101,12 @@ export class ProjectsService {
   getProjectsMeasures(p_projectsExported: number[], p_metricsExported: number[]): Observable<Project[]>{
     let headers = this.httpHeaders;
     
-    return this.http.get<Project[]>(`${this.API_URI}/projects/measures` + '/' + p_projectsExported + '/' + p_metricsExported, {headers});
+    return this.http.get<Project[]>(`${this.API_URI}/projects/${p_projectsExported}/measures/${p_metricsExported}`, {headers});
   }
 
   getComponentsMeasures(p_projectsExported: number, p_compMetricsExported: number[], p_delayTime : number): Observable<Component[]>{
 
-    let url = `${this.API_URI}/components/measures` + '/' + p_projectsExported + '/' + p_compMetricsExported;
+    let url = `${this.API_URI}/components/${p_projectsExported}/measures/${p_compMetricsExported}`;
     let headers = this.httpHeaders;
     
     return this.http.get<Component[]>(url, {headers}).pipe(delay(p_delayTime));

@@ -99,7 +99,7 @@ export class ExportModalComponent implements OnInit {
     this.projectsService.getNumberComponentsMeasures(this.projectsExported, this.compMetricsExported)
       .subscribe(
         numberComponents => { 
-          if ((this.compMetricsExported[0] == 0)||(numberComponents <= 3000000)){ 
+          if ((this.compMetricsExported[0] == 0)||(numberComponents[0]['count'] <= 3000000)){ 
 
             this.export();
             this.alert.closeAlert();

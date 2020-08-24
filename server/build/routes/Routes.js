@@ -24,15 +24,18 @@ class Routes {
         //public routes
         //projects
         this.router.get(this.rootPath + '/projects', projectController_1.projectController.listProjects);
-        this.router.get(this.rootPath + '/projects/measures/:idproj/:idmet', projectController_1.projectController.listProjectsMeasures);
-        this.router.get(this.rootPath + '/projects/components/:idproj', projectController_1.projectController.listProjectsComponents);
+        this.router.get(this.rootPath + '/projects/:idproj', projectController_1.projectController.getProjects);
+        this.router.get(this.rootPath + '/projects/:idproj/measures/:idmet', projectController_1.projectController.listProjectsMeasures);
+        this.router.get(this.rootPath + '/projects/:idproj/components', projectController_1.projectController.listProjectsComponents);
         //components             
-        this.router.get(this.rootPath + '/components/measures/:idproj/:idmet', componentController_1.componentController.listComponentsMeasures);
-        this.router.get(this.rootPath + '/components/measures/count/:idproj/:idmet', componentController_1.componentController.countComponentsMeasures);
+        this.router.get(this.rootPath + '/components/:idproj/measures/:idmet', componentController_1.componentController.listComponentsMeasures);
+        this.router.get(this.rootPath + '/components/:idproj/measures/:idmet/count', componentController_1.componentController.countComponentsMeasures);
         //metrics
         this.router.get(this.rootPath + '/metrics', metricController_1.metricController.listAllMetrics);
         this.router.get(this.rootPath + '/metrics/projects', metricController_1.metricController.listProjectMetrics);
         this.router.get(this.rootPath + '/metrics/components', metricController_1.metricController.listComponentMetrics);
+        //start page
+        this.router.get(this.rootPath + '/counts', projectController_1.projectController.counts);
         //another routes...
         this.router.get("*", (req, res) => { res.status(404).json({ "Error": "Element not found in " + req.url }); });
     }
