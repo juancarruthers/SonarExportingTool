@@ -4,7 +4,7 @@ import { Component, OnInit, HostListener} from '@angular/core';
 @Component({
   selector: 'app-start-page',
   templateUrl: './start-page.component.html',
-  styleUrls: ['./start-page.component.css']
+  styleUrls: ['./start-page.component.scss']
 })
 export class StartPageComponent implements OnInit {
 

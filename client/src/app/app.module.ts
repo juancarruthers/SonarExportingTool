@@ -27,6 +27,7 @@ import { StartPageComponent } from './components/start-page/start-page.component
 //Services
 import { ProjectsService } from './services/projects/projects.service';
 import { AuthService } from './services/auth/auth.service';
+import { FooterComponent } from './components/footer/footer.component';
 
 
 @NgModule({
@@ -45,7 +46,8 @@ import { AuthService } from './services/auth/auth.service';
     SearchBoxComponent,
     PaginatorComponent,
     AnalyzeProjectsComponent,
-    StartPageComponent
+    StartPageComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule,

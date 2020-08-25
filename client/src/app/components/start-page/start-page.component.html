@@ -1,79 +1,93 @@
-<div class="container pt-4 pb-4">
-    <div class="row align-items-center">
-        <div class="col-md-6 mb-5">
-            <h1><strong>Export the metrics of our SonarCloud's Repository</strong></h1>
-            <h3>All the projects and metrics in our SonarCloud's profile are listed.
-                Just check the ones you want and export them!
-            </h3>
-        </div>
-        <div class="col-md-6 mb-5">
-          <img src="../../../assets/images/export.png" class="card-img" alt="...">
-        </div>
-        <div class="col-md-7 mb-5">
-          <img src="../../../assets/images/format.png" class="card-img" alt="...">
-        </div>
-        <div class="col-md-5 mb-5">
-            <h2><strong>3 file formats to choose from</strong></h2>
-            <h5>You can export to CSV, JSON or XML </h5>
-        </div>
-        
+<div class="container">
+  <div class="row align-items-center">
+    <div class="col-md-6 mb-5">
+        <h1><strong>Export the metrics of our SonarCloud's Repository</strong></h1>
+        <h3>All the projects and metrics in our SonarCloud's profile are listed.
+            Just check the ones you want and export them!
+        </h3>
     </div>
-    <div (scroll)="onWindowScroll()" id="count">
-        <h1 class="text-center mb-0"><strong>{{arrayOfCounts[0] + arrayOfLetters[0]}}</strong></h1>
-        <h1 class="text-center mb-4"><strong>High Quality Projects</strong></h1>
-        <div class="row">
-            <div class="col-lg-4 mb-1">
-                <div class="card" style="width:300px">
-                    <div class="row align-items-center">
-                      <div class="col-3">            
-                        <div class="pl-2">
-                          <img src="../../../assets/images/engranaje.png" style="width: 70px; height: 70px;" alt="..." >
-                        </div> 
-                      </div>
-                      <div class="col-9">
-                        <div class="card-body">
-                          <h4 class="card-title mb-0">{{arrayOfCounts[1] + arrayOfLetters[1]}}</h4>
-                          <p class="card-text">Projects' Components</p>
-                        </div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 mb-1">
-                <div class="card" style="width:300px">
-                    <div class="row align-items-center">
-                      <div class="col-3">
-                        <div class="pl-2">
-                        <img src="../../../assets/images/barra.png" style="width: 70px; height: 70px;" alt="...">
-                        </div>
-                      </div>
-                      <div class="col-9">
-                        <div class="card-body">
-                          <h4 class="card-title mb-0">{{arrayOfCounts[2] + arrayOfLetters[2]}}</h4>
-                          <p class="card-text">Projects' Measures</p>
-                        </div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 mb-1">
-                <div class="card" style="width:300px">
-                    <div class="row align-items-center">
-                      <div class="col-3">
-                        <div class="pl-2">
-                        <img src="../../../assets/images/lupa.png" style="width: 70px; height: 70px;" alt="...">
-                      </div>
-                      </div>
-                      <div class="col-9">
-                        <div class="card-body">
-                          <h4 class="card-title mb-0">{{arrayOfCounts[3] + arrayOfLetters[3]}}</h4>
-                          <p class="card-text">Components' Measures</p>
-                        </div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="col-md-6 mb-5">
+      <img src="../../../assets/images/export.png" class="card-img" alt="...">
+    </div>        
+  </div>
+</div>
 
+<img alt="" src="../../../assets/images/home-grey-background.svg">
+
+<div class="testgray">
+  <div class="container">
+    <div class="row align-items-center ">
+      <div class="col-md-6 mb-5">
+        <img src="../../../assets/images/format.png" class="card-img" alt="...">
+      </div>
+      <div class="col-md-6 mb-5 ">
+        <div class="pl-5 ml-5">
+          <h2><strong>3 file formats to choose from</strong></h2>
+          <h5>You can export to CSV, JSON or XML </h5>
+        </div>
+      </div>     
+    </div>
+  </div>
+</div>
+
+<img alt="" src="../../../assets/images/home-background-grey-bottom.svg" >
+
+<div class="container">
+  <div (scroll)="onWindowScroll()" id="count">
+    <h1 class="text-center mb-0"><strong>{{arrayOfCounts[0] + arrayOfLetters[0]}}</strong></h1>
+    <h1 class="text-center mb-4"><strong>High Quality Projects</strong></h1>
+    <div class="row">
+      <div class="col-lg-4 mb-1">
+        <div class="card" >
+          <div class="row align-items-center">
+            <div class="col-3">            
+              <div class="pl-2">
+                <img src="../../../assets/images/engranaje.png" style="width: 70px; height: 70px;" alt="..." >
+              </div> 
+            </div>
+            <div class="col-9">
+              <div class="card-body">
+                <h4 class="card-title mb-0">{{arrayOfCounts[1] + arrayOfLetters[1]}}</h4>
+                <p class="card-text">Projects' Components</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 mb-1">
+        <div class="card" >
+          <div class="row align-items-center">
+            <div class="col-3">
+              <div class="pl-2">
+              <img src="../../../assets/images/barra.png" style="width: 70px; height: 70px;" alt="...">
+              </div>
+            </div>
+            <div class="col-9">
+              <div class="card-body">
+                <h4 class="card-title mb-0">{{arrayOfCounts[2] + arrayOfLetters[2]}}</h4>
+                <p class="card-text">Projects' Measures</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 mb-1">
+        <div class="card" >
+          <div class="row align-items-center">
+            <div class="col-3">
+              <div class="pl-2">
+              <img src="../../../assets/images/lupa.png" style="width: 70px; height: 70px;" alt="...">
+            </div>
+            </div>
+            <div class="col-9">
+              <div class="card-body">
+                <h4 class="card-title mb-0">{{arrayOfCounts[3] + arrayOfLetters[3]}}</h4>
+                <p class="card-text">Components' Measures</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
