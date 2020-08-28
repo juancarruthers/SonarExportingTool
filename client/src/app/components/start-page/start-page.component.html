@@ -1,14 +1,25 @@
 <div class="container">
   <div class="row align-items-center">
-    <div class="col-md-6 mb-5">
-        <h1><strong>Export the metrics of our SonarCloud's Repository</strong></h1>
-        <h3>All the projects and metrics in our SonarCloud's profile are listed.
+    <div class="col-md-5 mb-5">
+        <h1><strong>Export the metrics of our Sonar Cloud Repository</strong></h1>
+        <h3>All the projects and metrics in our Sonar Cloud profile are listed.
             Just check the ones you want and export them!
         </h3>
     </div>
+    <div class="col-md-1"></div> 
     <div class="col-md-6 mb-5">
       <img src="../../../assets/images/export.png" class="card-img" alt="...">
-    </div>        
+    </div> 
+    <div class="col-md-6 mb-5">
+      <img src="../../../assets/images/format.png" class="card-img" alt="...">
+    </div>
+    <div class="col-md-1"></div> 
+    <div class="col-md-5">
+      <div class="">
+        <h2><strong>3 file formats to choose</strong></h2>
+        <h4>You can export the measures to CSV, JSON or XML.</h4>
+      </div>
+    </div>         
   </div>
 </div>
 
@@ -17,77 +28,38 @@
 <div class="testgray">
   <div class="container">
     <div class="row align-items-center ">
+      <div class="col-md-5 mb-5 ">
+          <h2><strong>Get the Source Code</strong></h2>
+          <h4>You can download all the projects in the list, the links are avaible in the "Link to Project" column.</h4>
+      </div> 
+      <div class="col-md-1"></div> 
       <div class="col-md-6 mb-5">
-        <img src="../../../assets/images/format.png" class="card-img" alt="...">
+        <img src="../../../assets/images/code.png" class="card-img" alt="...">
       </div>
-      <div class="col-md-6 mb-5 ">
-        <div class="pl-5 ml-5">
-          <h2><strong>3 file formats to choose from</strong></h2>
-          <h5>You can export to CSV, JSON or XML </h5>
+          
+    </div>
+
+    <div id="count">
+      <div (scroll)="onWindowScroll()">
+      <h1 class="text-center mb-0"><strong>{{arrayOfCounts[0]}}</strong></h1>
+      <h1 class="text-center mb-4"><strong>High Quality Projects</strong></h1>
+      <div class="row">
+        <div class="d-flex justify-content-center col-lg-4 mb-1">
+          <app-card-counter [counter]="arrayOfCounts[1]" [image]="'engranaje.png'" [text]="'Project Components'"></app-card-counter>
         </div>
-      </div>     
+        <div class="d-flex justify-content-center col-lg-4 mb-1">
+          <app-card-counter [counter]="arrayOfCounts[2]" [image]="'barra.png'" [text]="'Project Measures'"></app-card-counter>
+        </div>
+        <div class="d-flex justify-content-center col-lg-4 mb-1">
+          <app-card-counter [counter]="arrayOfCounts[3]" [image]="'lupa.png'" [text]="'Component Measures'"></app-card-counter>
+        </div>
+      </div>
+    </div>
     </div>
   </div>
 </div>
 
-<img alt="" src="../../../assets/images/home-background-grey-bottom.svg" >
+<img alt="" src="../../../assets/images/home-background-grey-bottom.svg">
 
-<div class="container">
-  <div (scroll)="onWindowScroll()" id="count">
-    <h1 class="text-center mb-0"><strong>{{arrayOfCounts[0] + arrayOfLetters[0]}}</strong></h1>
-    <h1 class="text-center mb-4"><strong>High Quality Projects</strong></h1>
-    <div class="row">
-      <div class="col-lg-4 mb-1">
-        <div class="card" >
-          <div class="row align-items-center">
-            <div class="col-3">            
-              <div class="pl-2">
-                <img src="../../../assets/images/engranaje.png" style="width: 70px; height: 70px;" alt="..." >
-              </div> 
-            </div>
-            <div class="col-9">
-              <div class="card-body">
-                <h4 class="card-title mb-0">{{arrayOfCounts[1] + arrayOfLetters[1]}}</h4>
-                <p class="card-text">Projects' Components</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 mb-1">
-        <div class="card" >
-          <div class="row align-items-center">
-            <div class="col-3">
-              <div class="pl-2">
-              <img src="../../../assets/images/barra.png" style="width: 70px; height: 70px;" alt="...">
-              </div>
-            </div>
-            <div class="col-9">
-              <div class="card-body">
-                <h4 class="card-title mb-0">{{arrayOfCounts[2] + arrayOfLetters[2]}}</h4>
-                <p class="card-text">Projects' Measures</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 mb-1">
-        <div class="card" >
-          <div class="row align-items-center">
-            <div class="col-3">
-              <div class="pl-2">
-              <img src="../../../assets/images/lupa.png" style="width: 70px; height: 70px;" alt="...">
-            </div>
-            </div>
-            <div class="col-9">
-              <div class="card-body">
-                <h4 class="card-title mb-0">{{arrayOfCounts[3] + arrayOfLetters[3]}}</h4>
-                <p class="card-text">Components' Measures</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+
+<app-carousel id="carousel-component"></app-carousel>

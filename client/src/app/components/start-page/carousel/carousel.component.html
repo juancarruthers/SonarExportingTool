@@ -1,0 +1,74 @@
+<div class="container" *ngIf="projects.length > 0">
+  <h2 class="text-center"><strong>Sonar Cloud Repository</strong></h2>
+  <h5 class="text-center">The values exported are from <a href="https://sonarcloud.io/organizations/unne-sonar-corpus/projects">UNNE Sonar Corpus</a> organization.</h5>
+  <div class="row mt-4">
+    <div id="carousel" class="carousel slide w-100" data-ride="carousel" data-interval="false" data-keyboard="false">
+      <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-end align-items-center">
+          <a href="#carousel" type="button" data-slide="prev">
+            <span style="color: grey;">
+              <em class="fas fa-chevron-left fa-3x"></em>
+            </span>
+          </a>
+        </div>        
+        <div class="carousel-inner w-100" style="max-width: 900px;">
+          <div *ngFor="let i of counter" class="carousel-item" id="{{ 'slide' + i }}">
+            <div class="d-none d-lg-block">
+              <div class="slide-box justify-content-center">
+                <div class="row">
+                  <div class="col-4 d-flex justify-content-center">
+                    <app-card class="card" style="width: 16rem;" [project]="projects[i * 3]" ></app-card>
+                  </div> 
+                  <div class="col-4 d-flex justify-content-center">
+                    <app-card class="card" style="width: 16rem;" [project]="projects[(i * 3) + 1]"></app-card>
+                  </div> 
+                  <div class="col-4 d-flex justify-content-center">
+                    <app-card class="card" style="width: 16rem;" [project]="projects[(i * 3) + 2]"></app-card>
+                  </div> 
+                </div>
+              </div>
+            </div>
+            <div class="d-none d-md-block d-lg-none">
+              <div class="slide-box justify-content-center">
+                <div class="row">
+                  <div class="col-6 d-flex justify-content-center">
+                    <app-card class="card" style="width: 16rem;" [project]="projects[i * 3]"></app-card>
+                  </div> 
+                  <div class="col-6 d-flex justify-content-center">
+                    <app-card class="card" style="width: 16rem;" [project]="projects[(i * 3) + 1]"></app-card>
+                  </div> 
+                </div>
+              </div>
+            </div>
+            <div class="d-none d-sm-block d-md-none">
+              <div class="slide-box justify-content-center">
+                <div class="row">
+                  <div class="col-6 d-flex justify-content-center">
+                    <app-card class="card" style="width: 16rem;" [project]="projects[i * 3]"></app-card>
+                  </div> 
+                  <div class="col-6 d-flex justify-content-center">
+                    <app-card class="card" style="width: 16rem;" [project]="projects[(i * 3) + 1]"></app-card>
+                  </div> 
+                </div>
+              </div>
+            </div>
+            <div class="d-block d-sm-none">
+              <div class="d-flex justify-content-center">
+                <app-card class="card" style="width: 16rem;" [project]="projects[i * 3]"></app-card>
+              </div> 
+            </div>
+          </div>
+        </div>          
+        <div class="d-flex justify-content-start align-items-center">
+          <a href="#carousel" type="button" data-slide="next">
+            <span style="color: grey;">
+              <em class="fas fa-chevron-right fa-3x"></em>
+            </span>
+          </a>
+        </div>
+      </div>  
+    </div>
+  </div>   
+</div>
+
+

@@ -28,6 +28,9 @@ import { StartPageComponent } from './components/start-page/start-page.component
 import { ProjectsService } from './services/projects/projects.service';
 import { AuthService } from './services/auth/auth.service';
 import { FooterComponent } from './components/footer/footer.component';
+import { CarouselComponent } from './components/start-page/carousel/carousel.component';
+import { CardComponent } from './components/start-page/carousel/card/card.component';
+import { CardCounterComponent } from './components/start-page/card-counter/card-counter.component';
 
 
 @NgModule({
@@ -47,7 +50,10 @@ import { FooterComponent } from './components/footer/footer.component';
     PaginatorComponent,
     AnalyzeProjectsComponent,
     StartPageComponent,
-    FooterComponent
+    FooterComponent,
+    CarouselComponent,
+    CardComponent,
+    CardCounterComponent
   ],
   imports: [
     BrowserModule,
