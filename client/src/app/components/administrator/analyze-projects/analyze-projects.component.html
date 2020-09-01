@@ -1,32 +1,41 @@
 <div class="container">
     <h2 class="text-center mb-2"><strong>Analyze Projects</strong></h2>
-    <p>To manually analyze projects without any envioronment setted:</p>
-    <ol>
-    <li>
-        Download SonarScanner from <a href="https://sonarcloud.io/documentation/analysis/scan/sonarscanner/">SonarCloud</a> website.
+    <h5>To manually analyze projects without any envioronment setted:</h5>
+    <ol style="font-size: large">
+    <li class="mt-2 mb-2">
+        Download SonarScanner from <a href="https://sonarcloud.io/documentation/analysis/scan/sonarscanner/">SonarCloud</a> website (choose according to your OS).
     </li>
-    <li>
-        Download the <a href="https://drive.google.com/file/d/1UIcMzTUFHQ-VyyrVT9aZem2yRYFQjx0G/view?usp=sharing">zip</a> file with the script to automatize the process to upload many projects.
+    <img class="text-center card-img" [defaultImage]="loading" [lazyLoad] ="sonar_scanner_download" alt="sonar-scanner-download" >
+    <li class="mt-2 mb-2">
+        Download the <a href="https://drive.google.com/file/d/1UIcMzTUFHQ-VyyrVT9aZem2yRYFQjx0G/view?usp=sharing">zip</a> file with the script to automatize the process of uploading multiple projects at the same time.
     </li>
     <li>
         Decompress the two files downloaded.
     </li>
-    <li>
-        Copy all the folders inside the decompressed folder of the sonar-scanner (bin, conf, jre and lib) and paste them in the sonar-scanner subfolder from the analyzeProjects folder.
+    <li class="mt-2 mb-2">
+        Copy all the folders inside the decompressed folder of the SonarScanner (bin, conf, jre and lib) and paste them in the /sonar-scanner subfolder from the Analyze_Projects folder also decompressed in step 3.
+        
     </li>
-    <li>
-        Move the projects that are going to be analyzed in the /projects subfolder inside the analyzeProjects one.
+    <img class="d-block mx-auto"  [defaultImage]="loading" [lazyLoad] ="move_scanner" alt="move-scanner" >
+
+    <li class="mt-2 mb-2">
+        Move the project to be analyzed to the Analyze_Projects/projects subfolder.
     </li>
-    <li>
-        Use the sonar-project.properties file as a template and update the values according to the project and then put it in the project's root directory. You can search for all the analysis parameters (depends in the language) <a href="https://sonarcloud.io/documentation/analysis/analysis-parameters/">here</a>.
+    <li class="mt-2 mb-2">
+        Use the sonar-project.properties file inside Analyze_Projects as a template and update the values according to the project to be analyzed, then put it in the project's root directory (the one moved in step 5). You can find all the parameters of the analysis <a href="https://sonarcloud.io/documentation/analysis/analysis-parameters/">here</a> (depends in the main language of the project).
     </li>
-    <li>
-        Repeat the 6th step for every project that is going to be analyzed.
+    <img class="d-block mx-auto " [defaultImage]="loading" [lazyLoad] ="properties_file"  alt="properties-file" >
+    <li class="mt-2 mb-2">
+        Return to the 6th step for each project to be analyzed.
     </li>
-    <li>
-        Run the "anlyzeProjects.sh" script.
+    <li class="mt-2 mb-2">
+        Run the "anlyzeProjects.sh" script. It is a Bash script so you must have Bash installed in order to execute it. If using Windows you can download <a href="https://gitforwindows.org/">Git for Windows</a>.
     </li>
+    <img class="text-center card-img" [defaultImage]="loading" [lazyLoad] ="script_execution"  alt="script-execution" >
     </ol>
-    <p>* If an error appears with a project you can check it in "results.txt" file. </p>
+
+    
+
+    <p>* The errors are logged in "results.txt" file. </p>
 
 </div>

@@ -23,15 +23,15 @@ import { SearchBoxComponent } from './components/search-bar/search-box.component
 import { PaginatorComponent } from './components/paginator/paginator.component';
 import { AnalyzeProjectsComponent } from './components/administrator/analyze-projects/analyze-projects.component';
 import { StartPageComponent } from './components/start-page/start-page.component';
-
-//Services
-import { ProjectsService } from './services/projects/projects.service';
-import { AuthService } from './services/auth/auth.service';
 import { FooterComponent } from './components/footer/footer.component';
 import { CarouselComponent } from './components/start-page/carousel/carousel.component';
 import { CardComponent } from './components/start-page/carousel/card/card.component';
 import { CardCounterComponent } from './components/start-page/card-counter/card-counter.component';
+import { LazyLoadImageModule } from 'ng-lazyload-image';
 
+//Services
+import { ProjectsService } from './services/projects/projects.service';
+import { AuthService } from './services/auth/auth.service';
 
 @NgModule({
   declarations: [
@@ -60,7 +60,8 @@ import { CardCounterComponent } from './components/start-page/card-counter/card-
     AppRoutingModule,
     HttpClientModule,
     SweetAlert2Module.forRoot(),
-    FormsModule
+    FormsModule,
+    LazyLoadImageModule
   ],
   providers: [ 
     ProjectsService,
