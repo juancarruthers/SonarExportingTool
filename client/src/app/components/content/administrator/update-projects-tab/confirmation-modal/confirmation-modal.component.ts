@@ -1,4 +1,4 @@
-import { ProjectsService } from './../../../../services/projects/projects.service';
+import { ProjectsService } from '../../../../../services/projects/projects.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 

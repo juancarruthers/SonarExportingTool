@@ -1,9 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TableComponent } from './table.component';
-import { ProjectsService } from '../../services/projects/projects.service';
+import { ProjectsService } from '../../../../services/projects/projects.service';
 import { of } from 'rxjs';
-import { Project } from '../../classes/APIRequest/project';
+import { Project } from '../../../../classes/APIRequest/project';
 
 describe('TableComponent Test', () => {
   let component: TableComponent;
@@ -53,20 +53,20 @@ describe('TableComponent Test', () => {
   })
 
   it("should projectsExported have all projects checked", () => {
-    component.checkAll();
+    component.checkAll(true);
     expect(component.projectsExported.length).toBeGreaterThan(1);
   })
 
   it("should projectsExported have a project unchecked", () => {
-    component.checkAll();
+    component.checkAll(true);
     let projectsSelected = component.projectsExported;
     component.checkElement(false,2);
     expect(component.projectsExported.length).toBeLessThan(projectsSelected.length);
   })
 
   it("should projectsExported have all projects unchecked", () => {
-    component.checkAll();
-    component.checkAll();
+    component.checkAll(true);
+    component.checkAll(false);
     expect(component.projectsExported.length).toBe(0);
   })
 

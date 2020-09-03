@@ -1,6 +1,6 @@
-import { ProjectsService } from './../../../services/projects/projects.service';
+import { ProjectsService } from '../../../../services/projects/projects.service';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Project } from '../../../classes/APIRequest/project';
+import { Project } from '../../../../classes/APIRequest/project';
 import { SweetAlert } from '../../sweetAlert/sweetAlert';
 import { SweetAlertIcon } from 'sweetalert2';
 import { SearchBoxComponent } from '../../search-bar/search-box.component';
@@ -40,7 +40,13 @@ export class ProjTableEditionComponent implements OnInit {
             this.paginator.setPagination(this.allProjects);
             this.showMore();
           },
-          err=> console.log(err)
+          err => {
+            if (err.statusText == "Unknown Error"){
+              console.log("Disconnected from the database");
+            }else{
+              console.log(err);
+            }
+          }
         )
     }
 

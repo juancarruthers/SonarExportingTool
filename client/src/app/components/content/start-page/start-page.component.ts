@@ -1,5 +1,5 @@
-import { numericAnimator } from './../../classes/numeric-values-animator';
-import { ProjectsService } from './../../services/projects/projects.service';
+import { numericAnimator } from './../../../classes/numeric-values-animator';
+import { ProjectsService } from './../../../services/projects/projects.service';
 import { Component, OnInit, HostListener} from '@angular/core';
 
 @Component({
@@ -43,13 +43,21 @@ export class StartPageComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.projectService.getStartPageInfo().subscribe(
-      res => { 
-        this.tempArray = res;      
-        this.initiated = true;
-        this.onWindowScroll();
-      }
-    )
+    this.projectService.getStartPageInfo()
+      .subscribe(
+        res => { 
+          this.tempArray = res;      
+          this.initiated = true;
+          this.onWindowScroll();
+        },
+        err => { 
+          if (err.statusText == "Unknown Error"){
+            console.log("Disconnected from the database");
+          }else{
+            console.log(err);
+          }
+        }
+      );
 
   }
 

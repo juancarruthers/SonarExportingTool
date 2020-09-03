@@ -1,4 +1,4 @@
-import { SweetAlert } from '../components/sweetAlert/sweetAlert';
+import { SweetAlert } from '../components/content/sweetAlert/sweetAlert';
 import * as JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import  { j2xParser } from 'fast-xml-parser/src/parser';

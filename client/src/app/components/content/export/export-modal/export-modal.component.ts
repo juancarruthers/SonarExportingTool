@@ -1,12 +1,12 @@
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AlertComponent } from '../alert/alert.component';
-import { ProjectsService } from '../../services/projects/projects.service';
+import { AlertComponent } from '../../alert/alert.component';
+import { ProjectsService } from '../../../../services/projects/projects.service';
 import { forkJoin } from 'rxjs';
 
-import { SweetAlert } from '../sweetAlert/sweetAlert';
-import { Download } from '../../classes/download';
-import { Project } from 'src/app/classes/APIRequest/project';
+import { SweetAlert } from '../../sweetAlert/sweetAlert';
+import { Download } from '../../../../classes/download';
+import { Project } from '../../../../classes/APIRequest/project';
 
 @Component({
   selector: 'app-export-modal',

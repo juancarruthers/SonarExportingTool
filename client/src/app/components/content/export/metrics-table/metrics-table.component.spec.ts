@@ -1,39 +1,38 @@
 //Components
-import { CompMetricsTableComponent } from './comp-metrics-table.component';
+import { MetricsTableComponent } from './metrics-table.component';
+import { TwoOptionModalComponent } from '../two-option-modal/two-option-modal.component';
 import { ExportModalComponent } from '../export-modal/export-modal.component';
 
 //Classes
-import { Metric } from '../../classes/APIRequest/metric';
+import { Metric } from '../../../../classes/APIRequest/metric';
 
 //Testing
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
 //Services
-import { ProjectsService } from '../../services/projects/projects.service';
+import { ProjectsService } from '../../../../services/projects/projects.service';
 
-describe('CompMetricsTableComponent Test', () => {
-  let component: CompMetricsTableComponent;
-  let fixture: ComponentFixture<CompMetricsTableComponent>;
+describe('MetricsTableComponent Test', () => {
+  let component: MetricsTableComponent;
+  let fixture: ComponentFixture<MetricsTableComponent>;
   let testMetrics: Metric[];
 
-  let getComponentMetricsSpy: any;
+  let getProjectMetricsSpy: any;
   let getExportedProjectsSpy: any;
-  let getExportedProjectsMetricsSpy: any;
 
   beforeEach(async(() => {
     testMetrics = [{idmetric: 1, key: 'Metric-1', type: 'Testing', name: 'Metric 1', description: "Metric used in Testing", domain: 'Testing'}];
     testMetrics.push({idmetric: 2, key: 'Metric-2', type: 'Testing', name: 'Metric 2', description: "Metric used in Testing", domain: 'Testing'});
 
     
-    const projectsService = jasmine.createSpyObj('ProjectsService', ['getComponentMetrics', 'getExportedProjects', 'getExportedProjectsMetrics']);
+    const projectsService = jasmine.createSpyObj('ProjectsService', ['getProjectMetrics', 'getExportedProjects']);
     
-    getComponentMetricsSpy = projectsService.getComponentMetrics.and.returnValue( of(testMetrics) );
+    getProjectMetricsSpy = projectsService.getProjectMetrics.and.returnValue( of(testMetrics) );
     getExportedProjectsSpy = projectsService.getExportedProjects.and.returnValue([1,2,3]);
-    getExportedProjectsMetricsSpy = projectsService.getExportedProjectsMetrics.and.returnValue([4,5,6]);
 
     TestBed.configureTestingModule({
-      declarations: [ CompMetricsTableComponent, ExportModalComponent ],
+      declarations: [ MetricsTableComponent, TwoOptionModalComponent, ExportModalComponent ],
       providers: [ 
         
         { provide: ProjectsService, useValue: projectsService } 
@@ -46,7 +45,7 @@ describe('CompMetricsTableComponent Test', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CompMetricsTableComponent);
+    fixture = TestBed.createComponent(MetricsTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -59,24 +58,20 @@ describe('CompMetricsTableComponent Test', () => {
     expect(component.projectsExported).not.toBeUndefined();
   });
 
-  it('should have projMetricsExported set', () => {
-    expect(component.projMetricsExported).not.toBeUndefined();
-  });
-
   it('should check a metric to export', () => {
     component.checkElement(true,1);
-    expect(component.compMetricsExported.length).toBeGreaterThan(0);
+    expect(component.metricsExported.length).toBeGreaterThan(0);
   });
 
   it('should check all the metrics', () => {
-    component.checkAll();
-    expect(component.compMetricsExported.length).toBe(testMetrics.length);
+    component.checkAll(true);
+    expect(component.metricsExported.length).toBe(testMetrics.length);
   });
 
   it('should uncheck a metric', () => {
-    component.checkAll();
+    component.checkAll(true);
     component.checkElement(false, 1);
-    expect(component.compMetricsExported).not.toContain(1);
+    expect(component.metricsExported).not.toContain(1);
   });
 
 });

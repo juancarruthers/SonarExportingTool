@@ -1,7 +1,7 @@
-import { numericAnimator } from './../../../../classes/numeric-values-animator';
-import { Project } from './../../../../classes/APIRequest/project';
+import { numericAnimator } from '../../../../../classes/numeric-values-animator';
+import { Project } from '../../../../../classes/APIRequest/project';
 import { Component, OnInit, Input, HostListener } from '@angular/core';
-import { Measure } from './../../../../classes/APIRequest/measure';
+import { Measure } from '../../../../../classes/APIRequest/measure';
 
 @Component({
   selector: 'app-card',

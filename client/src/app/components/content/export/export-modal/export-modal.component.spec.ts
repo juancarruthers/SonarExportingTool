@@ -1,8 +1,7 @@
-import { AlertComponent } from './../alert/alert.component';
+import { AlertComponent } from '../../alert/alert.component';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ExportModalComponent } from './export-modal.component';
-import { ProjectsService } from '../../services/projects/projects.service';
-import { of } from 'rxjs';
+import { ProjectsService } from '../../../../services/projects/projects.service';
 
 describe('ExportModalComponent Test', () => {
   let component: ExportModalComponent;

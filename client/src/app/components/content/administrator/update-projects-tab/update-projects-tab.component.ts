@@ -1,6 +1,6 @@
-import { AlertComponent } from './../../alert/alert.component';
+import { AlertComponent } from '../../alert/alert.component';
 import { ConfirmationModalComponent } from './confirmation-modal/confirmation-modal.component';
-import { ProjectsService } from './../../../services/projects/projects.service';
+import { ProjectsService } from '../../../../services/projects/projects.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SweetAlert } from '../../sweetAlert/sweetAlert';
 
@@ -32,13 +32,24 @@ export class UpdateProjectsTabComponent implements OnInit {
   ngOnInit(){
     this.loadingModal.onLoad();
     this.loadingModal.update("Fetching the projects to be added and updated");
-    this.projectsService.getProjectsToUpdate().subscribe((response: any) => {
-        
-      this.newProjects = response[0];
-      this.refreshProjects = response[1];
-      this.projects = this.newProjects;
-      this.loadingModal.close();  
-    })
+    this.projectsService.getProjectsToUpdate()
+      .subscribe(
+        (response: any) => {
+          
+          this.newProjects = response[0];
+          this.refreshProjects = response[1];
+          this.projects = this.newProjects;
+          this.loadingModal.close();  
+        },
+        err => {
+          this.loadingModal.close();  
+          if (err.statusText == "Unknown Error"){
+            console.log("Disconnected from the database");
+          }else{
+            console.log(err);
+          }
+        }
+      );
   }
 
   
@@ -77,7 +88,7 @@ export class UpdateProjectsTabComponent implements OnInit {
   checkTime() : void{
     let result = this.checkNumber(this.upMaxTime);
     if (result){
-      if (!(Number(this.upMaxTime) > 0)){
+      if (Number(this.upMaxTime) <= 0){
         this.upMaxTime = 14400;
       }
     }else{

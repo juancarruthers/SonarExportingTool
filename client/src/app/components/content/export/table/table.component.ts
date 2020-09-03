@@ -1,8 +1,8 @@
-import { SearchBoxComponent } from './../search-bar/search-box.component';
-import { ProjectsService } from './../../services/projects/projects.service';
+import { SearchBoxComponent } from './../../search-bar/search-box.component';
+import { ProjectsService } from '../../../../services/projects/projects.service';
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Project } from '../../classes/APIRequest/project';
-import { PaginatorComponent } from '../paginator/paginator.component';
+import { Project } from '../../../../classes/APIRequest/project';
+import { PaginatorComponent } from '../../paginator/paginator.component';
 
 
 @Component({
@@ -44,8 +44,14 @@ export class TableComponent implements OnInit {
           this.showMore();
           
         },
-        err=> console.log(err)
-      )   
+        err => {
+          if (err.statusText == "Unknown Error"){
+            console.log("Disconnected from the database");
+          }else{
+            console.log(err);
+          }
+        }
+      );   
   }
 
   ngOnDestroy():void{

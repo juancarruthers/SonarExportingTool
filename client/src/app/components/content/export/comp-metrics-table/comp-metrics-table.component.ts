@@ -1,29 +1,28 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { ProjectsService }  from '../../services/projects/projects.service';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ExportModalComponent } from '../export-modal/export-modal.component';
-import { TwoOptionModalComponent } from '../two-option-modal/two-option-modal.component';
-import { Metric } from '../../classes/APIRequest/metric';
-import { SearchBoxComponent } from '../search-bar/search-box.component';
-import { PaginatorComponent } from '../paginator/paginator.component';
+import { ProjectsService } from '../../../../services/projects/projects.service';
+import { Metric } from 'src/app/classes/APIRequest/metric';
+import { SearchBoxComponent } from '../../search-bar/search-box.component';
+import { PaginatorComponent } from '../../paginator/paginator.component';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-metrics-table',
-  templateUrl: './metrics-table.component.html',
-  styleUrls: ['./metrics-table.component.scss']
+  selector: 'app-comp-metrics-table',
+  templateUrl: './comp-metrics-table.component.html',
+  styleUrls: ['./comp-metrics-table.component.scss']
 })
-export class MetricsTableComponent implements OnInit {
+export class CompMetricsTableComponent implements OnInit {
 
   //Suscribe
-  metrics: Metric[] = [];
+  metrics: Metric [];
 
   //Arguments for the API Request
   projectsExported: number[];
-  metricsExported: number[];
+  projMetricsExported: number[];
+  compMetricsExported: number[];
 
-  //Childs of this component
+  //Child of this component
   @ViewChild(ExportModalComponent) exportModal:ExportModalComponent;
-  @ViewChild(TwoOptionModalComponent) twoOptionModal:TwoOptionModalComponent;
 
   //To sort the elements
   allMetrics: Metric[];
@@ -36,50 +35,39 @@ export class MetricsTableComponent implements OnInit {
     this.metrics = []
   }
 
-  ngAfterViewInit(): void {
+  ngAfterViewInit(): void{
 
     //To sort elements
     this.searchBox.comboBox = [{'value' : 'domain', 'text' : 'Domain'}, {'value' : 'name', 'text':'Name'}, {'value' : 'type', 'text':'Type'}];
     this.searchBox.orderComboBox = 'asc';
     this.searchBox.sortProperty = 'domain';
 
-    this.twoOptionModal.title = 'Export Components Measures';
-    this.twoOptionModal.description = 'Would you like to export the components measures also?'
-    this.twoOptionModal.yesUrl = '/projects/components/metrics';
-    this.exportModal.title = "Export Project's Measures";
+    this.exportModal.title = "Export Components' Measures";
     this.exportModal.exportOption = '';
     this.cdr.detectChanges();
 
   }
 
-  ngOnInit(): void { 
+  ngOnInit(): void {   
 
     this.projectsExported = this.projectsService.getExportedProjects();
-    if (this.projectsExported.length == 0){
-      this.router.navigateByUrl('/projects');
-    }else{ 
-
-      this.projectsService.getProjectMetrics()
+    this.projMetricsExported = this.projectsService.getExportedProjectsMetrics();
+    if (this.projMetricsExported.length == 0){
+      this.router.navigateByUrl('/projects/metrics');
+    }else{
+      
+      this.projectsService.getComponentMetrics()
         .subscribe(
           res=> {
             this.allMetrics = res;
             this.paginator.setPagination(this.allMetrics);
-            let exportedMet = this.projectsService.getExportedProjectsMetrics();
-            if (exportedMet.length == 0){
-              this.metricsExported = new Array<number>();
-            }else{
-              this.metricsExported = exportedMet;
-            }
+            this.compMetricsExported = new Array<number>();
             this.showMore();
           },
           err=> console.log(err)
         );
+      
     }
-  }
-
-  ngOnDestroy():void{
-  
-    this.projectsService.setExportedProjectsMetrics(this.metricsExported);
     
   }
 
@@ -87,11 +75,11 @@ export class MetricsTableComponent implements OnInit {
 
     if (p_checked) {
 
-      this.metricsExported.push(p_idmetric);
+      this.compMetricsExported.push(p_idmetric);
 
     }else{   
 
-      this.metricsExported = this.metricsExported.filter(obj => obj != p_idmetric);
+      this.compMetricsExported = this.compMetricsExported.filter(obj => obj != p_idmetric);
 
     }
 
@@ -105,15 +93,16 @@ export class MetricsTableComponent implements OnInit {
         checkBox.click();
       }
     }
-    if(this.metricsExported.length != this.allMetrics.length){
+    if(this.compMetricsExported.length != this.allMetrics.length){
       (document.getElementById('checkAll') as HTMLInputElement).checked = false;
     }
+
  }
 
   export(): void{
     this.exportModal.projectsExported = this.projectsExported;
-    this.exportModal.projMetricsExported = this.metricsExported;
-    this.exportModal.compMetricsExported = [0];
+    this.exportModal.projMetricsExported = this.projMetricsExported;
+    this.exportModal.compMetricsExported = this.compMetricsExported;
   }
 
   //To sort elements
@@ -134,6 +123,7 @@ export class MetricsTableComponent implements OnInit {
     //pagination
     this.paginator.setPagination(this.metrics);
     this.showMore();
+    
   }
 
   //pagination
@@ -141,7 +131,7 @@ export class MetricsTableComponent implements OnInit {
   showMore(): void{     
     this.metrics = this.paginator.showMore();
     let idMetrics = this.metrics.map(met => met.idmetric);
-    idMetrics = this.metricsExported.filter(id => idMetrics.includes(id));
+    idMetrics = this.compMetricsExported.filter(id => idMetrics.includes(id));
     setTimeout(() => { this.searchBox.checkSelected(idMetrics); }, 10);
   }
 

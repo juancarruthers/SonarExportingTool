@@ -1,4 +1,4 @@
-import { browser, by, element, ElementFinder, promise } from 'protractor';
+import { by, element, ElementFinder, promise } from 'protractor';
 
 export class CompMetricsPage{
 
