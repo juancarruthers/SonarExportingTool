@@ -28,7 +28,7 @@ import { FooterComponent } from './components/footer/footer.component';
 import { CarouselComponent } from './components/content/start-page/carousel/carousel.component';
 import { CardComponent } from './components/content/start-page/carousel/card/card.component';
 import { CardCounterComponent } from './components/content/start-page/card-counter/card-counter.component';
-//import { AboutPageComponent } from './components/content/about-page/about-page.component';
+import { AboutPageComponent } from './components/content/about-page/about-page.component';
 
 //Services
 import { ProjectsService } from './services/projects/projects.service';
@@ -55,8 +55,8 @@ import { AuthService } from './services/auth/auth.service';
     FooterComponent,
     CarouselComponent,
     CardComponent,
-    CardCounterComponent/*,
-    AboutPageComponent*/
+    CardCounterComponent,
+    AboutPageComponent
   ],
   imports: [
     BrowserModule,

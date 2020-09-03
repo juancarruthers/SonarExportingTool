@@ -7,7 +7,7 @@ import { SweetAlert } from '../../sweetAlert/sweetAlert';
 @Component({
   selector: 'app-update-projects-tab',
   templateUrl: './update-projects-tab.component.html',
-  styleUrls: ['./update-projects-tab.component.css']
+  styleUrls: ['./update-projects-tab.component.scss']
 })
 export class UpdateProjectsTabComponent implements OnInit {
   activeTab: number;

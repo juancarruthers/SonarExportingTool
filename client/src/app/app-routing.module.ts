@@ -7,7 +7,7 @@ import { MetricsTableComponent } from './components/content/export/metrics-table
 import { CompMetricsTableComponent } from './components/content/export/comp-metrics-table/comp-metrics-table.component';
 import { ProjTableEditionComponent } from './components/content/administrator/proj-table-edition/proj-table-edition.component';
 import { StartPageComponent } from './components/content/start-page/start-page.component';
-//import { AboutPageComponent } from './components/content/about-page/about-page.component';
+import { AboutPageComponent } from './components/content/about-page/about-page.component';
 
 import { AuthGuard } from './guard/auth-guard.guard';
 
@@ -17,10 +17,10 @@ const routes: Routes = [
     component: StartPageComponent
   },
 
-  /*{
+  {
     path: 'about',
     component: AboutPageComponent
-  },*/
+  },
 
   {
     path: 'projects',
