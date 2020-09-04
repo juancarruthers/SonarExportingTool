@@ -2,11 +2,12 @@ import { numericAnimator } from '../../../../../classes/numeric-values-animator'
 import { Project } from '../../../../../classes/APIRequest/project';
 import { Component, OnInit, Input, HostListener } from '@angular/core';
 import { Measure } from '../../../../../classes/APIRequest/measure';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
-  styleUrls: ['./card.component.css']
+  styleUrls: ['./card.component.scss']
 })
 export class CardComponent implements OnInit {
   @Input() project: Project;
@@ -25,7 +26,7 @@ export class CardComponent implements OnInit {
       }
     }
 
-  constructor() { 
+  constructor(private router: Router) { 
     this.viewed = false;
     this.initiated = false;
     this.realValues = [{value: "0"}, {value: "0"}, {value: "0"}, {value: "0"}, {value: "0"}, {value: "0"}, {value: "0"}, {value: "0"}];
@@ -52,5 +53,4 @@ export class CardComponent implements OnInit {
       measures1[i].value = value;
     }
   }
-
 }

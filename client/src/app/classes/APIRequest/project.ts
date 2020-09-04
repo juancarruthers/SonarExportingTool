@@ -7,7 +7,7 @@ export interface Project{
     key: string;
     name: string;
     qualifier: string;
-    lastAnalysis: Date;
+    lastAnalysis: number;
     projectLink: string;
     version: string;
     project_measure : Measure [];

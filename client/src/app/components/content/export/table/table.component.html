@@ -21,9 +21,9 @@
                   <tr *ngFor="let project of projects">
                     <td>{{ project.key }}</td>
                     <td>{{ project.name }}</td>
-                    <td>{{ project.lastAnalysis }}</td>
+                    <td>{{ convertToDate(project.lastAnalysis).toLocaleString() }}</td>
                     <td>{{ project.version }}</td>                   
-                    <td><a href="{{ 'https://sonarcloud.io/dashboard?id=' + project.key.replace(':', '%3A') }}">Sonar Cloud Measures</a></td>
+                    <td><a href="{{ 'https://sonarcloud.io/dashboard?id=' + project.key }}">Sonar Cloud Measures</a></td>
                     <td><a href="{{ project.projectLink }}">Project</a></td>
                     <td><input type="checkbox" id="{{ 'checkbox' + project.idproject }}" (change)="checkElement($event.target.checked, project.idproject)"></td>
                   </tr>

@@ -1,0 +1,31 @@
+@import "../../../../../../variables"; 
+@import "../../../../../../../node_modules/bootstrap/scss/bootstrap"; 
+@import "../../../../../../../node_modules/bootswatch/dist/sandstone/bootswatch";
+
+.card{
+    width: 16rem;
+    
+}
+
+.card:hover {
+    color: inherit;
+    box-shadow: 0 10px 20px rgba(7,7,6,.2);
+    transform: translateY(-4px);
+}
+
+.card-title{
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.card-link{
+    outline: none;
+    text-decoration: none;
+    color: inherit;
+}
+
+.card-link:hover{
+    color: inherit;
+}

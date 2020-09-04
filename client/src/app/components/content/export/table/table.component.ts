@@ -12,6 +12,8 @@ import { PaginatorComponent } from '../../paginator/paginator.component';
 })
 export class TableComponent implements OnInit {
 
+  a: string = "prueba";
+
   //Suscribe
   projects: Project[];
 
@@ -52,6 +54,10 @@ export class TableComponent implements OnInit {
           }
         }
       );   
+  }
+
+  convertToDate(timestamp: number): Date{
+    return new Date(timestamp);
   }
 
   ngOnDestroy():void{

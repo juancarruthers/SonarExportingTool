@@ -11,19 +11,19 @@
             </span>
           </a>
         </div>        
-        <div class="carousel-inner w-100" style="max-width: 900px;">
+        <div class="carousel-inner w-100 p-4" style="max-width: 900px;">
           <div *ngFor="let i of counter" class="carousel-item" id="{{ 'slide' + i }}">
             <div class="d-none d-lg-block">
               <div class="slide-box justify-content-center">
                 <div class="row">
                   <div class="col-4 d-flex justify-content-center">
-                    <app-card class="card" style="width: 16rem;" [project]="projects[i * 3]" ></app-card>
+                    <app-card [project]="projects[i * 3]" ></app-card>
                   </div> 
                   <div class="col-4 d-flex justify-content-center">
-                    <app-card class="card" style="width: 16rem;" [project]="projects[(i * 3) + 1]"></app-card>
+                    <app-card [project]="projects[(i * 3) + 1]"></app-card>
                   </div> 
                   <div class="col-4 d-flex justify-content-center">
-                    <app-card class="card" style="width: 16rem;" [project]="projects[(i * 3) + 2]"></app-card>
+                    <app-card [project]="projects[(i * 3) + 2]"></app-card>
                   </div> 
                 </div>
               </div>
@@ -32,10 +32,10 @@
               <div class="slide-box justify-content-center">
                 <div class="row">
                   <div class="col-6 d-flex justify-content-center">
-                    <app-card class="card" style="width: 16rem;" [project]="projects[i * 3]"></app-card>
+                    <app-card [project]="projects[i * 3]"></app-card>
                   </div> 
                   <div class="col-6 d-flex justify-content-center">
-                    <app-card class="card" style="width: 16rem;" [project]="projects[(i * 3) + 1]"></app-card>
+                    <app-card [project]="projects[(i * 3) + 1]"></app-card>
                   </div> 
                 </div>
               </div>
@@ -44,17 +44,17 @@
               <div class="slide-box justify-content-center">
                 <div class="row">
                   <div class="col-6 d-flex justify-content-center">
-                    <app-card class="card" style="width: 16rem;" [project]="projects[i * 3]"></app-card>
+                    <app-card [project]="projects[i * 3]"></app-card>
                   </div> 
                   <div class="col-6 d-flex justify-content-center">
-                    <app-card class="card" style="width: 16rem;" [project]="projects[(i * 3) + 1]"></app-card>
+                    <app-card [project]="projects[(i * 3) + 1]"></app-card>
                   </div> 
                 </div>
               </div>
             </div>
             <div class="d-block d-sm-none">
               <div class="d-flex justify-content-center">
-                <app-card class="card" style="width: 16rem;" [project]="projects[i * 3]"></app-card>
+                <app-card [project]="projects[i * 3]"></app-card>
               </div> 
             </div>
           </div>

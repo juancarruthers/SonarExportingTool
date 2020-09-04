@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { ProjectsService } from '../../../../services/projects/projects.service';
 import { Component, OnInit} from '@angular/core';
 import { Project } from '../../../../classes/APIRequest/project';
@@ -51,5 +52,7 @@ export class CarouselComponent implements OnInit {
         }
       );   
   }
+
+  
 
 }

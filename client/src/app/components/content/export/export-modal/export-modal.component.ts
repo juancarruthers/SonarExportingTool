@@ -107,7 +107,7 @@ export class ExportModalComponent implements OnInit {
           }else{  
 
             this.progressModal.close();
-            this.alert.text = 'You cannot export more than 3 million measures at once! You tried to export: ' + numberComponents + " components' measures" ;
+            this.alert.text = 'You cannot export more than 3 million measures at once! You tried to export: ' + numberComponents[0]['count'] + " components' measures" ;
             this.alert.bootstrapColor = 'danger';
             this.alert.showAlert();
               
