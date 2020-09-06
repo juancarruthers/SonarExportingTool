@@ -36,21 +36,7 @@ export class MetricsTableComponent implements OnInit {
     this.metrics = []
   }
 
-  ngAfterViewInit(): void {
 
-    //To sort elements
-    this.searchBox.comboBox = [{'value' : 'domain', 'text' : 'Domain'}, {'value' : 'name', 'text':'Name'}, {'value' : 'type', 'text':'Type'}];
-    this.searchBox.orderComboBox = 'asc';
-    this.searchBox.sortProperty = 'domain';
-
-    this.twoOptionModal.title = 'Export Components Measures';
-    this.twoOptionModal.description = 'Would you like to export the components measures also?'
-    this.twoOptionModal.yesUrl = '/projects/components/metrics';
-    this.exportModal.title = "Export Project's Measures";
-    this.exportModal.exportOption = '';
-    this.cdr.detectChanges();
-
-  }
 
   ngOnInit(): void { 
 

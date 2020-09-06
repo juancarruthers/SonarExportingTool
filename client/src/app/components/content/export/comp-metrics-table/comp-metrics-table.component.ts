@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ExportModalComponent } from '../export-modal/export-modal.component';
 import { ProjectsService } from '../../../../services/projects/projects.service';
 import { Metric } from 'src/app/classes/APIRequest/metric';
@@ -31,22 +31,10 @@ export class CompMetricsTableComponent implements OnInit {
   //pagination
   @ViewChild(PaginatorComponent) paginator: PaginatorComponent;
 
-  constructor(private projectsService: ProjectsService, private cdr: ChangeDetectorRef, private router: Router) { 
+  constructor(private projectsService: ProjectsService, private router: Router) { 
     this.metrics = []
   }
 
-  ngAfterViewInit(): void{
-
-    //To sort elements
-    this.searchBox.comboBox = [{'value' : 'domain', 'text' : 'Domain'}, {'value' : 'name', 'text':'Name'}, {'value' : 'type', 'text':'Type'}];
-    this.searchBox.orderComboBox = 'asc';
-    this.searchBox.sortProperty = 'domain';
-
-    this.exportModal.title = "Export Components' Measures";
-    this.exportModal.exportOption = '';
-    this.cdr.detectChanges();
-
-  }
 
   ngOnInit(): void {   
 

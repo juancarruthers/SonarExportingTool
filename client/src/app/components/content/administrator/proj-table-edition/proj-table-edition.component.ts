@@ -1,5 +1,5 @@
 import { ProjectsService } from '../../../../services/projects/projects.service';
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Project } from '../../../../classes/APIRequest/project';
 import { SweetAlert } from '../../sweetAlert/sweetAlert';
 import { SweetAlertIcon } from 'sweetalert2';
@@ -26,7 +26,7 @@ export class ProjTableEditionComponent implements OnInit {
     //pagination
     @ViewChild(PaginatorComponent) paginator: PaginatorComponent;
   
-    constructor( private projectsService: ProjectsService, private cdr: ChangeDetectorRef) {
+    constructor( private projectsService: ProjectsService ) {
       this.projects = [];
       this.allProjects = [];
       this.projectsChanged = [];
@@ -85,13 +85,6 @@ export class ProjTableEditionComponent implements OnInit {
     }
 
   //To sort elements
-
-  ngAfterViewInit(): void {
-    this.searchBox.comboBox = [{'value' : 'lastAnalysis', 'text' : 'Last Analysis'}, {'value' : 'name', 'text':'Name'}];
-    this.searchBox.orderComboBox = 'desc';
-    this.searchBox.sortProperty = 'lastAnalysis';
-    this.cdr.detectChanges();
-  }
 
   sortContent(): void{
     let property = this.searchBox.sortProperty;

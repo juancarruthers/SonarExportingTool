@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <h2 class="text-center mb-2"><strong>Project's Metrics</strong></h2>
   
-  <app-search-box (assignedContent)="searchBoxChanges()" (sortedContent)="sortContent()"></app-search-box>
+  <app-search-box [sortComboBox]="[{'value' : 'domain', 'text' : 'Domain'}, {'value' : 'name', 'text':'Name'}, {'value' : 'type', 'text':'Type'}]" [sortProperty]="'domain'" [orderComboBox]="'asc'" [searchComboBox]="[{'value' : 'name', 'text':'Name'}, {'value' : 'domain', 'text' : 'Domain'}, {'value' : 'type', 'text':'Type'}]" [searchProperty]="'name'" (assignedContent)="searchBoxChanges()" (sortedContent)="sortContent()"></app-search-box>
       <div class="row">
 
         <div class="col-xl-1">
@@ -45,7 +45,7 @@
         </div>
 
     </div>
-    <app-export-modal></app-export-modal>
-    <app-two-option-modal></app-two-option-modal>
+    <app-export-modal [title]="'Export Projects Measures'" [exportOption]="''"></app-export-modal>
+    <app-two-option-modal [title]="'Export Components Measures'" [description]="'Would you like to export the components measures also?'" [yesUrl]="'/projects/components/metrics'"></app-two-option-modal>
 
 </div>

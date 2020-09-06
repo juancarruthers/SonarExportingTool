@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 
 @Component({
   selector: 'app-search-box',
@@ -8,16 +8,17 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 export class SearchBoxComponent implements OnInit {
 
   private content: string;
-  @Output() 
-  assignedContent: EventEmitter<string> = new EventEmitter<string>();
-  @Output()
-  sortedContent: EventEmitter<string> = new EventEmitter<string>();
-
-  public comboBox:Object[];
-  public sortProperty: string;
+  //Sort
+  @Output() sortedContent: EventEmitter<string> = new EventEmitter<string>();
+  @Input() public sortComboBox:Object[];
+  @Input() public sortProperty: string;
   //desc or asc
-  public orderComboBox: string;
+  @Input() public orderComboBox: string;
 
+  //Search
+  @Output() assignedContent: EventEmitter<string> = new EventEmitter<string>();
+  @Input() public searchComboBox:Object[];
+  @Input() public searchProperty: string;
 
   constructor() { 
     this.content = '';
@@ -25,6 +26,8 @@ export class SearchBoxComponent implements OnInit {
 
   ngOnInit(): void {
   }
+
+  //Sort
 
   sortContent(p_value: string){
     this.sortProperty = p_value;
@@ -48,7 +51,7 @@ export class SearchBoxComponent implements OnInit {
 
     return 0;  
       
- }
+  }
 
   changeDirection(){
     if (this.orderComboBox == 'desc') {
@@ -61,16 +64,18 @@ export class SearchBoxComponent implements OnInit {
     this.sortContent(this.sortProperty);
   }
 
+  //Search
+
   assignContent(): void{
     this.content = (document.getElementById('searchedText') as HTMLInputElement).value;
-    this.assignedContent.emit(/*this.content*/);
+    this.assignedContent.emit();
   }
 
   searchBoxChanges(p_set: any[]): any[] {
     let value = this.content.toLocaleLowerCase();
     let results = p_set;
     if(value != ''){
-      results = results.filter(item => item.name.toLocaleLowerCase().startsWith(value));
+      results = results.filter(item => item[this.searchProperty].toLocaleLowerCase().startsWith(value));
     }
     results.sort((a, b) => this.sortByProperty(a[this.sortProperty], b[this.sortProperty]));
     return results;
@@ -91,6 +96,11 @@ export class SearchBoxComponent implements OnInit {
 
   clearTextBox(){
     (document.getElementById('searchedText') as HTMLInputElement).value = '';
+  }
+
+  searchContent(p_value: string){
+    this.searchProperty = p_value;
+    this.assignedContent.emit();
   }
 
 }

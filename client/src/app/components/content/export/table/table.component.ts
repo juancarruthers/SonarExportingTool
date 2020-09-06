@@ -1,6 +1,6 @@
 import { SearchBoxComponent } from './../../search-bar/search-box.component';
 import { ProjectsService } from '../../../../services/projects/projects.service';
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Project } from '../../../../classes/APIRequest/project';
 import { PaginatorComponent } from '../../paginator/paginator.component';
 
@@ -11,8 +11,6 @@ import { PaginatorComponent } from '../../paginator/paginator.component';
   styleUrls: ['./table.component.scss'],
 })
 export class TableComponent implements OnInit {
-
-  a: string = "prueba";
 
   //Suscribe
   projects: Project[];
@@ -27,7 +25,7 @@ export class TableComponent implements OnInit {
   //pagination
   @ViewChild(PaginatorComponent) paginator: PaginatorComponent;
 
-  constructor( private projectsService: ProjectsService, private cdr: ChangeDetectorRef) { 
+  constructor( private projectsService: ProjectsService) { 
     this.projects = [];
   }
 
@@ -94,13 +92,6 @@ export class TableComponent implements OnInit {
  }
 
  //To sort elements
-
-  ngAfterViewInit(): void {
-    this.searchBox.comboBox = [{'value' : 'lastAnalysis', 'text' : 'Last Analysis'}, {'value' : 'name', 'text':'Name'}];
-    this.searchBox.orderComboBox = 'desc';
-    this.searchBox.sortProperty = 'lastAnalysis';
-    this.cdr.detectChanges();
-  }
 
   sortContent(): void{
     let property = this.searchBox.sortProperty;   

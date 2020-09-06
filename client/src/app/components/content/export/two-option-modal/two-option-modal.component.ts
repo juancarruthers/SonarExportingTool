@@ -1,5 +1,5 @@
 import { Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'app-two-option-modal',
@@ -8,9 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TwoOptionModalComponent implements OnInit {
 
-  title: string;
-  description: string;
-  yesUrl: string;
+  @Input() title: string;
+  @Input() description: string;
+  @Input() yesUrl: string;
 
   constructor(private router:Router) { }
 

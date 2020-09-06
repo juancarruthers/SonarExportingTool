@@ -1,5 +1,5 @@
 
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { AlertComponent } from '../../alert/alert.component';
 import { ProjectsService } from '../../../../services/projects/projects.service';
 import { forkJoin } from 'rxjs';
@@ -16,11 +16,11 @@ import { Project } from '../../../../classes/APIRequest/project';
 export class ExportModalComponent implements OnInit {
 
   //Title of the Modal
-  title: string;
+  @Input() title: string;
 
   //Options Available for export
   radioOptions: string[];
-  exportOption: string;
+  @Input() exportOption: string;
 
   //Arguments for the API Request
   projectsExported: number[];
@@ -99,7 +99,7 @@ export class ExportModalComponent implements OnInit {
     this.projectsService.getNumberComponentsMeasures(this.projectsExported, this.compMetricsExported)
       .subscribe(
         numberComponents => { 
-          if ((this.compMetricsExported[0] == 0)||(numberComponents[0]['count'] <= 3000000)){ 
+          if ((this.compMetricsExported[0] == 0)||(numberComponents[0]['count'] <= 2000000)){ 
 
             this.export();
             this.alert.closeAlert();
@@ -107,7 +107,7 @@ export class ExportModalComponent implements OnInit {
           }else{  
 
             this.progressModal.close();
-            this.alert.text = 'You cannot export more than 3 million measures at once! You tried to export: ' + numberComponents[0]['count'] + " components' measures" ;
+            this.alert.text = 'You cannot export more than 2 million measures at once! You tried to export: ' + numberComponents[0]['count'] + " components' measures" ;
             this.alert.bootstrapColor = 'danger';
             this.alert.showAlert();
               

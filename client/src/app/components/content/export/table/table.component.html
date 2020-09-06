@@ -1,6 +1,6 @@
 <div class="container-fluid">
 <h2 class="text-center mb-2"><strong>Projects Hosted in Sonar Cloud</strong></h2>
-<app-search-box (assignedContent)="searchBoxChanges()" (sortedContent)="sortContent()"></app-search-box>
+<app-search-box [sortComboBox]="[{'value' : 'lastAnalysis', 'text' : 'Last Analysis'}, {'value' : 'name', 'text':'Name'}]" [sortProperty]="'lastAnalysis'" [orderComboBox]="'desc'" [searchComboBox]="[{'value' : 'name', 'text':'Name'}]" [searchProperty]="'name'"  (assignedContent)="searchBoxChanges()" (sortedContent)="sortContent()"></app-search-box>
     <div class="row">
         <div class="col-xl-1"></div>
         <div class="col-xl-10">
