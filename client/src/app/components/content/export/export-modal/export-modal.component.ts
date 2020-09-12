@@ -5,7 +5,8 @@ import { ProjectsService } from '../../../../services/projects/projects.service'
 import { forkJoin } from 'rxjs';
 
 import { SweetAlert } from '../../sweetAlert/sweetAlert';
-import { Download } from '../../../../classes/download';
+import { File } from '../../../../classes/file/file';
+import * as Formats from '../../../../classes/file/formats/formats';
 import { Project } from '../../../../classes/APIRequest/project';
 
 @Component({
@@ -31,7 +32,7 @@ export class ExportModalComponent implements OnInit {
   progressModal: SweetAlert;
 
   //Classes to prepare and download the requested export
-  download: Download;
+  file: File;
 
   //Child Component
   @ViewChild(AlertComponent) alert:AlertComponent;
@@ -122,7 +123,6 @@ export class ExportModalComponent implements OnInit {
   */
 
   export(): void{
-    this.download = new Download();
     this.progressModal.update("Requesting for the Measures");  
     
     this.projectsService.getProjectsMeasures(this.projectsExported, this.projMetricsExported)
@@ -180,23 +180,23 @@ export class ExportModalComponent implements OnInit {
     switch (this.exportOption) {
       case 'json':
           
-        this.download.generateJsonFile(p_projects, this.progressModal);
+        this.file = new Formats.Json(p_projects);
 
       break;
   
       case 'xml':               
           
-        this.download.generateXmlFile(p_projects, this.progressModal);
+      this.file = new Formats.Xml(p_projects);
 
       break;
 
       case 'csv':
-        this.download.generateCsvFile(p_projects,this.progressModal, this.compMetricsExported[0]);
+
+        this.file = new Formats.Csv(p_projects);
+
       break;    
     }
-
-    this.progressModal.update("Generating the zip file with the results");
-    this.download.zipFile(this.progressModal); 
+    this.file.generateOutput(this.progressModal, this.compMetricsExported[0]); 
     
   }
 

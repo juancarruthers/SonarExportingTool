@@ -31,7 +31,7 @@
         <option *ngFor="let option of searchComboBox" value="{{option.value}}">{{option.text}}</option>
       </select>
 
-      <div class="input-group mt-1" >
+      <div class="input-group mt-1 mb-1" >
         <input class="form-control form-control-sm py-2 border-right-0 border" type="search" placeholder="{{ 'Search by ' + searchProperty }}" aria-label="Search" id="searchedText" (input)="assignContent()">
         <span class="input-group-append">
           <div class="input-group-text bg-transparent">

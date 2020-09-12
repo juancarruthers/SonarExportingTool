@@ -1,12 +1,12 @@
-import { Download } from './download';
+import { File } from './file';
 
 describe('Download Test', () => {
 
-  let download : Download; 
+  let download : File; 
 
   beforeEach(() => {
 
-    download = new Download();
+    //download = new File();
     
   });
 
